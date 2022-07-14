@@ -1,0 +1,16 @@
+{
+    "name": "UnityMvvmToolkit.UI",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5c4878a33f8e8b04cb2f76d30bb7b0b0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
