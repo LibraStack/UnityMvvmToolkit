@@ -9,6 +9,10 @@
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.8.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\UnityMvvmToolkit.Common\UnityMvvmToolkit.Common.csproj" />
+  </ItemGroup>
+
   <PropertyGroup>
     <DestinationRoot>$(ProjectDir)..\UnityMvvmToolkit.UnityPackage\Assets\Plugins\UnityMvvmToolkit\Runtime\</DestinationRoot>
   </PropertyGroup>

@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using UnityMvvmToolkit.Common.Attributes;
 
 namespace UnityMvvmToolkit.SourceGenerators
 {
@@ -15,7 +16,7 @@ namespace UnityMvvmToolkit.SourceGenerators
         public void Execute(GeneratorExecutionContext context)
         {
 
-            var sourceBuilder = new StringBuilder(
+            var stringBuilder = new StringBuilder(
                 @"
             using System;
             namespace ExampleSourceGenerated
@@ -26,16 +27,16 @@ namespace UnityMvvmToolkit.SourceGenerators
                     {
                         return ""This is from source generator ");
 
-            sourceBuilder.Append(System.DateTime.Now.ToString(CultureInfo.CurrentCulture));
+            stringBuilder.Append(nameof(BindToAttribute));
 
-            sourceBuilder.Append(
+            stringBuilder.Append(
                 @""";
                     }
     }
 }
 ");
 
-            context.AddSource("exampleSourceGenerator", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
+            context.AddSource("exampleSourceGenerator", SourceText.From(stringBuilder.ToString(), Encoding.UTF8));
         }
     }
 }
