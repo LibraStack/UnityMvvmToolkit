@@ -47,7 +47,8 @@ public class BindableElementsReceiver : ISyntaxReceiver
             _captures.Add(@class.Identifier.Text, bindableElement);
         }
         
-        bindableElement.Properties.Add(new KeyValuePair<string, PropertyDeclarationSyntax>(bindToPath, property));
+        // bindableElement.Properties.Add(new KeyValuePair<string, PropertyDeclarationSyntax>(bindToPath, property));
+        bindableElement.Properties.Add(property.Identifier.Text.ToLower(), bindToPath);
     }
 
     private string GetAttributeArgumentValue(AttributeSyntax attribute)

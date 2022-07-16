@@ -7,7 +7,7 @@
 
   <!-- Sync code with Unity -->
   <PropertyGroup>
-    <DestinationRoot>$(ProjectDir)..\UnityMvvmToolkit.UnityPackage\Assets\Plugins\UnityMvvmToolkit\Runtime\</DestinationRoot>
+    <DestinationRoot>$(ProjectDir)..\..\samples\Unity.Mvvm.MainMenu\Assets\UnityMvvmToolkit\</DestinationRoot>
   </PropertyGroup>
   <ItemGroup>
     <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />

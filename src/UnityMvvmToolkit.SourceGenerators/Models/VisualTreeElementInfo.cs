@@ -2,9 +2,9 @@
 
 namespace UnityMvvmToolkit.SourceGenerators.Models;
 
-public class BindableElementInfo
+public class VisualTreeElementInfo
 {
-    public BindableElementInfo(string classIdentifier)
+    public VisualTreeElementInfo(string classIdentifier)
     {
         ClassIdentifier = classIdentifier;
         Attributes = new List<KeyValuePair<string, string>>();

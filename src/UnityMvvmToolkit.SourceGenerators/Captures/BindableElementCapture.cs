@@ -8,9 +8,10 @@ public class BindableElementCapture
     public BindableElementCapture(ClassDeclarationSyntax @class)
     {
         Class = @class;
-        Properties = new List<KeyValuePair<string, PropertyDeclarationSyntax>>();
+        Properties = new Dictionary<string, string>();
     }
 
+    public string ClassIdentifier => Class.Identifier.Text;
     public ClassDeclarationSyntax Class { get; }
-    public List<KeyValuePair<string, PropertyDeclarationSyntax>> Properties { get; }
+    public Dictionary<string, string> Properties { get; }
 }

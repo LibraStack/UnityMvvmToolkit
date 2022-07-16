@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <DestinationRoot>$(ProjectDir)..\UnityMvvmToolkit.UnityPackage\Assets\Plugins\UnityMvvmToolkit\Runtime\</DestinationRoot>
+    <DestinationRoot>$(ProjectDir)..\..\samples\Unity.Mvvm.MainMenu\Assets\UnityMvvmToolkit\</DestinationRoot>
   </PropertyGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Copy SourceFiles="$(ProjectDir)$(OutDir)$(TargetFileName)" DestinationFolder="$(DestinationRoot)" SkipUnchangedFiles="true" />

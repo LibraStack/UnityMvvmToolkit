@@ -1,11 +1,5 @@
 {
   "dependencies": {
-    "com.chebanovdd.unitymvvmtoolkit": {
-      "version": "file:../../../src/UnityMvvmToolkit.UnityPackage/Assets/Plugins/UnityMvvmToolkit",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {}
-    },
     "com.unity.2d.animation": {
       "version": "7.0.6",
       "depth": 1,
