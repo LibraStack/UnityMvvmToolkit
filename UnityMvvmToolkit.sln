@@ -5,8 +5,6 @@ VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{566BFBA3-9616-448A-B1AF-7750539D1A12}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnityMvvmToolkit.SourceGenerators", "src\UnityMvvmToolkit.SourceGenerators\UnityMvvmToolkit.SourceGenerators.csproj", "{B05D0D76-FF31-42EB-BFC4-23A3BE3BC019}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{A04AE0B1-B475-44FD-AB92-37677624B6F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityMvvmToolkit.Common", "src\UnityMvvmToolkit.Common\UnityMvvmToolkit.Common.csproj", "{A8734DD9-F957-4315-B270-1E3FD81F5537}"
@@ -17,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B05D0D76-FF31-42EB-BFC4-23A3BE3BC019}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B05D0D76-FF31-42EB-BFC4-23A3BE3BC019}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B05D0D76-FF31-42EB-BFC4-23A3BE3BC019}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B05D0D76-FF31-42EB-BFC4-23A3BE3BC019}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A8734DD9-F957-4315-B270-1E3FD81F5537}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A8734DD9-F957-4315-B270-1E3FD81F5537}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8734DD9-F957-4315-B270-1E3FD81F5537}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -30,7 +24,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{B05D0D76-FF31-42EB-BFC4-23A3BE3BC019} = {566BFBA3-9616-448A-B1AF-7750539D1A12}
 		{A8734DD9-F957-4315-B270-1E3FD81F5537} = {566BFBA3-9616-448A-B1AF-7750539D1A12}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
