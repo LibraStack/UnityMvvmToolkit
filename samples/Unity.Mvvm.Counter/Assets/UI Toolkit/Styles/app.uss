@@ -1,0 +1,38 @@
+.counter-screen {
+    flex-grow: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 56px;
+    padding-right: 56px;
+    padding-top: 56px;
+    padding-bottom: 56px;
+}
+
+.number-container {
+    justify-content: center;
+    align-items: center;
+    margin-top: 35%;
+    border-top-left-radius: 40%;
+    border-bottom-left-radius: 40%;
+    border-top-right-radius: 40%;
+    border-bottom-right-radius: 40%;
+    padding-left: 96px;
+    padding-right: 96px;
+    padding-top: 96px;
+    padding-bottom: 96px;
+    width: 512px;
+    height: 512px;
+}
+
+.count-label {
+    font-size: 240px;
+    -unity-text-align: middle-center;
+    -unity-font-definition: url('project://database/Assets/UI%20Toolkit/Fonts/Roboto/Roboto-Bold%20SDF.asset?fileID=11400000&guid=6c482e1c475534444ae30d33009553a2&type=2#Roboto-Bold SDF');
+}
+
+.count-label--animation {
+    transition-duration: 250ms;
+    transition-property: scale;
+    transition-timing-function: ease-out-back;
+}

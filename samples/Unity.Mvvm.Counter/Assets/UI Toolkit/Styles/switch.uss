@@ -1,0 +1,59 @@
+.toggle-switch {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 512px;
+}
+
+.toggle-switch__label-container {
+    width: 32%;
+    height: 100%;
+}
+
+.toggle-switch__label {
+    font-size: 36px;
+    height: 100%;
+    width: 100%;
+}
+
+.toggle-switch__label--left {
+    -unity-text-align: middle-right;
+}
+
+.toggle-switch__label--right {
+    -unity-text-align: middle-left;
+}
+
+.toggle-switch__track {
+    width: 128px;
+    height: 64px;
+    border-top-left-radius: 32px;
+    border-bottom-left-radius: 32px;
+    border-top-right-radius: 32px;
+    border-bottom-right-radius: 32px;
+    justify-content: center;
+    align-items: stretch;
+    margin-left: 24px;
+    margin-right: 24px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.toggle-switch__track__thumb {
+    width: 48px;
+    height: 48px;
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    position: absolute;
+    translate: -50% 0;
+    left: 24px;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    transition-property: left;
+    transition-duration: 250ms;
+    transition-timing-function: ease-out-cubic;
+}

@@ -1,0 +1,47 @@
+:root {
+    --font-color: rgb(100, 104, 107);
+    --icon-color: rgb(71, 76, 80);
+}
+
+.unity-label {
+    color: var(--font-color);
+}
+
+.counter-screen {
+    background-color: rgb(242, 242, 242);
+}
+
+.number-container {
+    background-color: rgba(219, 227, 230, 0.85);
+}
+
+.slider {
+    background-color: rgb(228, 232, 233);
+}
+
+.slider__label {
+    color: rgb(71, 76, 80);
+}
+
+.slider__thumb {
+    background-color: rgb(176, 191, 198);
+}
+
+.slider__thumb__icon {
+    border-left-color: var(--icon-color);
+    border-right-color: var(--icon-color);
+    border-top-color: var(--icon-color);
+    border-bottom-color: var(--icon-color);
+}
+
+.toggle-switch__track {
+    background-color: rgb(222, 229, 232);
+}
+
+.toggle-switch__track:hover {
+    background-color: rgba(228, 232, 233, 255);
+}
+
+.toggle-switch__track__thumb {
+    background-color: rgb(71, 76, 80);
+}

@@ -1,0 +1,65 @@
+* {
+    --animation-property: color, background-color, border-color;
+    --animation-duration: 250ms, 250ms, 250ms;
+    --ease-function: ease-out-cubic, ease-out-cubic, ease-out-cubic;
+}
+
+.unity-label {
+    transition-property: var(--animation-property);
+    transition-duration: var(--animation-duration);
+    transition-timing-function: var(--ease-function);
+}
+
+.counter-screen {
+    transition-property: var(--animation-property);
+    transition-duration: var(--animation-duration);
+    transition-timing-function: var(--ease-function);
+}
+
+.number-container {
+    transition-property: var(--animation-property);
+    transition-duration: var(--animation-duration);
+    transition-timing-function: var(--ease-function);
+}
+
+.slider {
+    transition-property: var(--animation-property);
+    transition-duration: var(--animation-duration);
+    transition-timing-function: var(--ease-function);
+}
+
+.slider__label {
+    transition-property: var(--animation-property);
+    transition-duration: var(--animation-duration);
+    transition-timing-function: var(--ease-function);
+}
+
+.slider__thumb {
+    transition-property: var(--animation-property);
+    transition-duration: var(--animation-duration);
+    transition-timing-function: var(--ease-function);
+}
+
+.slider__thumb__icon {
+    transition-property: var(--animation-property);
+    transition-duration: var(--animation-duration);
+    transition-timing-function: var(--ease-function);
+}
+
+.toggle-switch__track {
+    transition-property: var(--animation-property);
+    transition-duration: var(--animation-duration);
+    transition-timing-function: var(--ease-function);
+}
+
+.toggle-switch__track:hover {
+    transition-property: var(--animation-property);
+    transition-duration: var(--animation-duration);
+    transition-timing-function: var(--ease-function);
+}
+
+.toggle-switch__track__thumb {
+    transition-property: var(--animation-property);
+    transition-duration: var(--animation-duration);
+    transition-timing-function: var(--ease-function);
+}
