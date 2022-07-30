@@ -24,7 +24,7 @@ namespace UnityMvvmToolkit.UI
             };
         }
 
-        public IBindableElement Create(IBindableUIElement bindableUIElement, TBindingContext bindingContext,
+        public virtual IBindableElement Create(IBindableUIElement bindableUIElement, TBindingContext bindingContext,
             PropertyInfo propertyInfo)
         {
             return bindableUIElement switch
@@ -40,21 +40,21 @@ namespace UnityMvvmToolkit.UI
             };
         }
 
-        private IBindableElement CreateBindableVisualLabel(IBindableUIElement bindableUIElement,
+        private IBindableElement CreateBindableVisualLabel(IBindableUIElement bindableLabel,
             TBindingContext bindingContext, PropertyInfo propertyInfo)
         {
-            return CreateBindableElement(typeof(BindableVisualLabel<>), typeof(ReadOnlyProperty<,>), bindableUIElement,
+            return CreateBindableElement(typeof(BindableVisualLabel<>), typeof(ReadOnlyProperty<,>), bindableLabel,
                 bindingContext, propertyInfo);
         }
 
-        private IBindableElement CreateBindableVisualTextField(IBindableUIElement bindableUIElement,
+        private IBindableElement CreateBindableVisualTextField(IBindableUIElement bindableTextField,
             TBindingContext bindingContext, PropertyInfo propertyInfo)
         {
-            return CreateBindableElement(typeof(BindableVisualTextField<>), typeof(Property<,>), bindableUIElement,
+            return CreateBindableElement(typeof(BindableVisualTextField<>), typeof(Property<,>), bindableTextField,
                 bindingContext, propertyInfo);
         }
 
-        private IBindableElement CreateBindableElement(Type elementType, Type propertyType,
+        protected IBindableElement CreateBindableElement(Type elementType, Type propertyType,
             IBindableUIElement bindableUIElement, TBindingContext bindingContext, PropertyInfo sourcePropertyInfo)
         {
             var sourcePropertyType = sourcePropertyInfo.PropertyType;
