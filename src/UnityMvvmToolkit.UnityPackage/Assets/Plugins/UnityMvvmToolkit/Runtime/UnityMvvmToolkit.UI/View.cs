@@ -9,8 +9,7 @@ using UnityMvvmToolkit.UI.Interfaces;
 namespace UnityMvvmToolkit.UI
 {
     [RequireComponent(typeof(UIDocument))]
-    public abstract class View<TBindingContext> : MonoBehaviour
-        where TBindingContext : class, INotifyPropertyChanged, new()
+    public abstract class View<TBindingContext> : MonoBehaviour where TBindingContext : class, INotifyPropertyChanged
     {
         private UIDocument _uiDocument;
         private TBindingContext _bindingContext;
@@ -56,7 +55,15 @@ namespace UnityMvvmToolkit.UI
 
         protected virtual TBindingContext GetBindingContext()
         {
-            return new TBindingContext(); // TODO: Change DataContext dynamically?
+            // TODO: Change DataContext dynamically?
+            
+            if (typeof(TBindingContext).GetConstructor(Type.EmptyTypes) == null)
+            {
+                throw new InvalidOperationException(
+                    $"Cannot create an instance of the type parameter {typeof(TBindingContext)} because it does not have a parameterless constructor.");
+            }
+            
+            return Activator.CreateInstance<TBindingContext>();
         }
 
         protected virtual IBindableVisualElementsCreator<TBindingContext> GetBindableVisualElementsCreator()
