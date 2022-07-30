@@ -1,14 +1,14 @@
 ﻿using UnityEngine.UIElements;
-using UnityMvvmToolkit.Common.Attributes;
 using UnityMvvmToolkit.Common.Interfaces;
 
-namespace UnityMvvmToolkit.UI.BindableVisualElements
+namespace UnityMvvmToolkit.UI.BindableUIElements
 {
-    public class BindableTextField : TextField, IBindableVisualElement
+    public class BindableTextField : TextField, IBindableUIElement
     {
-        [BindTo(nameof(value))]
         public string BindingValuePath { get; set; }
 
+        public string BindablePropertyName => BindingValuePath;
+        
         public new class UxmlFactory : UxmlFactory<BindableTextField, UxmlTraits>
         {
         }
@@ -16,7 +16,7 @@ namespace UnityMvvmToolkit.UI.BindableVisualElements
         public new class UxmlTraits : TextField.UxmlTraits
         {
             private readonly UxmlStringAttributeDescription _bindingValueAttribute = new()
-                { name = "binding-value-path", defaultValue = "binding-property-name" };
+                { name = "binding-value-path", defaultValue = "" };
 
             public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
             {

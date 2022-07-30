@@ -1,6 +1,8 @@
 ﻿namespace UnityMvvmToolkit.Common.Interfaces
 {
-    public interface IBindableVisualElement
+    // TODO: Come up with a better name.
+    public interface IBindableVisualElement : IBindableElement
     {
+        void UpdateValue();
     }
 }

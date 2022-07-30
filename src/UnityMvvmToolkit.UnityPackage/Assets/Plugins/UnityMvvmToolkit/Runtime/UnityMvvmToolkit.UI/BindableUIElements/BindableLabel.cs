@@ -1,13 +1,13 @@
 ﻿using UnityEngine.UIElements;
-using UnityMvvmToolkit.Common.Attributes;
 using UnityMvvmToolkit.Common.Interfaces;
 
-namespace UnityMvvmToolkit.UI.BindableVisualElements
+namespace UnityMvvmToolkit.UI.BindableUIElements
 {
-    public class BindableLabel : Label, IBindableVisualElement
+    public class BindableLabel : Label, IBindableUIElement
     {
-        [BindTo(nameof(text))]
         public string BindingTextPath { get; set; }
+        
+        public string BindablePropertyName => BindingTextPath;
         
         public new class UxmlFactory : UxmlFactory<BindableLabel, UxmlTraits>
         {
@@ -16,7 +16,7 @@ namespace UnityMvvmToolkit.UI.BindableVisualElements
         public new class UxmlTraits : Label.UxmlTraits
         {
             private readonly UxmlStringAttributeDescription _bindingTextAttribute = new()
-                { name = "binding-text-path", defaultValue = "binding-property-name" };
+                { name = "binding-text-path", defaultValue = "" };
 
             public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
             {
