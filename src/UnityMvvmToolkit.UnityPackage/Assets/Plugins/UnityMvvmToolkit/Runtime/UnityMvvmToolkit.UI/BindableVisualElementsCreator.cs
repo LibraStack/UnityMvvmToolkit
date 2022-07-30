@@ -10,7 +10,7 @@ using UnityMvvmToolkit.UI.Interfaces;
 
 namespace UnityMvvmToolkit.UI
 {
-    public class BindableVisualElementsCreator<TDataContext> : IBindableVisualElementsCreator<TDataContext>
+    public class BindableVisualElementsCreator<TBindingContext> : IBindableVisualElementsCreator<TBindingContext>
     {
         private readonly Dictionary<Type, IValueConverter> _valueConverters;
 
@@ -24,44 +24,44 @@ namespace UnityMvvmToolkit.UI
             };
         }
 
-        public IBindableElement Create(IBindableUIElement bindableUIElement, TDataContext dataContext,
+        public IBindableElement Create(IBindableUIElement bindableUIElement, TBindingContext bindingContext,
             PropertyInfo propertyInfo)
         {
             return bindableUIElement switch
             {
-                BindableLabel label => CreateBindableVisualLabel(label, dataContext, propertyInfo),
-                BindableTextField textField => CreateBindableVisualTextField(textField, dataContext, propertyInfo),
+                BindableLabel label => CreateBindableVisualLabel(label, bindingContext, propertyInfo),
+                BindableTextField textField => CreateBindableVisualTextField(textField, bindingContext, propertyInfo),
 
                 BindableButton button when propertyInfo.PropertyType == typeof(ICommand) => new BindableVisualButton(
-                    button, CreateReadOnlyProperty<ICommand>(dataContext, propertyInfo)),
+                    button, CreateReadOnlyProperty<ICommand>(bindingContext, propertyInfo)),
 
                 _ => throw new NotImplementedException(
                     $"Bindable element for {propertyInfo.PropertyType} is not implemented.")
             };
         }
 
-        private IBindableElement CreateBindableVisualLabel(IBindableUIElement bindableUIElement, TDataContext dataContext,
-            PropertyInfo propertyInfo)
+        private IBindableElement CreateBindableVisualLabel(IBindableUIElement bindableUIElement,
+            TBindingContext bindingContext, PropertyInfo propertyInfo)
         {
             return CreateBindableElement(typeof(BindableVisualLabel<>), typeof(ReadOnlyProperty<,>), bindableUIElement,
-                dataContext, propertyInfo);
+                bindingContext, propertyInfo);
         }
 
-        private IBindableElement CreateBindableVisualTextField(IBindableUIElement bindableUIElement, TDataContext dataContext,
-            PropertyInfo propertyInfo)
+        private IBindableElement CreateBindableVisualTextField(IBindableUIElement bindableUIElement,
+            TBindingContext bindingContext, PropertyInfo propertyInfo)
         {
             return CreateBindableElement(typeof(BindableVisualTextField<>), typeof(Property<,>), bindableUIElement,
-                dataContext, propertyInfo);
+                bindingContext, propertyInfo);
         }
 
         private IBindableElement CreateBindableElement(Type elementType, Type propertyType,
-            IBindableUIElement bindableUIElement, TDataContext dataContext, PropertyInfo sourcePropertyInfo)
+            IBindableUIElement bindableUIElement, TBindingContext bindingContext, PropertyInfo sourcePropertyInfo)
         {
             var sourcePropertyType = sourcePropertyInfo.PropertyType;
 
             // TODO: Cache source properties.
-            var genericPropertyType = propertyType.MakeGenericType(typeof(TDataContext), sourcePropertyType);
-            var sourcePropertyInstance = Activator.CreateInstance(genericPropertyType, dataContext, sourcePropertyInfo);
+            var genericPropertyType = propertyType.MakeGenericType(typeof(TBindingContext), sourcePropertyType);
+            var sourcePropertyInstance = Activator.CreateInstance(genericPropertyType, bindingContext, sourcePropertyInfo);
 
             var genericElementType = elementType.MakeGenericType(sourcePropertyType);
 
@@ -69,10 +69,10 @@ namespace UnityMvvmToolkit.UI
                 _valueConverters[sourcePropertyType]);
         }
 
-        private ReadOnlyProperty<TDataContext, TValueType> CreateReadOnlyProperty<TValueType>(TDataContext dataContext,
-            PropertyInfo propertyInfo)
+        private ReadOnlyProperty<TBindingContext, TValueType> CreateReadOnlyProperty<TValueType>(
+            TBindingContext bindingContext, PropertyInfo propertyInfo)
         {
-            return new ReadOnlyProperty<TDataContext, TValueType>(dataContext, propertyInfo);
+            return new ReadOnlyProperty<TBindingContext, TValueType>(bindingContext, propertyInfo);
         }
     }
 }
