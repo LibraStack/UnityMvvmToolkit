@@ -3,17 +3,13 @@ using UnityEngine.UIElements;
 
 namespace UIElements
 {
-    public delegate void MovableEventHandler(EventBase eventBase, Vector2 localPosition);
-    
-    public class MovableElement : Clickable
-    {
-        public event MovableEventHandler PointerDown;
-        public event MovableEventHandler PointerMove;
-        public event MovableEventHandler PointerUp;
+    public delegate void PointerEventHandler(EventBase eventBase, Vector2 localPosition);
 
-        public MovableElement() : base(null, 250L, 30L)
-        {
-        }
+    public class SliderManipulator : InputManipulator
+    {
+        public event PointerEventHandler PointerDown;
+        public event PointerEventHandler PointerMove;
+        public event PointerEventHandler PointerUp;
 
         protected override void ProcessDownEvent(EventBase eventBase, Vector2 localPosition, int pointerId)
         {

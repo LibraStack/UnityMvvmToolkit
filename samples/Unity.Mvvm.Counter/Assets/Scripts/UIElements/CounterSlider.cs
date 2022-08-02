@@ -59,12 +59,12 @@ namespace UIElements
 
         private void RegisterManipulator()
         {
-            var clickableElement = new MovableElement();
-            clickableElement.PointerDown += OnPointerDown;
-            clickableElement.PointerMove += OnPointerMove;
-            clickableElement.PointerUp += OnPointerUp;
+            var manipulator = new SliderManipulator();
+            manipulator.PointerDown += OnPointerDown;
+            manipulator.PointerMove += OnPointerMove;
+            manipulator.PointerUp += OnPointerUp;
 
-            this.AddManipulator(clickableElement);
+            this.AddManipulator(manipulator);
         }
 
         private void OnLayoutCalculated(GeometryChangedEvent e)
