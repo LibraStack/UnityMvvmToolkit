@@ -10,10 +10,10 @@ namespace UIElements
 
         private bool _isDarkMode;
         private bool _isLayoutCalculated;
-        
+
         private float _thumbLeftPosition;
         private float _thumbRightPosition;
-        
+
         public ThemeSwitcher()
         {
             AddToClassList("toggle-switch");
@@ -21,7 +21,7 @@ namespace UIElements
             CreateLabelContainer("LeftContainer", "Light", "--left");
             CreateTrack();
             CreateLabelContainer("RightContainer", "Dark", "--right");
-            
+
             RegisterCallback<GeometryChangedEvent>(OnLayoutCalculated);
             RegisterCallback<ClickEvent>(OnClick);
         }
@@ -49,7 +49,7 @@ namespace UIElements
             label.text = labelText;
             label.AddToClassList("toggle-switch__label");
             label.AddToClassList($"toggle-switch__label{labelClassNameModifier}");
-            
+
             labelContainer.Add(label);
             Add(labelContainer);
         }
@@ -80,6 +80,7 @@ namespace UIElements
 
         private void OnClick(ClickEvent e)
         {
+            e.StopPropagation();
             IsDarkMode = !IsDarkMode;
         }
 
