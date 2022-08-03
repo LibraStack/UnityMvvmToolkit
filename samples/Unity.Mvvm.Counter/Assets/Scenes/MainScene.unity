@@ -184,7 +184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d243a125c401f264aa979df9f74459e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _themeService: {fileID: 319737167}
+  _appContext: {fileID: 1118070393}
 --- !u!1 &288362811
 GameObject:
   m_ObjectHideFlags: 0
@@ -358,6 +358,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1118070392}
   - component: {fileID: 1118070391}
+  - component: {fileID: 1118070393}
   m_Layer: 0
   m_Name: App
   m_TagString: Untagged
@@ -377,6 +378,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd4f833f2d967b946a4dd39f356b9cec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _appContext: {fileID: 1118070393}
 --- !u!4 &1118070392
 Transform:
   m_ObjectHideFlags: 0
@@ -392,6 +394,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1118070393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118070390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b83f6d8a5d9a4adda9a9899b1a859b54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _themeService: {fileID: 319737167}
 --- !u!1 &2082921700
 GameObject:
   m_ObjectHideFlags: 0

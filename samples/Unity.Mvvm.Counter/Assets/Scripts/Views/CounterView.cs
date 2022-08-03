@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using Enums;
-using Services;
 using UnityEngine;
 using UnityMvvmToolkit.UI;
 using UnityMvvmToolkit.UI.Interfaces;
@@ -10,26 +7,16 @@ namespace Views
 {
     public class CounterView : View<CounterViewModel>
     {
-        [SerializeField] private ThemeService _themeService;
+        [SerializeField] private AppContext _appContext;
 
         protected override CounterViewModel GetBindingContext()
         {
-            return new CounterViewModel { IsDarkMode = _themeService.IsDarkMode };
+            return _appContext.Resolve<CounterViewModel>();
         }
 
         protected override IBindableVisualElementsCreator<CounterViewModel> GetBindableVisualElementsCreator()
         {
-            return new BindableElementsCreator<CounterViewModel>();
-        }
-
-        protected override void OnBindingContextPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(BindingContext.IsDarkMode)) // TODO: Bind a view directly to the property?
-            {
-                _themeService.SetThemeMode(BindingContext.IsDarkMode ? ThemeMode.Dark : ThemeMode.Light);
-            }
-
-            base.OnBindingContextPropertyChanged(sender, e);
+            return _appContext.Resolve<IBindableVisualElementsCreator<CounterViewModel>>();
         }
     }
 }

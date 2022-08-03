@@ -1,10 +1,9 @@
 ﻿using Enums;
 
-namespace Interfaces
+namespace Interfaces.Services
 {
     public interface IThemeService
     {
-        bool IsDarkMode { get; }
         void SetThemeMode(ThemeMode mode);
     }
 }
