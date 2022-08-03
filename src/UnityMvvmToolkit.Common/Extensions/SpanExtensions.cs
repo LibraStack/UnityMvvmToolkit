@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace UnityMvvmToolkit.Common.Extensions
@@ -17,13 +16,7 @@ namespace UnityMvvmToolkit.Common.Extensions
         };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParse(this ReadOnlySpan<char> str, out int result)
-        {
-            return int.TryParse(str, out result);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParse(this ReadOnlySpan<char> str, out float result)
+        public static bool TryParse(this string str, out float result)
         {
             return float.TryParse(str, NumberStyles.Any, CommaCulture, out result) ||
                    float.TryParse(str, NumberStyles.Any, PointCulture, out result);

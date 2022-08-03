@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using UnityMvvmToolkit.Common.Extensions;
+﻿using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Common.Interfaces;
 
 namespace UnityMvvmToolkit.Common.ValueConverters
@@ -17,7 +15,7 @@ namespace UnityMvvmToolkit.Common.ValueConverters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryConvertBack(string value, out int result)
         {
-            return value.AsSpan().TryParse(out result); // TODO: Benchmark.
+            return int.TryParse(value, out result);
         }
     }
 }

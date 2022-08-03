@@ -10,15 +10,15 @@ namespace UnityMvvmToolkit.UI.BindableVisualElements
     public class BindableVisualTextField : BindableVisualElement, IDisposable
     {
         private readonly BindableTextField _textField;
-        private readonly IProperty<string> _textProperty;
+        private readonly IProperty<string> _valueProperty;
 
-        public BindableVisualTextField(BindableTextField textField, IPropertyProvider propertyProvider) 
+        public BindableVisualTextField(BindableTextField textField, IPropertyProvider propertyProvider)
             : base(propertyProvider)
         {
             _textField = textField;
             _textField.RegisterValueChangedCallback(OnTextFieldValueChanged);
 
-            _textProperty = GetProperty<string>(textField.BindingValuePath);
+            _valueProperty = GetProperty<string>(textField.BindingValuePath);
         }
 
         public void Dispose()
@@ -28,21 +28,20 @@ namespace UnityMvvmToolkit.UI.BindableVisualElements
 
         private void OnTextFieldValueChanged(ChangeEvent<string> e)
         {
-            _textProperty.Value = e.newValue;
+            _valueProperty.Value = e.newValue;
         }
 
         public override void UpdateValues()
         {
-            if (_textProperty == null)
+            if (_valueProperty == null)
             {
                 return;
             }
 
-            var textPropertyValue = _textProperty.Value;
-
-            if (_textField.value != textPropertyValue)
+            var value = _valueProperty.Value;
+            if (_textField.value != value)
             {
-                _textField.SetValueWithoutNotify(_textProperty.Value);
+                _textField.SetValueWithoutNotify(value);
             }
         }
     }
