@@ -20,7 +20,7 @@ public class AppContext : MonoBehaviour, IAppContext
         RegisterInstance<IThemeService>(_themeService);
         RegisterInstance(new CounterViewModel());
         RegisterInstance<IDataStoreService>(new DataStoreService(this));
-        RegisterInstance<IBindableVisualElementsCreator>(new BindableElementsCreator());
+        RegisterInstance<IBindableVisualElementsCreator>(new CounterBindableElementsCreator());
     }
 
     public T Resolve<T>()
