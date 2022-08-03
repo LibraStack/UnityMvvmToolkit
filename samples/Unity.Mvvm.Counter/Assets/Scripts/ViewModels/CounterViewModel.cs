@@ -29,12 +29,12 @@ namespace ViewModels
         public ICommand IncreaseCommand { get; }
         public ICommand DecreaseCommand { get; }
 
-        private void IncreaseCount(string parameter)
+        private void IncreaseCount()
         {
             Count++;
         }
 
-        private void DecreaseCount(string parameter)
+        private void DecreaseCount()
         {
             Count--;
         }

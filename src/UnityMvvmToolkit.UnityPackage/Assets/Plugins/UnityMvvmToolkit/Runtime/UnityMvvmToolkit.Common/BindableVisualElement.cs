@@ -42,7 +42,7 @@ namespace UnityMvvmToolkit.Common
 
         private bool IsNotCommand<T>()
         {
-            return typeof(T) != typeof(ICommand);
+            return typeof(T) != typeof(IBaseCommand);
         }
     }
 }

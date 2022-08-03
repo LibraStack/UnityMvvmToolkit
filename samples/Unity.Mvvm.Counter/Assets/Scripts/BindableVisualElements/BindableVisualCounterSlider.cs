@@ -13,8 +13,8 @@ namespace BindableVisualElements
         public BindableVisualCounterSlider(BindableCounterSlider counterSlider, IPropertyProvider propertyProvider)
         {
             _counterSlider = counterSlider;
-            _increaseCommand = propertyProvider.GetReadOnlyProperty<ICommand>(counterSlider.IncreaseCommand)?.Value;
-            _decreaseCommand = propertyProvider.GetReadOnlyProperty<ICommand>(counterSlider.DecreaseCommand)?.Value;
+            _increaseCommand = propertyProvider.GetCommand<ICommand>(counterSlider.IncreaseCommand);
+            _decreaseCommand = propertyProvider.GetCommand<ICommand>(counterSlider.DecreaseCommand);
 
             if (_increaseCommand != null)
             {
@@ -42,12 +42,12 @@ namespace BindableVisualElements
 
         private void OnIncrease(object sender, EventArgs e)
         {
-            _increaseCommand.Execute(null);
+            _increaseCommand.Execute();
         }
-        
+
         private void OnDecrease(object sender, EventArgs e)
         {
-            _decreaseCommand.Execute(null);
+            _decreaseCommand.Execute();
         }
     }
 }
