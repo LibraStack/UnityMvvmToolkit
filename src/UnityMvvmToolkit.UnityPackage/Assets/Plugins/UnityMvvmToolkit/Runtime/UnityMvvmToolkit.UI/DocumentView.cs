@@ -24,7 +24,7 @@ namespace UnityMvvmToolkit.UI
             _uiDocument = GetComponent<UIDocument>();
 
             _view = new View<TBindingContext>();
-            _view.Configure(GetBindingContext(), GetBindableVisualElementsCreator());
+            _view.Configure(GetBindingContext(), GetBindableVisualElementsCreator(), GetValueConverters());
 
             _disposables = new List<IDisposable>();
 
@@ -65,6 +65,11 @@ namespace UnityMvvmToolkit.UI
         protected virtual IBindableVisualElementsCreator GetBindableVisualElementsCreator()
         {
             return new BindableVisualElementsCreator();
+        }
+
+        protected virtual IReadOnlyDictionary<Type, IValueConverter> GetValueConverters()
+        {
+            return null;
         }
 
         private void BindElements(VisualElement rootVisualElement)

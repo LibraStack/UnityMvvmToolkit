@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.UI;
@@ -12,6 +14,11 @@ namespace Views
         protected override CounterViewModel GetBindingContext()
         {
             return _appContext.Resolve<CounterViewModel>();
+        }
+
+        protected override IReadOnlyDictionary<Type, IValueConverter> GetValueConverters()
+        {
+            return _appContext.Resolve<IReadOnlyDictionary<Type, IValueConverter>>();
         }
 
         protected override IBindableVisualElementsCreator GetBindableVisualElementsCreator()

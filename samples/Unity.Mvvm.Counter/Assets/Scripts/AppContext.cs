@@ -5,6 +5,7 @@ using Interfaces.Services;
 using Services;
 using UnityEngine;
 using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Common.ValueConverters;
 using ViewModels;
 
 public class AppContext : MonoBehaviour, IAppContext
@@ -21,6 +22,7 @@ public class AppContext : MonoBehaviour, IAppContext
         RegisterInstance(new CounterViewModel());
         RegisterInstance<IDataStoreService>(new DataStoreService(this));
         RegisterInstance<IBindableVisualElementsCreator>(new CounterBindableElementsCreator());
+        RegisterInstance(GetValueConverters());
     }
 
     public T Resolve<T>()
@@ -31,5 +33,13 @@ public class AppContext : MonoBehaviour, IAppContext
     private void RegisterInstance<T>(T instance)
     {
         _registeredTypes.Add(typeof(T), instance);
+    }
+
+    private IReadOnlyDictionary<Type, IValueConverter> GetValueConverters()
+    {
+        return new Dictionary<Type, IValueConverter>
+        {
+            { typeof(int), new IntToStrConverter() }
+        };
     }
 }

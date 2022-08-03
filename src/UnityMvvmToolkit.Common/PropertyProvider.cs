@@ -4,26 +4,21 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Common.Properties;
-using UnityMvvmToolkit.Common.ValueConverters;
 
 namespace UnityMvvmToolkit.Common
 {
     public class PropertyProvider<TBindingContext> : IPropertyProvider
     {
         private readonly TBindingContext _bindingContext;
-        private readonly Dictionary<Type, IValueConverter> _valueConverters;
         private readonly Dictionary<(string, Type), object> _cachedProperties;
+        private readonly IReadOnlyDictionary<Type, IValueConverter> _valueConverters;
 
-        public PropertyProvider(TBindingContext bindingContext)
+        public PropertyProvider(TBindingContext bindingContext,
+            IReadOnlyDictionary<Type, IValueConverter> valueConverters)
         {
             _bindingContext = bindingContext;
             _cachedProperties = new Dictionary<(string, Type), object>();
-
-            _valueConverters = new Dictionary<Type, IValueConverter> // TODO: Register user converters.
-            {
-                { typeof(int), new IntToStrConverter() },
-                { typeof(float), new FloatToStrConverter() }
-            };
+            _valueConverters = valueConverters;
         }
 
         public TCommand GetCommand<TCommand>(string propertyName) where TCommand : IBaseCommand
@@ -92,7 +87,8 @@ namespace UnityMvvmToolkit.Common
             }
             else
             {
-                args = new object[] { _bindingContext, propertyInfo, _valueConverters[propertyInfo.PropertyType] };
+                args = new object[]
+                    { _bindingContext, propertyInfo, GetValueConverter<TValueType>(propertyInfo.PropertyType) };
                 genericPropertyType = propertyWithValueConverterType.MakeGenericType(typeof(TBindingContext),
                     typeof(TValueType), propertyInfo.PropertyType);
             }
@@ -108,6 +104,22 @@ namespace UnityMvvmToolkit.Common
             {
                 throw new NullReferenceException(nameof(propertyInfo));
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IValueConverter GetValueConverter<TValueType>(Type propertyType)
+        {
+            if (_valueConverters == null)
+            {
+                throw new NullReferenceException(nameof(_valueConverters));
+            }
+
+            if (_valueConverters.TryGetValue(propertyType, out var valueConverter))
+            {
+                return valueConverter;
+            }
+
+            throw new InvalidOperationException($"Converter is missing: From {propertyType} To {typeof(TValueType)}");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
