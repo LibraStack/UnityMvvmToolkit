@@ -6,7 +6,6 @@ using UnityMvvmToolkit.Common.Properties;
 using UnityMvvmToolkit.Common.ValueConverters;
 using UnityMvvmToolkit.UI.BindableUIElements;
 using UnityMvvmToolkit.UI.BindableVisualElements;
-using UnityMvvmToolkit.UI.Interfaces;
 
 namespace UnityMvvmToolkit.UI
 {

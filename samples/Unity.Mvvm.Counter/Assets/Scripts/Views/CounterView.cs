@@ -1,11 +1,11 @@
 using UnityEngine;
+using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.UI;
-using UnityMvvmToolkit.UI.Interfaces;
 using ViewModels;
 
 namespace Views
 {
-    public class CounterView : View<CounterViewModel>
+    public class CounterView : DocumentView<CounterViewModel>
     {
         [SerializeField] private AppContext _appContext;
 

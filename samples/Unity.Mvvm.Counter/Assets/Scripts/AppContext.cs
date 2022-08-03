@@ -4,7 +4,7 @@ using Interfaces;
 using Interfaces.Services;
 using Services;
 using UnityEngine;
-using UnityMvvmToolkit.UI.Interfaces;
+using UnityMvvmToolkit.Common.Interfaces;
 using ViewModels;
 
 public class AppContext : MonoBehaviour, IAppContext
