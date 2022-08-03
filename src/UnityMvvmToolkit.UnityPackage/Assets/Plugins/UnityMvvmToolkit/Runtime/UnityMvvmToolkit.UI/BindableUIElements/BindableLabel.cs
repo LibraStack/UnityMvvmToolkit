@@ -7,8 +7,6 @@ namespace UnityMvvmToolkit.UI.BindableUIElements
     {
         public string BindingTextPath { get; set; }
         
-        public string BindablePropertyName => BindingTextPath;
-        
         public new class UxmlFactory : UxmlFactory<BindableLabel, UxmlTraits>
         {
         }

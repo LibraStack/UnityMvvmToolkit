@@ -8,8 +8,6 @@ namespace BindableUIElements
     {
         public string BindingValuePath { get; set; }
         
-        public string BindablePropertyName => BindingValuePath;
-        
         public new class UxmlFactory : UxmlFactory<BindableThemeSwitcher, UxmlTraits>
         {
         }

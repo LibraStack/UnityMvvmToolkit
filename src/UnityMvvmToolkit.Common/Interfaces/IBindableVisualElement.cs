@@ -1,8 +1,12 @@
-﻿namespace UnityMvvmToolkit.Common.Interfaces
+﻿using System.Collections.Generic;
+
+namespace UnityMvvmToolkit.Common.Interfaces
 {
     // TODO: Come up with a better name.
     public interface IBindableVisualElement : IBindableElement
     {
-        void UpdateValue();
+        IEnumerable<string> BindableProperties { get; }
+
+        void UpdateValues();
     }
 }

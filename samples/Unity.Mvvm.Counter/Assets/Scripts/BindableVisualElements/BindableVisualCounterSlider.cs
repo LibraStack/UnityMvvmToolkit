@@ -7,35 +7,47 @@ namespace BindableVisualElements
     public class BindableVisualCounterSlider : IBindableElement, IDisposable
     {
         private readonly BindableCounterSlider _counterSlider;
-        private readonly ICommand _command;
-        private readonly string _increaseCommandParameter;
-        private readonly string _decreaseCommandParameter;
+        private readonly ICommand _increaseCommand;
+        private readonly ICommand _decreaseCommand;
 
-        public BindableVisualCounterSlider(BindableCounterSlider counterSlider, IReadOnlyProperty<ICommand> property)
+        public BindableVisualCounterSlider(BindableCounterSlider counterSlider, IPropertyProvider propertyProvider)
         {
             _counterSlider = counterSlider;
-            _command = property.Value;
-            _increaseCommandParameter = counterSlider.IncreaseCommandParameter;
-            _decreaseCommandParameter = counterSlider.DecreaseCommandParameter;
+            _increaseCommand = propertyProvider.GetReadOnlyProperty<ICommand>(counterSlider.IncreaseCommand)?.Value;
+            _decreaseCommand = propertyProvider.GetReadOnlyProperty<ICommand>(counterSlider.DecreaseCommand)?.Value;
 
-            _counterSlider.Increase += OnIncrease;
-            _counterSlider.Decrease += OnDecrease;
+            if (_increaseCommand != null)
+            {
+                _counterSlider.Increase += OnIncrease;
+            }
+
+            if (_decreaseCommand != null)
+            {
+                _counterSlider.Decrease += OnDecrease;
+            }
         }
 
         public void Dispose()
         {
-            _counterSlider.Increase -= OnIncrease;
-            _counterSlider.Decrease -= OnDecrease;
+            if (_increaseCommand != null)
+            {
+                _counterSlider.Increase -= OnIncrease;
+            }
+
+            if (_decreaseCommand != null)
+            {
+                _counterSlider.Decrease -= OnDecrease;
+            }
         }
 
         private void OnIncrease(object sender, EventArgs e)
         {
-            _command.Execute(_increaseCommandParameter);
+            _increaseCommand.Execute(null);
         }
         
         private void OnDecrease(object sender, EventArgs e)
         {
-            _command.Execute(_decreaseCommandParameter);
+            _decreaseCommand.Execute(null);
         }
     }
 }

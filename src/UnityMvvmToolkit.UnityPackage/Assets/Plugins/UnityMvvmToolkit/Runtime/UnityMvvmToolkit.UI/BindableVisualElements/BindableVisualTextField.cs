@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Common.Interfaces;
@@ -8,18 +7,18 @@ using UnityMvvmToolkit.UI.BindableUIElements;
 namespace UnityMvvmToolkit.UI.BindableVisualElements
 {
     // TODO: Reset value on leave.
-    public class BindableVisualTextField<TValueType> : TwoWayBindableElement<TValueType>, IDisposable
+    public class BindableVisualTextField : BindableVisualElement, IDisposable
     {
         private readonly BindableTextField _textField;
-        private readonly IValueConverter<TValueType, string> _valueConverter;
+        private readonly IProperty<string> _textProperty;
 
-        public BindableVisualTextField(BindableTextField textField, IProperty<TValueType> property,
-            IValueConverter<TValueType, string> valueConverter) : base(property)
+        public BindableVisualTextField(BindableTextField textField, IPropertyProvider propertyProvider) 
+            : base(propertyProvider)
         {
-            _valueConverter = valueConverter;
-
             _textField = textField;
             _textField.RegisterValueChangedCallback(OnTextFieldValueChanged);
+
+            _textProperty = GetProperty<string>(textField.BindingValuePath);
         }
 
         public void Dispose()
@@ -29,24 +28,21 @@ namespace UnityMvvmToolkit.UI.BindableVisualElements
 
         private void OnTextFieldValueChanged(ChangeEvent<string> e)
         {
-            if (_valueConverter.TryConvertBack(e.newValue, out var newValue))
+            _textProperty.Value = e.newValue;
+        }
+
+        public override void UpdateValues()
+        {
+            if (_textProperty == null)
             {
-                Property.Value = newValue;
+                return;
             }
-        }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected override bool TryGetElementValue(out TValueType value)
-        {
-            return _valueConverter.TryConvertBack(_textField.value, out value);
-        }
+            var textPropertyValue = _textProperty.Value;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected override void OnPropertyValueChanged(TValueType newValue)
-        {
-            if (_valueConverter.TryConvert(newValue, out var result))
+            if (_textField.value != textPropertyValue)
             {
-                _textField.SetValueWithoutNotify(result);
+                _textField.SetValueWithoutNotify(_textProperty.Value);
             }
         }
     }

@@ -2,6 +2,5 @@
 {
     public interface IBindableUIElement
     {
-        string BindablePropertyName { get; } // TODO: Use attribute?
     }
 }

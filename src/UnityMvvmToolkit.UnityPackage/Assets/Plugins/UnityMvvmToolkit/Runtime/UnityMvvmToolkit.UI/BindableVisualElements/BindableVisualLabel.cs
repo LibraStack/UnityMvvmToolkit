@@ -1,28 +1,25 @@
-﻿using System.Runtime.CompilerServices;
-using UnityMvvmToolkit.Common;
+﻿using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.UI.BindableUIElements;
 
 namespace UnityMvvmToolkit.UI.BindableVisualElements
 {
-    public class BindableVisualLabel<TValueType> : OneWayBindableElement<TValueType>
+    public class BindableVisualLabel : BindableVisualElement
     {
         private readonly BindableLabel _label;
-        private readonly IValueConverter<TValueType, string> _valueConverter;
+        private readonly IReadOnlyProperty<string> _textProperty;
 
-        public BindableVisualLabel(BindableLabel label, IReadOnlyProperty<TValueType> property,
-            IValueConverter<TValueType, string> valueConverter) : base(property)
+        public BindableVisualLabel(BindableLabel label, IPropertyProvider propertyProvider) : base(propertyProvider)
         {
             _label = label;
-            _valueConverter = valueConverter;
+            _textProperty = GetReadOnlyProperty<string>(label.BindingTextPath);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected override void OnPropertyValueChanged(TValueType newValue)
+        public override void UpdateValues()
         {
-            if (_valueConverter.TryConvert(newValue, out var result))
+            if (_textProperty != null)
             {
-                _label.text = result;
+                _label.text = _textProperty.Value;
             }
         }
     }

@@ -8,8 +8,6 @@ namespace UnityMvvmToolkit.UI.BindableUIElements
         public string Command { get; set; }
         public string CommandParameter { get; set; }
 
-        public string BindablePropertyName => Command;
-
         public new class UxmlFactory : UxmlFactory<BindableButton, UxmlTraits>
         {
         }

@@ -8,6 +8,6 @@
             <BindableUIElements.BindableCountLabel text="25" binding-text-path="Count" class="count-label count-label--animation" />
         </ui:VisualElement>
         <BindableUIElements.BindableThemeSwitcher binding-value-path="IsDarkMode" />
-        <BindableUIElements.BindableCounterSlider command="UpdateCountCommand" increase-command-parameter="+" decrease-command-parameter="-" style="margin-bottom: 15%;" />
+        <BindableUIElements.BindableCounterSlider increase-command="IncreaseCommand" decrease-command="DecreaseCommand" style="margin-bottom: 15%;" />
     </ui:VisualElement>
 </ui:UXML>

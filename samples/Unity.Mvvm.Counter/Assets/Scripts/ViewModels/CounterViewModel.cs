@@ -10,7 +10,8 @@ namespace ViewModels
 
         public CounterViewModel()
         {
-            UpdateCountCommand = new Command(UpdateCount);
+            IncreaseCommand = new Command(IncreaseCount);
+            DecreaseCommand = new Command(DecreaseCount);
         }
 
         public int Count
@@ -25,18 +26,17 @@ namespace ViewModels
             set => Set(ref _isDarkMode, value);
         }
 
-        public ICommand UpdateCountCommand { get; }
+        public ICommand IncreaseCommand { get; }
+        public ICommand DecreaseCommand { get; }
 
-        private void UpdateCount(string parameter) // TODO: Implement via IncreaseCommand & DecreaseCommand.
+        private void IncreaseCount(string parameter)
         {
-            if (parameter == "+")
-            {
-                Count++;
-            }
-            else
-            {
-                Count--;
-            }
+            Count++;
+        }
+
+        private void DecreaseCount(string parameter)
+        {
+            Count--;
         }
     }
 }

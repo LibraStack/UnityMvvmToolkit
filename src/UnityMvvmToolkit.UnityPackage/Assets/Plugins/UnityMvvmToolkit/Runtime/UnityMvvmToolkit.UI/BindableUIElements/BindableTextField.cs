@@ -6,8 +6,6 @@ namespace UnityMvvmToolkit.UI.BindableUIElements
     public class BindableTextField : TextField, IBindableUIElement
     {
         public string BindingValuePath { get; set; }
-
-        public string BindablePropertyName => BindingValuePath;
         
         public new class UxmlFactory : UxmlFactory<BindableTextField, UxmlTraits>
         {

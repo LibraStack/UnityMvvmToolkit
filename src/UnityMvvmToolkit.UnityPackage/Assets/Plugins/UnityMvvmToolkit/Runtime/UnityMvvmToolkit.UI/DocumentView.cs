@@ -28,7 +28,7 @@ namespace UnityMvvmToolkit.UI
 
             _disposables = new List<IDisposable>();
 
-            BindElements(BindingContext, _uiDocument.rootVisualElement); // TODO: Move to start?
+            BindElements(_uiDocument.rootVisualElement); // TODO: Move to start?
         }
 
         private void OnEnable()
@@ -67,7 +67,7 @@ namespace UnityMvvmToolkit.UI
             return new BindableVisualElementsCreator();
         }
 
-        private void BindElements(TBindingContext bindingContext, VisualElement rootVisualElement)
+        private void BindElements(VisualElement rootVisualElement)
         {
             rootVisualElement.Query<VisualElement>().ForEach(visualElement =>
             {
@@ -76,12 +76,7 @@ namespace UnityMvvmToolkit.UI
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(bindableUIElement.BindablePropertyName))
-                {
-                    return;
-                }
-
-                var bindableElement = _view.RegisterBindableElement(bindableUIElement, bindingContext);
+                var bindableElement = _view.RegisterBindableElement(bindableUIElement);
                 if (bindableElement is IDisposable disposable)
                 {
                     _disposables.Add(disposable);

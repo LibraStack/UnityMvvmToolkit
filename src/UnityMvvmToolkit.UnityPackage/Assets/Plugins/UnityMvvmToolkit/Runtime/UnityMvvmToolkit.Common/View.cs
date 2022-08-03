@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using UnityMvvmToolkit.Common.Interfaces;
 
@@ -9,6 +8,7 @@ namespace UnityMvvmToolkit.Common
     {
         private TBindingContext _bindingContext;
 
+        private IPropertyProvider _propertyProvider;
         private IBindableVisualElementsCreator _bindableElementsCreator;
         private Dictionary<string, HashSet<IBindableVisualElement>> _bindableVisualElements;
 
@@ -17,6 +17,7 @@ namespace UnityMvvmToolkit.Common
         public void Configure(TBindingContext bindingContext, IBindableVisualElementsCreator visualElementsCreator)
         {
             _bindingContext = bindingContext;
+            _propertyProvider = new PropertyProvider<TBindingContext>(bindingContext);
             _bindableElementsCreator = visualElementsCreator;
             _bindableVisualElements = new Dictionary<string, HashSet<IBindableVisualElement>>();
         }
@@ -31,33 +32,34 @@ namespace UnityMvvmToolkit.Common
             _bindingContext.PropertyChanged -= OnBindingContextPropertyChanged;
         }
 
-        public IBindableElement RegisterBindableElement(IBindableUIElement bindableUiElement, TBindingContext bindingContext)
+        public IBindableElement RegisterBindableElement(IBindableUIElement bindableUiElement)
         {
-            var propertyInfo = bindingContext.GetType().GetProperty(bindableUiElement.BindablePropertyName);
-            if (propertyInfo == null)
+            var bindableElement = _bindableElementsCreator.Create(bindableUiElement, _propertyProvider);
+            if (bindableElement is not IBindableVisualElement bindableVisualElement)
             {
-                throw new NullReferenceException(nameof(propertyInfo));
+                return bindableElement;
             }
 
-            var bindableElement = _bindableElementsCreator.Create(bindingContext, bindableUiElement, propertyInfo);
-            if (bindableElement is IBindableVisualElement bindableVisualElement)
+            foreach (var propertyName in bindableVisualElement.BindableProperties)
             {
-                RegisterBindableElement(bindableVisualElement, bindableUiElement.BindablePropertyName);
+                RegisterBindableElement(propertyName, bindableVisualElement);
             }
 
+            bindableVisualElement.UpdateValues();
             return bindableElement;
         }
 
-        private void RegisterBindableElement(IBindableVisualElement bindableElement, string propertyName)
+        private void RegisterBindableElement(string propertyName, IBindableVisualElement bindableVisualElement)
         {
-            if (_bindableVisualElements.TryGetValue(propertyName, out var visualElements) == false)
+            if (_bindableVisualElements.TryGetValue(propertyName, out var visualElements))
             {
-                visualElements = new HashSet<IBindableVisualElement>();
-                _bindableVisualElements.Add(propertyName, visualElements);
+                visualElements.Add(bindableVisualElement);
             }
-
-            bindableElement.UpdateValue();
-            visualElements.Add(bindableElement);
+            else
+            {
+                _bindableVisualElements.Add(propertyName,
+                    new HashSet<IBindableVisualElement> { bindableVisualElement });
+            }
         }
 
         private void OnBindingContextPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -66,7 +68,7 @@ namespace UnityMvvmToolkit.Common
             {
                 foreach (var visualElement in visualElements)
                 {
-                    visualElement.UpdateValue();
+                    visualElement.UpdateValues();
                 }
             }
         }

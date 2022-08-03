@@ -10,18 +10,24 @@ namespace UnityMvvmToolkit.UI.BindableVisualElements
         private readonly ICommand _command;
         private readonly string _commandParameter;
 
-        public BindableVisualButton(BindableButton button, IReadOnlyProperty<ICommand> property)
+        public BindableVisualButton(BindableButton button, IPropertyProvider propertyProvider)
         {
             _button = button;
-            _command = property.Value;
+            _command = propertyProvider.GetReadOnlyProperty<ICommand>(_button.Command)?.Value;
             _commandParameter = button.CommandParameter;
 
-            _button.clicked += OnButtonClicked;
+            if (_command != null)
+            {
+                _button.clicked += OnButtonClicked;
+            }
         }
 
         public void Dispose()
         {
-            _button.clicked -= OnButtonClicked;
+            if (_command != null)
+            {
+                _button.clicked -= OnButtonClicked;
+            }
         }
 
         private void OnButtonClicked()
