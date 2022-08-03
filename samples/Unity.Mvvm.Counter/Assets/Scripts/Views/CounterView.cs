@@ -14,9 +14,9 @@ namespace Views
             return _appContext.Resolve<CounterViewModel>();
         }
 
-        protected override IBindableVisualElementsCreator<CounterViewModel> GetBindableVisualElementsCreator()
+        protected override IBindableVisualElementsCreator GetBindableVisualElementsCreator()
         {
-            return _appContext.Resolve<IBindableVisualElementsCreator<CounterViewModel>>();
+            return _appContext.Resolve<IBindableVisualElementsCreator>();
         }
     }
 }

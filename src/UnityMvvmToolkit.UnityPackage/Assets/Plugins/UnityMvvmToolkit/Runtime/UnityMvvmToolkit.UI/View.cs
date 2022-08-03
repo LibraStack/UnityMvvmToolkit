@@ -15,7 +15,7 @@ namespace UnityMvvmToolkit.UI
         private TBindingContext _bindingContext;
 
         private List<IDisposable> _disposables;
-        private IBindableVisualElementsCreator<TBindingContext> _bindableElementsCreator;
+        private IBindableVisualElementsCreator _bindableElementsCreator;
         private Dictionary<string, HashSet<IBindableVisualElement>> _bindableVisualElements;
 
         public TBindingContext BindingContext => _bindingContext;
@@ -66,9 +66,9 @@ namespace UnityMvvmToolkit.UI
             return Activator.CreateInstance<TBindingContext>();
         }
 
-        protected virtual IBindableVisualElementsCreator<TBindingContext> GetBindableVisualElementsCreator()
+        protected virtual IBindableVisualElementsCreator GetBindableVisualElementsCreator()
         {
-            return new BindableVisualElementsCreator<TBindingContext>();
+            return new BindableVisualElementsCreator();
         }
 
         private void BindElements(TBindingContext bindingContext, VisualElement rootVisualElement)
@@ -95,7 +95,7 @@ namespace UnityMvvmToolkit.UI
                 throw new NullReferenceException(nameof(propertyInfo));
             }
 
-            var bindableElement = _bindableElementsCreator.Create(bindableUIElement, bindingContext, propertyInfo);
+            var bindableElement = _bindableElementsCreator.Create(bindingContext, bindableUIElement, propertyInfo);
             if (bindableElement is IBindableVisualElement bindableVisualElement)
             {
                 RegisterBindableElement(bindableVisualElement, bindableUIElement.BindablePropertyName);

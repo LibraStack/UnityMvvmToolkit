@@ -3,9 +3,9 @@ using UnityMvvmToolkit.Common.Interfaces;
 
 namespace UnityMvvmToolkit.UI.Interfaces
 {
-    public interface IBindableVisualElementsCreator<in TDataContext>
+    public interface IBindableVisualElementsCreator
     {
-        IBindableElement Create(IBindableUIElement bindableUIElement, TDataContext dataContext,
+        IBindableElement Create<TBindingContext>(TBindingContext bindingContext, IBindableUIElement bindableUIElement,
             PropertyInfo propertyInfo);
     }
 }

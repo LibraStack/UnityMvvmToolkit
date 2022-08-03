@@ -10,7 +10,7 @@ using UnityMvvmToolkit.UI.Interfaces;
 
 namespace UnityMvvmToolkit.UI
 {
-    public class BindableVisualElementsCreator<TBindingContext> : IBindableVisualElementsCreator<TBindingContext>
+    public class BindableVisualElementsCreator : IBindableVisualElementsCreator
     {
         private readonly Dictionary<Type, IValueConverter> _valueConverters;
 
@@ -24,52 +24,54 @@ namespace UnityMvvmToolkit.UI
             };
         }
 
-        public virtual IBindableElement Create(IBindableUIElement bindableUIElement, TBindingContext bindingContext,
-            PropertyInfo propertyInfo)
+        public virtual IBindableElement Create<TBindingContext>(TBindingContext bindingContext,
+            IBindableUIElement bindableUIElement, PropertyInfo propertyInfo)
         {
             return bindableUIElement switch
             {
-                BindableLabel label => CreateBindableVisualLabel(label, bindingContext, propertyInfo),
-                BindableTextField textField => CreateBindableVisualTextField(textField, bindingContext, propertyInfo),
+                BindableLabel label => CreateBindableVisualLabel(bindingContext, label, propertyInfo),
+                BindableTextField textField => CreateBindableVisualTextField(bindingContext, textField, propertyInfo),
 
                 BindableButton button when propertyInfo.PropertyType == typeof(ICommand) => new BindableVisualButton(
-                    button, CreateReadOnlyProperty<ICommand>(bindingContext, propertyInfo)),
+                    button, CreateReadOnlyProperty<TBindingContext, ICommand>(bindingContext, propertyInfo)),
 
                 _ => throw new NotImplementedException(
                     $"Bindable element for {propertyInfo.PropertyType} is not implemented.")
             };
         }
 
-        private IBindableElement CreateBindableVisualLabel(IBindableUIElement bindableLabel,
-            TBindingContext bindingContext, PropertyInfo propertyInfo)
+        private IBindableElement CreateBindableVisualLabel<TBindingContext>(TBindingContext bindingContext,
+            IBindableUIElement bindableLabel, PropertyInfo propertyInfo)
         {
-            return CreateBindableElement(typeof(BindableVisualLabel<>), typeof(ReadOnlyProperty<,>), bindableLabel,
-                bindingContext, propertyInfo);
+            return CreateBindableElement(typeof(BindableVisualLabel<>), typeof(ReadOnlyProperty<,>), bindingContext,
+                bindableLabel, propertyInfo);
         }
 
-        private IBindableElement CreateBindableVisualTextField(IBindableUIElement bindableTextField,
-            TBindingContext bindingContext, PropertyInfo propertyInfo)
+        private IBindableElement CreateBindableVisualTextField<TBindingContext>(TBindingContext bindingContext,
+            IBindableUIElement bindableTextField, PropertyInfo propertyInfo)
         {
-            return CreateBindableElement(typeof(BindableVisualTextField<>), typeof(Property<,>), bindableTextField,
-                bindingContext, propertyInfo);
+            return CreateBindableElement(typeof(BindableVisualTextField<>), typeof(Property<,>), bindingContext,
+                bindableTextField, propertyInfo);
         }
 
-        protected IBindableElement CreateBindableElement(Type elementType, Type propertyType,
-            IBindableUIElement bindableUIElement, TBindingContext bindingContext, PropertyInfo sourcePropertyInfo)
+        protected IBindableElement CreateBindableElement<TBindingContext>(Type elementType, Type propertyType,
+            TBindingContext bindingContext, IBindableUIElement bindableUIElement, PropertyInfo sourcePropertyInfo)
         {
             var sourcePropertyType = sourcePropertyInfo.PropertyType;
 
             // TODO: Cache source properties.
             var genericPropertyType = propertyType.MakeGenericType(typeof(TBindingContext), sourcePropertyType);
-            var sourcePropertyInstance = Activator.CreateInstance(genericPropertyType, bindingContext, sourcePropertyInfo);
+            var sourcePropertyInstance =
+                Activator.CreateInstance(genericPropertyType, bindingContext, sourcePropertyInfo);
 
             var genericElementType = elementType.MakeGenericType(sourcePropertyType);
 
-            return (IBindableElement) Activator.CreateInstance(genericElementType, bindableUIElement, sourcePropertyInstance,
+            return (IBindableElement) Activator.CreateInstance(genericElementType, bindableUIElement,
+                sourcePropertyInstance,
                 _valueConverters[sourcePropertyType]);
         }
 
-        private ReadOnlyProperty<TBindingContext, TValueType> CreateReadOnlyProperty<TValueType>(
+        private ReadOnlyProperty<TBindingContext, TValueType> CreateReadOnlyProperty<TBindingContext, TValueType>(
             TBindingContext bindingContext, PropertyInfo propertyInfo)
         {
             return new ReadOnlyProperty<TBindingContext, TValueType>(bindingContext, propertyInfo);
