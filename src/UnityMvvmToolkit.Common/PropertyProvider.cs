@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Common.Properties;
 using UnityMvvmToolkit.Common.ValueConverters;
@@ -11,11 +12,14 @@ namespace UnityMvvmToolkit.Common
     {
         private readonly TBindingContext _bindingContext;
         private readonly Dictionary<Type, IValueConverter> _valueConverters;
+        private readonly Dictionary<(string, Type), object> _cachedProperties;
 
         public PropertyProvider(TBindingContext bindingContext)
         {
             _bindingContext = bindingContext;
-            _valueConverters = new Dictionary<Type, IValueConverter>
+            _cachedProperties = new Dictionary<(string, Type), object>();
+
+            _valueConverters = new Dictionary<Type, IValueConverter> // TODO: Register user converters.
             {
                 { typeof(int), new IntToStrConverter() },
                 { typeof(float), new FloatToStrConverter() }
@@ -29,6 +33,11 @@ namespace UnityMvvmToolkit.Common
                 return default;
             }
 
+            if (TryGetPropertyFromCache<TCommand>(propertyName, out var command))
+            {
+                return command;
+            }
+
             AssurePropertyExist(propertyName, out var propertyInfo);
 
             if (typeof(TCommand) != propertyInfo.PropertyType)
@@ -37,7 +46,7 @@ namespace UnityMvvmToolkit.Common
                     $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(TCommand)} command.");
             }
 
-            return (TCommand) propertyInfo.GetValue(_bindingContext);
+            return CacheProperty<TCommand>(propertyName, propertyInfo.GetValue(_bindingContext));
         }
 
         public IProperty<TValueType> GetProperty<TValueType>(string propertyName)
@@ -52,6 +61,7 @@ namespace UnityMvvmToolkit.Common
                 typeof(ReadOnlyPropertyWithValueConverter<,,>));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private TProperty CreateProperty<TProperty, TValueType>(string propertyName, Type propertyType,
             Type propertyWithValueConverterType)
         {
@@ -63,6 +73,11 @@ namespace UnityMvvmToolkit.Common
             if (typeof(TValueType) == typeof(IBaseCommand))
             {
                 throw new InvalidOperationException($"To get a command use the {nameof(GetCommand)} method instead.");
+            }
+
+            if (TryGetPropertyFromCache<TProperty>(propertyName, out var property))
+            {
+                return property;
             }
 
             AssurePropertyExist(propertyName, out var propertyInfo);
@@ -82,9 +97,10 @@ namespace UnityMvvmToolkit.Common
                     typeof(TValueType), propertyInfo.PropertyType);
             }
 
-            return (TProperty) Activator.CreateInstance(genericPropertyType, args);
+            return CacheProperty<TProperty>(propertyName, Activator.CreateInstance(genericPropertyType, args));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AssurePropertyExist(string propertyName, out PropertyInfo propertyInfo)
         {
             propertyInfo = _bindingContext.GetType().GetProperty(propertyName);
@@ -92,6 +108,26 @@ namespace UnityMvvmToolkit.Common
             {
                 throw new NullReferenceException(nameof(propertyInfo));
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private T CacheProperty<T>(string propertyName, object property)
+        {
+            _cachedProperties.Add((propertyName, typeof(T)), property);
+            return (T) property;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool TryGetPropertyFromCache<T>(string propertyName, out T property)
+        {
+            if (_cachedProperties.TryGetValue((propertyName, typeof(T)), out var cachedProperty))
+            {
+                property = (T) cachedProperty;
+                return true;
+            }
+
+            property = default;
+            return false;
         }
     }
 }
