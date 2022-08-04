@@ -134,11 +134,10 @@ namespace UnityMvvmToolkit.Common.Internal
 
             if (converterName.IsEmpty)
             {
-                throw new InvalidOperationException(
-                    $"Converter is missing: From {propertyType} To {typeof(TValueType)}");
+                throw new NullReferenceException($"Converter is missing: From {propertyType} To {typeof(TValueType)}");
             }
 
-            throw new InvalidOperationException($"Converter '{converterName.ToString()}' not found.");
+            throw new NullReferenceException($"Converter '{converterName.ToString()}' not found.");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
