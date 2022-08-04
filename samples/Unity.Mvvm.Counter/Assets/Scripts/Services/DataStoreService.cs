@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Enums;
 using Interfaces;
 using Interfaces.Services;
 using UnityEngine;
@@ -35,8 +36,8 @@ namespace Services
                     PlayerPrefs.SetInt(e.PropertyName, _counterViewModel.Count);
                     break;
 
-                case nameof(_counterViewModel.IsDarkMode):
-                    PlayerPrefs.SetInt(e.PropertyName, _counterViewModel.IsDarkMode ? 1 : 0);
+                case nameof(_counterViewModel.ThemeMode):
+                    PlayerPrefs.SetInt(e.PropertyName, (int) _counterViewModel.ThemeMode);
                     break;
             }
 
@@ -46,7 +47,7 @@ namespace Services
         private void LoadData()
         {
             _counterViewModel.Count = PlayerPrefs.GetInt(nameof(_counterViewModel.Count));
-            _counterViewModel.IsDarkMode = PlayerPrefs.GetInt(nameof(_counterViewModel.IsDarkMode)) == 1;
+            _counterViewModel.ThemeMode = (ThemeMode) PlayerPrefs.GetInt(nameof(_counterViewModel.ThemeMode));
         }
     }
 }

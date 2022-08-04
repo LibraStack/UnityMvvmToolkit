@@ -7,7 +7,6 @@ namespace ViewModels
     public class CounterViewModel : ViewModel
     {
         private int _count;
-        private bool _isDarkMode;
         private ThemeMode _themeMode;
 
         public CounterViewModel()
@@ -22,19 +21,11 @@ namespace ViewModels
             set => Set(ref _count, value);
         }
 
-        public bool IsDarkMode
+        public ThemeMode ThemeMode
         {
-            get => _isDarkMode;
-            set
-            {
-                if (Set(ref _isDarkMode, value))
-                {
-                    OnPropertyChanged(nameof(ThemeMode));
-                }
-            }
+            get => _themeMode;
+            set => Set(ref _themeMode, value);
         }
-
-        public ThemeMode ThemeMode => _isDarkMode ? ThemeMode.Dark : ThemeMode.Light;
 
         public ICommand IncreaseCommand { get; }
         public ICommand DecreaseCommand { get; }

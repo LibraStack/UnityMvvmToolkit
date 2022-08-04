@@ -6,6 +6,7 @@ using Services;
 using UnityEngine;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Common.ValueConverters;
+using ValueConverters;
 using ViewModels;
 
 public class AppContext : MonoBehaviour, IAppContext
@@ -39,7 +40,8 @@ public class AppContext : MonoBehaviour, IAppContext
     {
         return new IValueConverter[]
         {
-            new IntToStrConverter()
+            new IntToStrConverter(),
+            new ThemeModeToBoolConverter()
         };
     }
 }

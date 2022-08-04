@@ -7,7 +7,7 @@
         <ui:VisualElement name="NumberContainer" class="number-container">
             <BindableUIElements.BindableCountLabel text="25" binding-text-path="Count" class="count-label count-label--animation" />
         </ui:VisualElement>
-        <BindableUIElements.BindableThemeSwitcher binding-value-path="IsDarkMode" />
+        <BindableUIElements.BindableThemeSwitcher binding-value-path="ThemeMode, Converter={ThemeModeToBoolConverter}" />
         <BindableUIElements.BindableCounterSlider increase-command="IncreaseCommand" decrease-command="DecreaseCommand" style="margin-bottom: 15%;" />
     </BindableUIElements.BindableRootPage>
 </ui:UXML>
