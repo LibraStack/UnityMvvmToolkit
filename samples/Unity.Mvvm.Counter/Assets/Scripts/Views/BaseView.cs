@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using BindableUIElements;
 using Interfaces.Services;
+using UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.Common.Interfaces;
@@ -16,7 +16,7 @@ namespace Views
 
         protected override TBindingContext GetBindingContext()
         {
-            RootVisualElement.Q<BindableRootPage>()?.Initialize(_appContext.Resolve<IThemeService>());
+            RootVisualElement.Q<RootPage>()?.Initialize(_appContext.Resolve<IThemeService>());
             return _appContext.Resolve<TBindingContext>();
         }
 

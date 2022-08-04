@@ -10,8 +10,8 @@ namespace BindableVisualElements
         private readonly BindableRootPage _rootPage;
         private readonly IReadOnlyProperty<ThemeMode> _themeModeProperty;
 
-        public BindableVisualRootPage(BindableRootPage rootPage, IPropertyProvider propertyProvider) : base(
-            propertyProvider)
+        public BindableVisualRootPage(BindableRootPage rootPage, IPropertyProvider propertyProvider) 
+            : base(propertyProvider)
         {
             _rootPage = rootPage;
             _themeModeProperty = GetReadOnlyProperty<ThemeMode>(rootPage.BindingThemeModePath);
