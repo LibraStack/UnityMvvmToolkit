@@ -81,7 +81,7 @@ namespace UnityMvvmToolkit.UI
                     return;
                 }
 
-                var bindableElement = _view.RegisterBindableElement(bindableUIElement);
+                var bindableElement = _view.RegisterBindableElement(bindableUIElement, true);
                 if (bindableElement is IDisposable disposable)
                 {
                     _disposables.Add(disposable);

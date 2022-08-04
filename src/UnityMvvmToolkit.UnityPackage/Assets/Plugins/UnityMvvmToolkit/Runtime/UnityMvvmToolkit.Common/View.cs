@@ -34,7 +34,7 @@ namespace UnityMvvmToolkit.Common
             _bindingContext.PropertyChanged -= OnBindingContextPropertyChanged;
         }
 
-        public IBindableElement RegisterBindableElement(IBindableUIElement bindableUiElement)
+        public IBindableElement RegisterBindableElement(IBindableUIElement bindableUiElement, bool updateElementValues)
         {
             var bindableElement = _bindableElementsCreator.Create(bindableUiElement, _propertyProvider);
             if (bindableElement is not IBindableVisualElement bindableVisualElement)
@@ -47,7 +47,11 @@ namespace UnityMvvmToolkit.Common
                 RegisterBindableElement(propertyName, bindableVisualElement);
             }
 
-            bindableVisualElement.UpdateValues();
+            if (updateElementValues)
+            {
+                bindableVisualElement.UpdateValues();
+            }
+
             return bindableElement;
         }
 
