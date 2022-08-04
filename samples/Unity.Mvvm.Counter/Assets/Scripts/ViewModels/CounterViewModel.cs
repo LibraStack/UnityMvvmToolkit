@@ -1,4 +1,5 @@
-﻿using UnityMvvmToolkit.Common;
+﻿using Enums;
+using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Common.Interfaces;
 
 namespace ViewModels
@@ -7,6 +8,7 @@ namespace ViewModels
     {
         private int _count;
         private bool _isDarkMode;
+        private ThemeMode _themeMode;
 
         public CounterViewModel()
         {
@@ -23,8 +25,16 @@ namespace ViewModels
         public bool IsDarkMode
         {
             get => _isDarkMode;
-            set => Set(ref _isDarkMode, value);
+            set
+            {
+                if (Set(ref _isDarkMode, value))
+                {
+                    OnPropertyChanged(nameof(ThemeMode));
+                }
+            }
         }
+
+        public ThemeMode ThemeMode => _isDarkMode ? ThemeMode.Dark : ThemeMode.Light;
 
         public ICommand IncreaseCommand { get; }
         public ICommand DecreaseCommand { get; }

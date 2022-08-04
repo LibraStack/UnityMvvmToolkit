@@ -9,6 +9,7 @@ public class CounterBindableElementsCreator : BindableVisualElementsCreator
     {
         return bindableUiElement switch
         {
+            BindableRootPage rootPage => new BindableVisualRootPage(rootPage, propertyProvider),
             BindableCounterSlider counterSlider => new BindableVisualCounterSlider(counterSlider, propertyProvider),
             BindableThemeSwitcher themeSwitcher => new BindableVisualThemeSwitcher(themeSwitcher, propertyProvider),
             BindableAnimationLabel animationLabel => new BindableVisualAnimationLabel(animationLabel, propertyProvider),
