@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnityMvvmToolkit.Common.Internal
+namespace UnityMvvmToolkit.Common.Internal.Structs
 {
     internal readonly ref struct LineSplitData
     {

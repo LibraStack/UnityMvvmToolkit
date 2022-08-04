@@ -9,13 +9,13 @@ namespace UnityMvvmToolkit.Common
     {
         private readonly List<string> _bindableProperties;
         private readonly IPropertyProvider _propertyProvider;
-        private readonly BindingDataParser _bindingDataParser;
+        private readonly BindingStringParser _bindingStringParser;
 
         protected BindableVisualElement(IPropertyProvider propertyProvider)
         {
             _propertyProvider = propertyProvider;
-            _bindingDataParser = new BindingDataParser();
             _bindableProperties = new List<string>();
+            _bindingStringParser = new BindingStringParser();
         }
 
         public IEnumerable<string> BindableProperties => _bindableProperties;
@@ -24,7 +24,7 @@ namespace UnityMvvmToolkit.Common
 
         protected IProperty<TValueType> GetProperty<TValueType>(string bindingStringData)
         {
-            var bindingData = _bindingDataParser.GetBindingData(bindingStringData.AsMemory());
+            var bindingData = _bindingStringParser.GetBindingData(bindingStringData.AsMemory());
             var propertyName = bindingData.PropertyName.ToString();
 
             var property = _propertyProvider.GetProperty<TValueType>(propertyName, bindingData.ConverterName);
@@ -38,7 +38,7 @@ namespace UnityMvvmToolkit.Common
 
         protected IReadOnlyProperty<TValueType> GetReadOnlyProperty<TValueType>(string bindingStringData)
         {
-            var bindingData = _bindingDataParser.GetBindingData(bindingStringData.AsMemory());
+            var bindingData = _bindingStringParser.GetBindingData(bindingStringData.AsMemory());
             var propertyName = bindingData.PropertyName.ToString();
 
             var property = _propertyProvider.GetReadOnlyProperty<TValueType>(propertyName, bindingData.ConverterName);

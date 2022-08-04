@@ -1,9 +1,10 @@
 ﻿using System;
 using UnityMvvmToolkit.Common.Extensions;
+using UnityMvvmToolkit.Common.Internal.Structs;
 
 namespace UnityMvvmToolkit.Common.Internal
 {
-    internal class BindingDataParser
+    internal class BindingStringParser
     {
         private const char Comma = ',';
         private const string ConverterOpen = "Converter={";

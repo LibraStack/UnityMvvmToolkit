@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Common.Properties;
 
-namespace UnityMvvmToolkit.Common
+namespace UnityMvvmToolkit.Common.Internal
 {
     internal class PropertyProvider<TBindingContext> : IPropertyProvider
     {

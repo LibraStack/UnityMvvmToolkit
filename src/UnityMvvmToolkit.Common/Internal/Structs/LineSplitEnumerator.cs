@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace UnityMvvmToolkit.Common.Internal
+namespace UnityMvvmToolkit.Common.Internal.Structs
 {
     internal ref struct LineSplitEnumerator
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using UnityMvvmToolkit.Common.Internal;
+using UnityMvvmToolkit.Common.Internal.Structs;
 
 namespace UnityMvvmToolkit.Common.Extensions
 {

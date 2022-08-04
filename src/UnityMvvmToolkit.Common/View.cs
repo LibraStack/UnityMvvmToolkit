@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Common.Internal;
 
 namespace UnityMvvmToolkit.Common
 {
