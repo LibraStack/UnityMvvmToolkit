@@ -13,29 +13,27 @@ namespace UnityMvvmToolkit.Common.Internal
         {
             var bindingData = new BindingData();
 
-            foreach (var lineData in bindingStringData.Split(Comma))
+            foreach (var line in bindingStringData.Split(Comma, true))
             {
-                if (lineData.IsEmptyOrWhiteSpace)
+                if (line.IsEmptyOrWhiteSpace)
                 {
                     continue;
                 }
 
-                var resultLine = lineData.Trim();
-
-                var converterStartIndex = resultLine.Data.IndexOf(ConverterOpen);
+                var converterStartIndex = line.Data.IndexOf(ConverterOpen);
                 if (converterStartIndex == -1)
                 {
-                    bindingData.PropertyName = bindingStringData.Slice(resultLine.Start, resultLine.Length);
+                    bindingData.PropertyName = bindingStringData.Slice(line.Start, line.Length);
                 }
                 else
                 {
-                    var converterCloseIndex = resultLine.Data.IndexOf(ConverterClose);
+                    var converterCloseIndex = line.Data.IndexOf(ConverterClose);
                     if (converterCloseIndex == -1)
                     {
                         continue;
                     }
 
-                    var start = resultLine.Start + converterStartIndex + ConverterOpen.Length;
+                    var start = line.Start + converterStartIndex + ConverterOpen.Length;
                     var length = converterCloseIndex - (converterStartIndex + ConverterOpen.Length);
 
                     bindingData.ConverterName = bindingStringData.Slice(start, length);

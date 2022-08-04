@@ -25,9 +25,9 @@ namespace UnityMvvmToolkit.Common.Extensions
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static LineSplitEnumerator Split(this ReadOnlyMemory<char> strMemory, char separator)
+        internal static LineSplitEnumerator Split(this ReadOnlyMemory<char> strMemory, char separator, bool trim = false)
         {
-            return new LineSplitEnumerator(strMemory.Span, separator);
+            return new LineSplitEnumerator(strMemory.Span, separator, trim);
         }
     }
 }

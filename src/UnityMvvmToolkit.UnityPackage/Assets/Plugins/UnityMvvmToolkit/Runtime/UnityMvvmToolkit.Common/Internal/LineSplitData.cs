@@ -16,10 +16,11 @@ namespace UnityMvvmToolkit.Common.Internal
         public ReadOnlySpan<char> Data { get; }
 
         public bool IsEmptyOrWhiteSpace => Data.IsEmpty || Data.IsWhiteSpace();
-        
+
         public LineSplitData Trim()
         {
             var start = Start + (Length - Data.TrimStart().Length);
+
             return new LineSplitData(start, Data.Trim());
         }
 
@@ -28,9 +29,5 @@ namespace UnityMvvmToolkit.Common.Internal
             start = Start;
             length = Length;
         }
-
-        // This method allow to implicitly cast the type into a ReadOnlySpan<char>, so you can write the following code
-        // foreach (ReadOnlySpan<char> entry in str.SplitLines())
-        // public static implicit operator ReadOnlySpan<char>(LineSplitData data) => data.Line;
     }
 }
