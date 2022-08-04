@@ -67,7 +67,7 @@ namespace UnityMvvmToolkit.UI
             return new BindableVisualElementsCreator();
         }
 
-        protected virtual IReadOnlyDictionary<Type, IValueConverter> GetValueConverters()
+        protected virtual IEnumerable<IValueConverter> GetValueConverters()
         {
             return null;
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using UnityMvvmToolkit.Common.Interfaces;
 
@@ -16,7 +15,7 @@ namespace UnityMvvmToolkit.Common
         public TBindingContext BindingContext => _bindingContext;
 
         public void Configure(TBindingContext bindingContext, IBindableVisualElementsCreator visualElementsCreator,
-            IReadOnlyDictionary<Type, IValueConverter> valueConverters)
+            IEnumerable<IValueConverter> valueConverters)
         {
             _bindingContext = bindingContext;
             _propertyProvider = new PropertyProvider<TBindingContext>(bindingContext, valueConverters);

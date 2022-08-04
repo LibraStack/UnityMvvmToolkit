@@ -1,16 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Common.Internal;
 
 namespace UnityMvvmToolkit.Common
 {
     public abstract class BindableVisualElement : IBindableVisualElement
     {
-        private readonly IPropertyProvider _propertyProvider;
         private readonly List<string> _bindableProperties;
+        private readonly IPropertyProvider _propertyProvider;
+        private readonly BindingDataParser _bindingDataParser;
 
         protected BindableVisualElement(IPropertyProvider propertyProvider)
         {
             _propertyProvider = propertyProvider;
+            _bindingDataParser = new BindingDataParser();
             _bindableProperties = new List<string>();
         }
 
@@ -18,10 +22,13 @@ namespace UnityMvvmToolkit.Common
 
         public abstract void UpdateValues();
 
-        protected IProperty<TValueType> GetProperty<TValueType>(string propertyName)
+        protected IProperty<TValueType> GetProperty<TValueType>(string bindingStringData)
         {
-            var property = _propertyProvider.GetProperty<TValueType>(propertyName);
-            if (property != null && IsNotCommand<TValueType>())
+            var bindingData = _bindingDataParser.GetBindingData(bindingStringData.AsMemory());
+            var propertyName = bindingData.PropertyName.ToString();
+
+            var property = _propertyProvider.GetProperty<TValueType>(propertyName, bindingData.ConverterName);
+            if (property != null)
             {
                 _bindableProperties.Add(propertyName);
             }
@@ -29,20 +36,18 @@ namespace UnityMvvmToolkit.Common
             return property;
         }
 
-        protected IReadOnlyProperty<TValueType> GetReadOnlyProperty<TValueType>(string propertyName)
+        protected IReadOnlyProperty<TValueType> GetReadOnlyProperty<TValueType>(string bindingStringData)
         {
-            var property = _propertyProvider.GetReadOnlyProperty<TValueType>(propertyName);
-            if (property != null && IsNotCommand<TValueType>())
+            var bindingData = _bindingDataParser.GetBindingData(bindingStringData.AsMemory());
+            var propertyName = bindingData.PropertyName.ToString();
+
+            var property = _propertyProvider.GetReadOnlyProperty<TValueType>(propertyName, bindingData.ConverterName);
+            if (property != null)
             {
                 _bindableProperties.Add(propertyName);
             }
 
             return property;
-        }
-
-        private bool IsNotCommand<T>()
-        {
-            return typeof(T) != typeof(IBaseCommand);
         }
     }
 }

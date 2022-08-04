@@ -35,11 +35,11 @@ public class AppContext : MonoBehaviour, IAppContext
         _registeredTypes.Add(typeof(T), instance);
     }
 
-    private IReadOnlyDictionary<Type, IValueConverter> GetValueConverters()
+    private IEnumerable<IValueConverter> GetValueConverters()
     {
-        return new Dictionary<Type, IValueConverter>
+        return new IValueConverter[]
         {
-            { typeof(int), new IntToStrConverter() }
+            new IntToStrConverter()
         };
     }
 }

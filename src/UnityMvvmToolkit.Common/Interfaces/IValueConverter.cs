@@ -1,9 +1,13 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace UnityMvvmToolkit.Common.Interfaces
 {
     public interface IValueConverter
     {
+        string Name { get; }
+        Type SourceType { get; }
+        Type TargetType { get; }
     }
 
     public interface IValueConverter<TSourceType, TTargetType> : IValueConverter

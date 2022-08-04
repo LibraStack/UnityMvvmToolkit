@@ -1,9 +1,11 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using UnityMvvmToolkit.Common.Internal;
 
 namespace UnityMvvmToolkit.Common.Extensions
 {
-    public static class SpanExtensions
+    public static class StringExtensions
     {
         private static readonly CultureInfo CommaCulture = new("en")
         {
@@ -20,6 +22,12 @@ namespace UnityMvvmToolkit.Common.Extensions
         {
             return float.TryParse(str, NumberStyles.Any, CommaCulture, out result) ||
                    float.TryParse(str, NumberStyles.Any, PointCulture, out result);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static LineSplitEnumerator Split(this ReadOnlyMemory<char> strMemory, char separator)
+        {
+            return new LineSplitEnumerator(strMemory.Span, separator);
         }
     }
 }

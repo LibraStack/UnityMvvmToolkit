@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Common.Interfaces;
@@ -7,18 +8,17 @@ using UnityMvvmToolkit.Common.Properties;
 
 namespace UnityMvvmToolkit.Common
 {
-    public class PropertyProvider<TBindingContext> : IPropertyProvider
+    internal class PropertyProvider<TBindingContext> : IPropertyProvider
     {
         private readonly TBindingContext _bindingContext;
+        private readonly IEnumerable<IValueConverter> _valueConverters;
         private readonly Dictionary<(string, Type), object> _cachedProperties;
-        private readonly IReadOnlyDictionary<Type, IValueConverter> _valueConverters;
 
-        public PropertyProvider(TBindingContext bindingContext,
-            IReadOnlyDictionary<Type, IValueConverter> valueConverters)
+        public PropertyProvider(TBindingContext bindingContext, IEnumerable<IValueConverter> valueConverters)
         {
             _bindingContext = bindingContext;
-            _cachedProperties = new Dictionary<(string, Type), object>();
             _valueConverters = valueConverters;
+            _cachedProperties = new Dictionary<(string, Type), object>();
         }
 
         public TCommand GetCommand<TCommand>(string propertyName) where TCommand : IBaseCommand
@@ -44,21 +44,22 @@ namespace UnityMvvmToolkit.Common
             return CacheProperty<TCommand>(propertyName, propertyInfo.GetValue(_bindingContext));
         }
 
-        public IProperty<TValueType> GetProperty<TValueType>(string propertyName)
+        public IProperty<TValueType> GetProperty<TValueType>(string propertyName, ReadOnlyMemory<char> converterName)
         {
-            return CreateProperty<IProperty<TValueType>, TValueType>(propertyName, typeof(Property<,>),
-                typeof(PropertyWithValueConverter<,,>));
+            return CreateProperty<IProperty<TValueType>, TValueType>(propertyName, converterName,
+                typeof(Property<,>), typeof(PropertyWithValueConverter<,,>));
         }
 
-        public IReadOnlyProperty<TValueType> GetReadOnlyProperty<TValueType>(string propertyName)
+        public IReadOnlyProperty<TValueType> GetReadOnlyProperty<TValueType>(string propertyName,
+            ReadOnlyMemory<char> converterName)
         {
-            return CreateProperty<IReadOnlyProperty<TValueType>, TValueType>(propertyName, typeof(ReadOnlyProperty<,>),
-                typeof(ReadOnlyPropertyWithValueConverter<,,>));
+            return CreateProperty<IReadOnlyProperty<TValueType>, TValueType>(propertyName, converterName,
+                typeof(ReadOnlyProperty<,>), typeof(ReadOnlyPropertyWithValueConverter<,,>));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private TProperty CreateProperty<TProperty, TValueType>(string propertyName, Type propertyType,
-            Type propertyWithValueConverterType)
+        private TProperty CreateProperty<TProperty, TValueType>(string propertyName, ReadOnlyMemory<char> converterName,
+            Type propertyType, Type propertyWithValueConverterType)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
             {
@@ -82,13 +83,21 @@ namespace UnityMvvmToolkit.Common
 
             if (typeof(TValueType) == propertyInfo.PropertyType)
             {
-                args = new object[] { _bindingContext, propertyInfo };
+                args = new object[]
+                {
+                    _bindingContext, propertyInfo
+                };
+
                 genericPropertyType = propertyType.MakeGenericType(typeof(TBindingContext), typeof(TValueType));
             }
             else
             {
                 args = new object[]
-                    { _bindingContext, propertyInfo, GetValueConverter<TValueType>(propertyInfo.PropertyType) };
+                {
+                    _bindingContext, propertyInfo,
+                    GetValueConverter<TValueType>(propertyInfo.PropertyType, converterName.Span)
+                };
+
                 genericPropertyType = propertyWithValueConverterType.MakeGenericType(typeof(TBindingContext),
                     typeof(TValueType), propertyInfo.PropertyType);
             }
@@ -107,19 +116,49 @@ namespace UnityMvvmToolkit.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IValueConverter GetValueConverter<TValueType>(Type propertyType)
+        private IValueConverter GetValueConverter<TValueType>(Type propertyType, ReadOnlySpan<char> converterName)
         {
             if (_valueConverters == null)
             {
                 throw new NullReferenceException(nameof(_valueConverters));
             }
 
-            if (_valueConverters.TryGetValue(propertyType, out var valueConverter))
+            var valueConverter = converterName.IsEmpty
+                ? GetValueConverter(propertyType)
+                : GetValueConverter(propertyType, converterName);
+
+            if (valueConverter != null)
             {
                 return valueConverter;
             }
 
-            throw new InvalidOperationException($"Converter is missing: From {propertyType} To {typeof(TValueType)}");
+            if (converterName.IsEmpty)
+            {
+                throw new InvalidOperationException(
+                    $"Converter is missing: From {propertyType} To {typeof(TValueType)}");
+            }
+
+            throw new InvalidOperationException($"Converter '{converterName.ToString()}' not found.");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IValueConverter GetValueConverter(Type propertyType)
+        {
+            return _valueConverters.FirstOrDefault(valueConverter => valueConverter.SourceType == propertyType);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IValueConverter GetValueConverter(Type propertyType, ReadOnlySpan<char> converterName)
+        {
+            foreach (var valueConverter in _valueConverters)
+            {
+                if (valueConverter.SourceType == propertyType && converterName.SequenceEqual(valueConverter.Name))
+                {
+                    return valueConverter;
+                }
+            }
+
+            return null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

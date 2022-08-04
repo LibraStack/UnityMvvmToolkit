@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityMvvmToolkit.Common.Interfaces;
@@ -16,9 +15,9 @@ namespace Views
             return _appContext.Resolve<CounterViewModel>();
         }
 
-        protected override IReadOnlyDictionary<Type, IValueConverter> GetValueConverters()
+        protected override IEnumerable<IValueConverter> GetValueConverters()
         {
-            return _appContext.Resolve<IReadOnlyDictionary<Type, IValueConverter>>();
+            return _appContext.Resolve<IEnumerable<IValueConverter>>();
         }
 
         protected override IBindableVisualElementsCreator GetBindableVisualElementsCreator()
