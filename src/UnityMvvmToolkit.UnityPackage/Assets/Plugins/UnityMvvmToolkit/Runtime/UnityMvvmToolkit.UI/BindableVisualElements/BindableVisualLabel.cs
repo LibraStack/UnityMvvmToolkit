@@ -4,12 +4,12 @@ using UnityMvvmToolkit.UI.BindableUIElements;
 
 namespace UnityMvvmToolkit.UI.BindableVisualElements
 {
-    public class BindableVisualLabel : BindableVisualElement
+    public class BindableVisualLabel : BindablePropertyElement
     {
         private readonly BindableLabel _label;
         private readonly IReadOnlyProperty<string> _textProperty;
 
-        public BindableVisualLabel(BindableLabel label, IPropertyProvider propertyProvider) : base(propertyProvider)
+        public BindableVisualLabel(BindableLabel label, IObjectProvider objectProvider) : base(objectProvider)
         {
             _label = label;
             _textProperty = GetReadOnlyProperty<string>(label.BindingTextPath);

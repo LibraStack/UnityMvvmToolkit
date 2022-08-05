@@ -3,9 +3,8 @@ using System.Runtime.CompilerServices;
 
 namespace UnityMvvmToolkit.Common.Interfaces
 {
-    public interface IValueConverter
+    public interface IValueConverter : IConverter
     {
-        string Name { get; }
         Type SourceType { get; }
         Type TargetType { get; }
     }

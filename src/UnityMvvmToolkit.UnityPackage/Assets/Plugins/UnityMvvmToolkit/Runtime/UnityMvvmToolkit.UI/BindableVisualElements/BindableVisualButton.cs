@@ -1,38 +1,13 @@
-﻿using System;
-using UnityMvvmToolkit.Common.Interfaces;
+﻿using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.UI.BindableUIElements;
 
 namespace UnityMvvmToolkit.UI.BindableVisualElements
 {
-    public class BindableVisualButton : IBindableElement, IDisposable
+    public class BindableVisualButton : BindableButtonElement
     {
-        private readonly BindableButton _button;
-        private readonly ICommand<string> _command;
-        private readonly string _commandParameter;
-
-        public BindableVisualButton(BindableButton button, IPropertyProvider propertyProvider)
+        public BindableVisualButton(BindableButton button, IObjectProvider objectProvider) 
+            : base(button, objectProvider)
         {
-            _button = button;
-            _command = propertyProvider.GetCommand<ICommand<string>>(_button.Command);
-            _commandParameter = button.CommandParameter;
-
-            if (_command != null)
-            {
-                _button.clicked += OnButtonClicked;
-            }
-        }
-
-        public void Dispose()
-        {
-            if (_command != null)
-            {
-                _button.clicked -= OnButtonClicked;
-            }
-        }
-
-        private void OnButtonClicked()
-        {
-            _command.Execute(_commandParameter);
         }
     }
 }

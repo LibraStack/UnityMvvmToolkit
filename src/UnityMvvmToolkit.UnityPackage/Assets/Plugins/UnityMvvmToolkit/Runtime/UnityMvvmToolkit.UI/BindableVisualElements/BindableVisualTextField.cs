@@ -7,13 +7,13 @@ using UnityMvvmToolkit.UI.BindableUIElements;
 namespace UnityMvvmToolkit.UI.BindableVisualElements
 {
     // TODO: Reset value on leave.
-    public class BindableVisualTextField : BindableVisualElement, IDisposable
+    public class BindableVisualTextField : BindablePropertyElement, IDisposable
     {
         private readonly BindableTextField _textField;
         private readonly IProperty<string> _valueProperty;
 
-        public BindableVisualTextField(BindableTextField textField, IPropertyProvider propertyProvider)
-            : base(propertyProvider)
+        public BindableVisualTextField(BindableTextField textField, IObjectProvider objectProvider)
+            : base(objectProvider)
         {
             _textField = textField;
             _textField.RegisterValueChangedCallback(OnTextFieldValueChanged);

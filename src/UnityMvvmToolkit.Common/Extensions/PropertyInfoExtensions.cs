@@ -5,11 +5,6 @@ namespace UnityMvvmToolkit.Common.Extensions
 {
     public static class PropertyInfoExtensions
     {
-        public static bool HasSetMethod(this PropertyInfo propertyInfo)
-        {
-            return propertyInfo.SetMethod != null;
-        }
-
         public static Func<TObjectType, TValueType> CreateGetValueDelegate<TObjectType, TValueType>(
             this PropertyInfo propertyInfo)
         {

@@ -10,11 +10,11 @@ namespace BindableVisualElements
         private readonly ICommand _increaseCommand;
         private readonly ICommand _decreaseCommand;
 
-        public BindableVisualCounterSlider(BindableCounterSlider counterSlider, IPropertyProvider propertyProvider)
+        public BindableVisualCounterSlider(BindableCounterSlider counterSlider, IObjectProvider objectProvider)
         {
             _counterSlider = counterSlider;
-            _increaseCommand = propertyProvider.GetCommand<ICommand>(counterSlider.IncreaseCommand);
-            _decreaseCommand = propertyProvider.GetCommand<ICommand>(counterSlider.DecreaseCommand);
+            _increaseCommand = objectProvider.GetCommand<ICommand>(counterSlider.IncreaseCommand);
+            _decreaseCommand = objectProvider.GetCommand<ICommand>(counterSlider.DecreaseCommand);
 
             if (_increaseCommand != null)
             {

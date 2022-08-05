@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Interfaces.Services;
 using UIElements;
 using UnityEngine;
@@ -20,9 +19,9 @@ namespace Views
             return _appContext.Resolve<TBindingContext>();
         }
 
-        protected override IEnumerable<IValueConverter> GetValueConverters()
+        protected override IConverter[] GetValueConverters()
         {
-            return _appContext.Resolve<IEnumerable<IValueConverter>>();
+            return _appContext.Resolve<IConverter[]>();
         }
 
         protected override IBindableVisualElementsCreator GetBindableVisualElementsCreator()

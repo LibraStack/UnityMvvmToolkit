@@ -2,6 +2,6 @@
 {
     public interface IBindableVisualElementsCreator
     {
-        IBindableElement Create(IBindableUIElement bindableUiElement, IPropertyProvider propertyProvider);
+        IBindableElement Create(IBindableUIElement bindableUiElement, IObjectProvider objectProvider);
     }
 }

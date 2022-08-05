@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using Enums;
-using UnityMvvmToolkit.Common.ValueConverters;
+using UnityMvvmToolkit.Common.Converters.ValueConverters;
 
 namespace ValueConverters
 {

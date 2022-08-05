@@ -7,13 +7,13 @@ namespace UnityMvvmToolkit.UI
 {
     public class BindableVisualElementsCreator : IBindableVisualElementsCreator
     {
-        public virtual IBindableElement Create(IBindableUIElement bindableUiElement, IPropertyProvider propertyProvider)
+        public virtual IBindableElement Create(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
         {
             return bindableUiElement switch
             {
-                BindableLabel label => new BindableVisualLabel(label, propertyProvider),
-                BindableTextField textField => new BindableVisualTextField(textField, propertyProvider),
-                BindableButton button => new BindableVisualButton(button, propertyProvider),
+                BindableLabel label => new BindableVisualLabel(label, objectProvider),
+                BindableTextField textField => new BindableVisualTextField(textField, objectProvider),
+                BindableButton button => new BindableVisualButton(button, objectProvider),
 
                 _ => throw new NotImplementedException(
                     $"Bindable visual element for {bindableUiElement.GetType()} is not implemented.")

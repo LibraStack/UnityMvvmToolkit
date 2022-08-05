@@ -4,8 +4,8 @@ using Interfaces;
 using Interfaces.Services;
 using Services;
 using UnityEngine;
+using UnityMvvmToolkit.Common.Converters.ValueConverters;
 using UnityMvvmToolkit.Common.Interfaces;
-using UnityMvvmToolkit.Common.ValueConverters;
 using ValueConverters;
 using ViewModels;
 
@@ -36,9 +36,9 @@ public class AppContext : MonoBehaviour, IAppContext
         _registeredTypes.Add(typeof(T), instance);
     }
 
-    private IEnumerable<IValueConverter> GetValueConverters()
+    private IConverter[] GetValueConverters()
     {
-        return new IValueConverter[]
+        return new IConverter[]
         {
             new IntToStrConverter(),
             new ThemeModeToBoolConverter()

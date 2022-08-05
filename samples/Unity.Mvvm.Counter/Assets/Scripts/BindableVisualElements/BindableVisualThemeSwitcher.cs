@@ -5,13 +5,13 @@ using UnityMvvmToolkit.Common.Interfaces;
 
 namespace BindableVisualElements
 {
-    public class BindableVisualThemeSwitcher : BindableVisualElement, IDisposable
+    public class BindableVisualThemeSwitcher : BindablePropertyElement, IDisposable
     {
         private readonly BindableThemeSwitcher _themeSwitcher;
         private readonly IProperty<bool> _valueProperty;
 
-        public BindableVisualThemeSwitcher(BindableThemeSwitcher themeSwitcher, IPropertyProvider propertyProvider)
-            : base(propertyProvider)
+        public BindableVisualThemeSwitcher(BindableThemeSwitcher themeSwitcher, IObjectProvider objectProvider)
+            : base(objectProvider)
         {
             _themeSwitcher = themeSwitcher;
             _themeSwitcher.Switch += OnThemeSwitch;

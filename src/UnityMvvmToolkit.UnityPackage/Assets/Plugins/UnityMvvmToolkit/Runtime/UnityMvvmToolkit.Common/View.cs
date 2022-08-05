@@ -9,19 +9,19 @@ namespace UnityMvvmToolkit.Common
     {
         private TBindingContext _bindingContext;
 
-        private IPropertyProvider _propertyProvider;
+        private IObjectProvider _objectProvider;
         private IBindableVisualElementsCreator _bindableElementsCreator;
-        private Dictionary<string, HashSet<IBindableVisualElement>> _bindableVisualElements;
+        private Dictionary<string, HashSet<IBindablePropertyElement>> _bindableVisualElements;
 
         public TBindingContext BindingContext => _bindingContext;
 
         public void Configure(TBindingContext bindingContext, IBindableVisualElementsCreator visualElementsCreator,
-            IEnumerable<IValueConverter> valueConverters)
+            IConverter[] converters)
         {
             _bindingContext = bindingContext;
-            _propertyProvider = new PropertyProvider<TBindingContext>(bindingContext, valueConverters);
+            _objectProvider = new BindingContextObjectProvider<TBindingContext>(bindingContext, converters);
             _bindableElementsCreator = visualElementsCreator;
-            _bindableVisualElements = new Dictionary<string, HashSet<IBindableVisualElement>>();
+            _bindableVisualElements = new Dictionary<string, HashSet<IBindablePropertyElement>>();
         }
 
         public void EnableBinding()
@@ -36,8 +36,8 @@ namespace UnityMvvmToolkit.Common
 
         public IBindableElement RegisterBindableElement(IBindableUIElement bindableUiElement, bool updateElementValues)
         {
-            var bindableElement = _bindableElementsCreator.Create(bindableUiElement, _propertyProvider);
-            if (bindableElement is not IBindableVisualElement bindableVisualElement)
+            var bindableElement = _bindableElementsCreator.Create(bindableUiElement, _objectProvider);
+            if (bindableElement is not IBindablePropertyElement bindableVisualElement)
             {
                 return bindableElement;
             }
@@ -55,16 +55,16 @@ namespace UnityMvvmToolkit.Common
             return bindableElement;
         }
 
-        private void RegisterBindableElement(string propertyName, IBindableVisualElement bindableVisualElement)
+        private void RegisterBindableElement(string propertyName, IBindablePropertyElement bindablePropertyElement)
         {
             if (_bindableVisualElements.TryGetValue(propertyName, out var visualElements))
             {
-                visualElements.Add(bindableVisualElement);
+                visualElements.Add(bindablePropertyElement);
             }
             else
             {
                 _bindableVisualElements.Add(propertyName,
-                    new HashSet<IBindableVisualElement> { bindableVisualElement });
+                    new HashSet<IBindablePropertyElement> { bindablePropertyElement });
             }
         }
 

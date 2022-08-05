@@ -4,7 +4,7 @@ namespace UnityMvvmToolkit.Common.Internal.Structs
 {
     internal readonly ref struct LineSplitData
     {
-        public LineSplitData(int start, ReadOnlySpan<char> data)
+        internal LineSplitData(int start, ReadOnlySpan<char> data)
         {
             Data = data;
             Start = start;
@@ -14,8 +14,6 @@ namespace UnityMvvmToolkit.Common.Internal.Structs
         public int Start { get; }
         public int Length { get; }
         public ReadOnlySpan<char> Data { get; }
-
-        public bool IsEmptyOrWhiteSpace => Data.IsEmpty || Data.IsWhiteSpace();
 
         public LineSplitData Trim()
         {

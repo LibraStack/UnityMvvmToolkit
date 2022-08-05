@@ -10,7 +10,7 @@ namespace UnityMvvmToolkit.Common.Internal.Structs
         private readonly char _separator;
         private readonly bool _trimLines;
 
-        public LineSplitEnumerator(ReadOnlySpan<char> str, char separator, bool trimLines)
+        internal LineSplitEnumerator(ReadOnlySpan<char> str, char separator, bool trimLines)
         {
             _str = str;
             _start = 0;
