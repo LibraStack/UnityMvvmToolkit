@@ -2,14 +2,14 @@
 using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Common.Interfaces;
 
-namespace BindableVisualElements
+namespace BindableUIElementWrappers
 {
-    public class BindableVisualAnimationLabel : BindablePropertyElement
+    public class BindableAnimationLabelWrapper : BindablePropertyElement
     {
         private readonly BindableAnimationLabel _animationLabel;
         private readonly IReadOnlyProperty<string> _textProperty;
 
-        public BindableVisualAnimationLabel(BindableAnimationLabel animationLabel, IObjectProvider objectProvider)
+        public BindableAnimationLabelWrapper(BindableAnimationLabel animationLabel, IObjectProvider objectProvider)
             : base(objectProvider)
         {
             _animationLabel = animationLabel;

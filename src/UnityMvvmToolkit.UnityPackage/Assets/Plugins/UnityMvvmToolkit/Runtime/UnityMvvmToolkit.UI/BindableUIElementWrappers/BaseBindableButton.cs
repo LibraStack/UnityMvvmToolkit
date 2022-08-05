@@ -3,14 +3,14 @@ using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.UI.BindableUIElements;
 
-namespace UnityMvvmToolkit.UI.BindableVisualElements
+namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
 {
-    public abstract class BindableButtonElement : BindableCommandElement, IDisposable
+    public abstract class BaseBindableButton : BindableCommandElement, IDisposable
     {
         private readonly BindableButton _button;
         private readonly ICommandWrapper _commandWrapper;
 
-        protected BindableButtonElement(BindableButton button, IObjectProvider objectProvider)
+        protected BaseBindableButton(BindableButton button, IObjectProvider objectProvider)
             : base(objectProvider)
         {
             _commandWrapper = GetCommandWrapper(button.Command);

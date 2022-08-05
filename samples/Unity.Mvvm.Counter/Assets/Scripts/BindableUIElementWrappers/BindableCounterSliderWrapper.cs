@@ -3,15 +3,15 @@ using BindableUIElements;
 using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Common.Interfaces;
 
-namespace BindableVisualElements
+namespace BindableUIElementWrappers
 {
-    public class BindableVisualCounterSlider : BindableCommandElement, IDisposable
+    public class BindableCounterSliderWrapper : BindableCommandElement, IDisposable
     {
         private readonly BindableCounterSlider _counterSlider;
         private readonly ICommand _increaseCommand;
         private readonly ICommand _decreaseCommand;
 
-        public BindableVisualCounterSlider(BindableCounterSlider counterSlider, IObjectProvider objectProvider)
+        public BindableCounterSliderWrapper(BindableCounterSlider counterSlider, IObjectProvider objectProvider)
             : base(objectProvider)
         {
             _counterSlider = counterSlider;

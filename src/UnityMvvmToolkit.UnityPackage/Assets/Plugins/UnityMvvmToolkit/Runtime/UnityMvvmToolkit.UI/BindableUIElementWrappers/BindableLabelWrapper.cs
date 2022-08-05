@@ -2,14 +2,14 @@
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.UI.BindableUIElements;
 
-namespace UnityMvvmToolkit.UI.BindableVisualElements
+namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
 {
-    public class BindableVisualLabel : BindablePropertyElement
+    public class BindableLabelWrapper : BindablePropertyElement
     {
         private readonly BindableLabel _label;
         private readonly IReadOnlyProperty<string> _textProperty;
 
-        public BindableVisualLabel(BindableLabel label, IObjectProvider objectProvider) : base(objectProvider)
+        public BindableLabelWrapper(BindableLabel label, IObjectProvider objectProvider) : base(objectProvider)
         {
             _label = label;
             _textProperty = GetReadOnlyProperty<string>(label.BindingTextPath);

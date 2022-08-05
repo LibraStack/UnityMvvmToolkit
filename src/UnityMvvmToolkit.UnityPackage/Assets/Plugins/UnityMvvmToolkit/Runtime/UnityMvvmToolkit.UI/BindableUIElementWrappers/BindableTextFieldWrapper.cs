@@ -4,15 +4,15 @@ using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.UI.BindableUIElements;
 
-namespace UnityMvvmToolkit.UI.BindableVisualElements
+namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
 {
     // TODO: Reset value on leave.
-    public class BindableVisualTextField : BindablePropertyElement, IDisposable
+    public class BindableTextFieldWrapper : BindablePropertyElement, IDisposable
     {
         private readonly BindableTextField _textField;
         private readonly IProperty<string> _valueProperty;
 
-        public BindableVisualTextField(BindableTextField textField, IObjectProvider objectProvider)
+        public BindableTextFieldWrapper(BindableTextField textField, IObjectProvider objectProvider)
             : base(objectProvider)
         {
             _textField = textField;

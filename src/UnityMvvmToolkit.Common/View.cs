@@ -10,17 +10,17 @@ namespace UnityMvvmToolkit.Common
         private TBindingContext _bindingContext;
 
         private IObjectProvider _objectProvider;
-        private IBindableVisualElementsCreator _bindableElementsCreator;
+        private IBindableElementsWrapper _bindableElementsWrapper;
         private Dictionary<string, HashSet<IBindablePropertyElement>> _bindableVisualElements;
 
         public TBindingContext BindingContext => _bindingContext;
 
-        public void Configure(TBindingContext bindingContext, IBindableVisualElementsCreator visualElementsCreator,
+        public void Configure(TBindingContext bindingContext, IBindableElementsWrapper elementsWrapper,
             IConverter[] converters)
         {
             _bindingContext = bindingContext;
             _objectProvider = new BindingContextObjectProvider<TBindingContext>(bindingContext, converters);
-            _bindableElementsCreator = visualElementsCreator;
+            _bindableElementsWrapper = elementsWrapper;
             _bindableVisualElements = new Dictionary<string, HashSet<IBindablePropertyElement>>();
         }
 
@@ -36,7 +36,7 @@ namespace UnityMvvmToolkit.Common
 
         public IBindableElement RegisterBindableElement(IBindableUIElement bindableUiElement, bool updateElementValues)
         {
-            var bindableElement = _bindableElementsCreator.Create(bindableUiElement, _objectProvider);
+            var bindableElement = _bindableElementsWrapper.Wrap(bindableUiElement, _objectProvider);
             if (bindableElement is not IBindablePropertyElement bindableVisualElement)
             {
                 return bindableElement;

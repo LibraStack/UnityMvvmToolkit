@@ -3,14 +3,14 @@ using BindableUIElements;
 using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Common.Interfaces;
 
-namespace BindableVisualElements
+namespace BindableUIElementWrappers
 {
-    public class BindableVisualThemeSwitcher : BindablePropertyElement, IDisposable
+    public class BindableThemeSwitcherWrapper : BindablePropertyElement, IDisposable
     {
         private readonly BindableThemeSwitcher _themeSwitcher;
         private readonly IProperty<bool> _valueProperty;
 
-        public BindableVisualThemeSwitcher(BindableThemeSwitcher themeSwitcher, IObjectProvider objectProvider)
+        public BindableThemeSwitcherWrapper(BindableThemeSwitcher themeSwitcher, IObjectProvider objectProvider)
             : base(objectProvider)
         {
             _themeSwitcher = themeSwitcher;

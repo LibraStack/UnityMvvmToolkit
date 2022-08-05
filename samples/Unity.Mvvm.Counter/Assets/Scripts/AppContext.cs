@@ -22,7 +22,7 @@ public class AppContext : MonoBehaviour, IAppContext
         RegisterInstance<IThemeService>(_themeService);
         RegisterInstance(new CounterViewModel());
         RegisterInstance<IDataStoreService>(new DataStoreService(this));
-        RegisterInstance<IBindableVisualElementsCreator>(new CounterBindableElementsCreator());
+        RegisterInstance<IBindableElementsWrapper>(new CounterBindableElementsWrapper());
         RegisterInstance(GetValueConverters());
     }
 
