@@ -59,7 +59,7 @@ namespace UnityMvvmToolkit.Common.Internal.ObjectProviders
                 return default;
             }
 
-            if (typeof(TValueType) == typeof(IBaseCommand))
+            if (typeof(TValueType).GetInterface(nameof(IBaseCommand)) != null)
             {
                 throw new InvalidOperationException(
                     $"To get a command use the {nameof(CommandProvider<TBindingContext>.GetCommand)} method instead.");

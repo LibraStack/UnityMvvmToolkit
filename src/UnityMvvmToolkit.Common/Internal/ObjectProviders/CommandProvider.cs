@@ -77,19 +77,19 @@ namespace UnityMvvmToolkit.Common.Internal.ObjectProviders
             AssurePropertyExist(propertyName, out var propertyInfo);
 
             var propertyType = propertyInfo.PropertyType;
-            if (propertyType != typeof(IBaseCommand))
+            if (propertyType.GetInterface(nameof(IBaseCommand)) == null)
             {
                 throw new InvalidCastException(
                     $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(IBaseCommand)} command."); // TODO: Conditional?
             }
 
-            if (propertyType == typeof(ICommand))
+            if (propertyType.GetInterface(nameof(ICommand)) != null)
             {
                 return AddInstanceToCache<ICommandWrapper>(propertyName,
                     new CommandWrapper((ICommand) propertyInfo.GetValue(BindingContext)));
             }
 
-            if (propertyType != typeof(ICommand<>))
+            if (propertyType.GetGenericTypeDefinition() != typeof(ICommand<>))
             {
                 throw new InvalidCastException(
                     $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(ICommand<>)} command.");
