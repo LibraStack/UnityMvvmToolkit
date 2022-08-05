@@ -11,13 +11,13 @@ namespace UnityMvvmToolkit.Common.Internal.StringParsers
         private const char OptionClose = '}';
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected LineSplitEnumerator Split(ReadOnlyMemory<char> bindingStringData, bool trim = true)
+        protected static LineSplitEnumerator Split(ReadOnlyMemory<char> bindingStringData, bool trim = true)
         {
             return bindingStringData.Split(Comma, trim);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected bool IsBindingOption(ReadOnlySpan<char> optionOpen, LineSplitData line,
+        protected static bool IsBindingOption(ReadOnlySpan<char> optionOpen, LineSplitData line,
             ReadOnlyMemory<char> bindingStringData, out ReadOnlyMemory<char> optionValue)
         {
             if (line.Data.Contains(optionOpen, out var startIndex) &&
