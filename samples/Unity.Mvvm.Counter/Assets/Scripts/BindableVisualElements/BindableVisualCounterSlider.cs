@@ -1,20 +1,22 @@
 ﻿using System;
 using BindableUIElements;
+using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Common.Interfaces;
 
 namespace BindableVisualElements
 {
-    public class BindableVisualCounterSlider : IBindableElement, IDisposable
+    public class BindableVisualCounterSlider : BindableCommandElement, IDisposable
     {
         private readonly BindableCounterSlider _counterSlider;
         private readonly ICommand _increaseCommand;
         private readonly ICommand _decreaseCommand;
 
         public BindableVisualCounterSlider(BindableCounterSlider counterSlider, IObjectProvider objectProvider)
+            : base(objectProvider)
         {
             _counterSlider = counterSlider;
-            _increaseCommand = objectProvider.GetCommand<ICommand>(counterSlider.IncreaseCommand);
-            _decreaseCommand = objectProvider.GetCommand<ICommand>(counterSlider.DecreaseCommand);
+            _increaseCommand = GetCommand<ICommand>(counterSlider.IncreaseCommand);
+            _decreaseCommand = GetCommand<ICommand>(counterSlider.DecreaseCommand);
 
             if (_increaseCommand != null)
             {

@@ -19,8 +19,7 @@ namespace UnityMvvmToolkit.UI.BindableUIElements
             public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
             {
                 base.Init(visualElement, bag, context);
-                ((BindableLabel) visualElement).BindingTextPath =
-                    _bindingTextAttribute.GetValueFromBag(bag, context);
+                ((BindableLabel) visualElement).BindingTextPath = _bindingTextAttribute.GetValueFromBag(bag, context);
             }
         }
     }
