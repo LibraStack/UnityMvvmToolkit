@@ -1,27 +1,27 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using UnityMvvmToolkit.Common.Interfaces;
-using UnityMvvmToolkit.Common.Internal;
 
 namespace UnityMvvmToolkit.Common
 {
     public class View<TBindingContext> where TBindingContext : class, INotifyPropertyChanged
     {
         private TBindingContext _bindingContext;
-
         private IObjectProvider _objectProvider;
         private IBindableElementsWrapper _bindableElementsWrapper;
-        private Dictionary<string, HashSet<IBindablePropertyElement>> _bindableVisualElements;
+        private Dictionary<string, HashSet<IBindablePropertyElement>> _bindablePropertyElements;
 
         public TBindingContext BindingContext => _bindingContext;
 
-        public void Configure(TBindingContext bindingContext, IBindableElementsWrapper elementsWrapper,
-            IConverter[] converters)
+        public View<TBindingContext> Configure(TBindingContext bindingContext, IObjectProvider objectProvider,
+            IBindableElementsWrapper elementsWrapper)
         {
             _bindingContext = bindingContext;
-            _objectProvider = new BindingContextObjectProvider<TBindingContext>(bindingContext, converters);
+            _objectProvider = objectProvider;
             _bindableElementsWrapper = elementsWrapper;
-            _bindableVisualElements = new Dictionary<string, HashSet<IBindablePropertyElement>>();
+            _bindablePropertyElements = new Dictionary<string, HashSet<IBindablePropertyElement>>();
+
+            return this;
         }
 
         public void EnableBinding()
@@ -37,19 +37,19 @@ namespace UnityMvvmToolkit.Common
         public IBindableElement RegisterBindableElement(IBindableUIElement bindableUiElement, bool updateElementValues)
         {
             var bindableElement = _bindableElementsWrapper.Wrap(bindableUiElement, _objectProvider);
-            if (bindableElement is not IBindablePropertyElement bindableVisualElement)
+            if (bindableElement is not IBindablePropertyElement bindablePropertyElement)
             {
                 return bindableElement;
             }
 
-            foreach (var propertyName in bindableVisualElement.BindableProperties)
+            foreach (var propertyName in bindablePropertyElement.BindableProperties)
             {
-                RegisterBindableElement(propertyName, bindableVisualElement);
+                RegisterBindableElement(propertyName, bindablePropertyElement);
             }
 
             if (updateElementValues)
             {
-                bindableVisualElement.UpdateValues();
+                bindablePropertyElement.UpdateValues();
             }
 
             return bindableElement;
@@ -57,24 +57,24 @@ namespace UnityMvvmToolkit.Common
 
         private void RegisterBindableElement(string propertyName, IBindablePropertyElement bindablePropertyElement)
         {
-            if (_bindableVisualElements.TryGetValue(propertyName, out var visualElements))
+            if (_bindablePropertyElements.TryGetValue(propertyName, out var propertyElements))
             {
-                visualElements.Add(bindablePropertyElement);
+                propertyElements.Add(bindablePropertyElement);
             }
             else
             {
-                _bindableVisualElements.Add(propertyName,
+                _bindablePropertyElements.Add(propertyName,
                     new HashSet<IBindablePropertyElement> { bindablePropertyElement });
             }
         }
 
         private void OnBindingContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (_bindableVisualElements.TryGetValue(e.PropertyName, out var visualElements))
+            if (_bindablePropertyElements.TryGetValue(e.PropertyName, out var propertyElements))
             {
-                foreach (var visualElement in visualElements)
+                foreach (var propertyElement in propertyElements)
                 {
-                    visualElement.UpdateValues();
+                    propertyElement.UpdateValues();
                 }
             }
         }

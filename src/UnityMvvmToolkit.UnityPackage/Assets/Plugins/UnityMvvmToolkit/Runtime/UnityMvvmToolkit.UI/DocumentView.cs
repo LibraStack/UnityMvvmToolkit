@@ -23,9 +23,7 @@ namespace UnityMvvmToolkit.UI
         {
             _uiDocument = GetComponent<UIDocument>();
 
-            _view = new View<TBindingContext>();
-            _view.Configure(GetBindingContext(), GetBindableElementsWrapper(), GetValueConverters());
-
+            _view = CreateView(GetBindingContext(), GetBindableElementsWrapper());
             _disposables = new List<IDisposable>();
 
             BindElements(_uiDocument.rootVisualElement); // TODO: Move to start?
@@ -70,6 +68,19 @@ namespace UnityMvvmToolkit.UI
         protected virtual IConverter[] GetValueConverters()
         {
             return null;
+        }
+
+        protected virtual IObjectProvider GetObjectProvider(TBindingContext bindingContext, IConverter[] converters)
+        {
+            return new BindingContextObjectProvider<TBindingContext>(bindingContext, converters);
+        }
+
+        private View<TBindingContext> CreateView(TBindingContext bindingContext,
+            IBindableElementsWrapper bindableElementsWrapper)
+        {
+            return new View<TBindingContext>()
+                .Configure(bindingContext, GetObjectProvider(bindingContext, GetValueConverters()),
+                    bindableElementsWrapper);
         }
 
         private void BindElements(VisualElement rootVisualElement)

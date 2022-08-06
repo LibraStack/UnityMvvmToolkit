@@ -3,14 +3,14 @@ using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Common.Internal.ObjectProviders;
 
-namespace UnityMvvmToolkit.Common.Internal
+namespace UnityMvvmToolkit.Common
 {
-    internal class BindingContextObjectProvider<TBindingContext> : IObjectProvider
+    public class BindingContextObjectProvider<TBindingContext> : IObjectProvider
     {
         private readonly CommandProvider<TBindingContext> _commandProvider;
         private readonly PropertyProvider<TBindingContext> _propertyProvider;
 
-        internal BindingContextObjectProvider(TBindingContext bindingContext, IConverter[] converters)
+        public BindingContextObjectProvider(TBindingContext bindingContext, IConverter[] converters)
         {
             _commandProvider = new CommandProvider<TBindingContext>(bindingContext, converters);
             _propertyProvider = new PropertyProvider<TBindingContext>(bindingContext, converters);
