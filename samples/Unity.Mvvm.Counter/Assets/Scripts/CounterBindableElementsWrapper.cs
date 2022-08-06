@@ -9,7 +9,7 @@ public class CounterBindableElementsWrapper : BindableElementsWrapper
     {
         return bindableUiElement switch
         {
-            BindableRootPage rootPage => new BindableRootPageWrapper(rootPage, objectProvider),
+            BindableContentPage contentPage => new BindableContentPageWrapper(contentPage, objectProvider),
             BindableCounterSlider counterSlider => new BindableCounterSliderWrapper(counterSlider, objectProvider),
             BindableThemeSwitcher themeSwitcher => new BindableThemeSwitcherWrapper(themeSwitcher, objectProvider),
             BindableAnimationLabel animationLabel => new BindableAnimationLabelWrapper(animationLabel, objectProvider),

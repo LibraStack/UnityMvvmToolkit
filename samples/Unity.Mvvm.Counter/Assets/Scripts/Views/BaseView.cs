@@ -15,7 +15,7 @@ namespace Views
 
         protected override TBindingContext GetBindingContext()
         {
-            RootVisualElement.Q<RootPage>()?.Initialize(_appContext.Resolve<IThemeService>());
+            RootVisualElement.Q<ContentPage>()?.Initialize(_appContext.Resolve<IThemeService>());
             return _appContext.Resolve<TBindingContext>();
         }
 

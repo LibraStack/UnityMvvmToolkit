@@ -3,11 +3,11 @@
     <Style src="project://database/Assets/UI%20Toolkit/Styles/app.uss?fileID=7433441132597879392&amp;guid=c7b8f36ee5df4e54fa1af17026a87cf2&amp;type=3#app" />
     <Style src="project://database/Assets/UI%20Toolkit/Styles/counter-slider.uss?fileID=7433441132597879392&amp;guid=8a77c3fef1cd1504287d70bfafdc9ee2&amp;type=3#counter-slider" />
     <Style src="project://database/Assets/UI%20Toolkit/Styles/switch.uss?fileID=7433441132597879392&amp;guid=3ca0ec88bf7f3be4092616e9534045e7&amp;type=3#switch" />
-    <BindableUIElements.BindableRootPage binding-theme-mode-path="ThemeMode" class="counter-screen">
+    <BindableUIElements.BindableContentPage binding-theme-mode-path="ThemeMode" class="counter-screen">
         <ui:VisualElement name="NumberContainer" class="number-container">
             <BindableUIElements.BindableCountLabel text="25" binding-text-path="Count" class="count-label count-label--animation" />
         </ui:VisualElement>
         <BindableUIElements.BindableThemeSwitcher binding-value-path="ThemeMode, Converter={ThemeModeToBoolConverter}" />
         <BindableUIElements.BindableCounterSlider increase-command="IncreaseCommand" decrease-command="DecreaseCommand" style="margin-bottom: 15%;" />
-    </BindableUIElements.BindableRootPage>
+    </BindableUIElements.BindableContentPage>
 </ui:UXML>

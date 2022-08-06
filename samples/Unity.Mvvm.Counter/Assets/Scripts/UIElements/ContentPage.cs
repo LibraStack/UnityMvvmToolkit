@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace UIElements
 {
-    public class RootPage : VisualElement
+    public class ContentPage : VisualElement
     {
         private IThemeService _themeService;
 
@@ -18,7 +18,7 @@ namespace UIElements
             _themeService?.SetThemeMode(themeMode);
         }
 
-        public new class UxmlFactory : UxmlFactory<RootPage, UxmlTraits>
+        public new class UxmlFactory : UxmlFactory<ContentPage, UxmlTraits>
         {
         }
 
