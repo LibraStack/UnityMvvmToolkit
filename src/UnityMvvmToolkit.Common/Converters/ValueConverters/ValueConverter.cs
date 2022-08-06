@@ -18,9 +18,9 @@ namespace UnityMvvmToolkit.Common.Converters.ValueConverters
         public Type TargetType { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public abstract bool TryConvert(TSourceType value, out TTargetType result);
+        public abstract TTargetType Convert(TSourceType value);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public abstract bool TryConvertBack(TTargetType value, out TSourceType result);
+        public abstract TSourceType ConvertBack(TTargetType value);
     }
 }

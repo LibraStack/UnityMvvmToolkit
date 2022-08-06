@@ -7,17 +7,15 @@ namespace ValueConverters
     public class ThemeModeToBoolConverter : ValueConverter<ThemeMode, bool>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool TryConvert(ThemeMode value, out bool result)
+        public override bool Convert(ThemeMode value)
         {
-            result = (int) value == 1;
-            return true;
+            return (int) value == 1;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool TryConvertBack(bool value, out ThemeMode result)
+        public override ThemeMode ConvertBack(bool value)
         {
-            result = (ThemeMode) (value ? 1 : 0);
-            return true;
+            return (ThemeMode) (value ? 1 : 0);
         }
     }
 }

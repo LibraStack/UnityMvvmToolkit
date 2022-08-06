@@ -16,6 +16,6 @@ namespace UnityMvvmToolkit.Common.Converters.ParameterConverters
         public Type TargetType { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public abstract bool TryConvert(ReadOnlyMemory<char> parameter, out TTargetType result);
+        public abstract TTargetType Convert(ReadOnlyMemory<char> parameter);
     }
 }

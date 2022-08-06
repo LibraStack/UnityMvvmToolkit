@@ -7,9 +7,10 @@ namespace UnityMvvmToolkit.Common.Converters.ParameterConverters
     public class ParameterToFloatConverter : ParameterConverter<float>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool TryConvert(ReadOnlyMemory<char> parameter, out float result)
+        public override float Convert(ReadOnlyMemory<char> parameter)
         {
-            return parameter.Span.TryParse(out result);
+            parameter.Span.TryParse(out var result);
+            return result;
         }
     }
 }

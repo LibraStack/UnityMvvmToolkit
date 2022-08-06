@@ -6,7 +6,7 @@ using UnityMvvmToolkit.Common.Interfaces;
 
 namespace UnityMvvmToolkit.Common.Internal.BindingContextObjectWrappers.PropertyWrappers
 {
-    internal class ReadOnlyPropertyWrapperWithConverter<TObjectType, TValueType, TSourceType> 
+    internal class ReadOnlyPropertyWrapperWithConverter<TObjectType, TValueType, TSourceType>
         : IReadOnlyProperty<TValueType>
     {
         private readonly TObjectType _obj;
@@ -24,7 +24,7 @@ namespace UnityMvvmToolkit.Common.Internal.BindingContextObjectWrappers.Property
         public TValueType Value
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _valueConverter.TryConvert(_getPropertyDelegate(_obj), out var result) ? result : default;
+            get => _valueConverter.Convert(_getPropertyDelegate(_obj));
         }
     }
 }

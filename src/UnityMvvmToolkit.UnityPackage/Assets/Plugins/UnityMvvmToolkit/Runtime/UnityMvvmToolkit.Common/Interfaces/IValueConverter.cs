@@ -12,9 +12,9 @@ namespace UnityMvvmToolkit.Common.Interfaces
     public interface IValueConverter<TSourceType, TTargetType> : IValueConverter
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        bool TryConvert(TSourceType value, out TTargetType result);
+        TTargetType Convert(TSourceType value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        bool TryConvertBack(TTargetType value, out TSourceType result);
+        TSourceType ConvertBack(TTargetType value);
     }
 }

@@ -8,9 +8,9 @@ namespace UnityMvvmToolkit.Common.Interfaces
         Type TargetType { get; }
     }
 
-    public interface IParameterConverter<TTargetType> : IParameterConverter
+    public interface IParameterConverter<out TTargetType> : IParameterConverter
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        bool TryConvert(ReadOnlyMemory<char> parameter, out TTargetType result);
+        TTargetType Convert(ReadOnlyMemory<char> parameter);
     }
 }

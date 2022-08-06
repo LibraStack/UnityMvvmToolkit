@@ -8,16 +8,16 @@ namespace UnityMvvmToolkit.Common.Converters.ValueConverters
     public class FloatToStrConverter : ValueConverter<float, string>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool TryConvert(float value, out string result)
+        public override string Convert(float value)
         {
-            result = value.ToString(CultureInfo.CurrentCulture);
-            return true;
+            return value.ToString(CultureInfo.CurrentCulture);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool TryConvertBack(string value, out float result)
+        public override float ConvertBack(string value)
         {
-            return value.AsSpan().TryParse(out result);
+            value.AsSpan().TryParse(out var result);
+            return result;
         }
     }
 }

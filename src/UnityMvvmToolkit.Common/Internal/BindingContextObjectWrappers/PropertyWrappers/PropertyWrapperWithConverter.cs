@@ -25,15 +25,9 @@ namespace UnityMvvmToolkit.Common.Internal.BindingContextObjectWrappers.Property
         public TValueType Value
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _valueConverter.TryConvert(_getPropertyDelegate(_obj), out var result) ? result : default;
+            get => _valueConverter.Convert(_getPropertyDelegate(_obj));
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set
-            {
-                if (_valueConverter.TryConvertBack(value, out var propertyValue))
-                {
-                    _setPropertyDelegate(_obj, propertyValue);
-                }
-            }
+            set => _setPropertyDelegate(_obj, _valueConverter.ConvertBack(value));
         }
     }
 }

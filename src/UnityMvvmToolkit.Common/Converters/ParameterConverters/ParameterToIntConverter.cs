@@ -6,9 +6,9 @@ namespace UnityMvvmToolkit.Common.Converters.ParameterConverters
     public class ParameterToIntConverter : ParameterConverter<int>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool TryConvert(ReadOnlyMemory<char> parameter, out int result)
+        public override int Convert(ReadOnlyMemory<char> parameter)
         {
-            return int.TryParse(parameter.Span, out result);
+            return int.Parse(parameter.Span);
         }
     }
 }
