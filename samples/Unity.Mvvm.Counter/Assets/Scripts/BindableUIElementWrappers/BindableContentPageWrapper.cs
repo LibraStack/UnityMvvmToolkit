@@ -19,10 +19,7 @@ namespace BindableUIElementWrappers
 
         public override void UpdateValues()
         {
-            if (_themeModeProperty != null)
-            {
-                _contentPage.SetThemeMode(_themeModeProperty.Value);
-            }
+            _contentPage.SetThemeMode(_themeModeProperty.Value);
         }
     }
 }

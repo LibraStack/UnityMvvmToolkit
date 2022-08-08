@@ -17,10 +17,7 @@ namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
 
         public override void UpdateValues()
         {
-            if (_textProperty != null)
-            {
-                _label.text = _textProperty.Value;
-            }
+            _label.text = _textProperty.Value;
         }
     }
 }

@@ -18,10 +18,7 @@ namespace BindableUIElementWrappers
 
         public override void UpdateValues()
         {
-            if (_textProperty != null)
-            {
-                _animationLabel.SetText(_textProperty.Value);
-            }
+            _animationLabel.SetText(_textProperty.Value);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace UnityMvvmToolkit.Core
             _propertyStringParser = new PropertyStringParser();
         }
 
-        public IEnumerable<string> BindableProperties => _bindableProperties;
+        public IReadOnlyCollection<string> BindableProperties => _bindableProperties;
 
         public abstract void UpdateValues();
 

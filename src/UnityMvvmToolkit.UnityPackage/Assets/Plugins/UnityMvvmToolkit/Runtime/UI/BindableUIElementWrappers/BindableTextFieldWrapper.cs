@@ -28,11 +28,6 @@ namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
 
         public override void UpdateValues()
         {
-            if (_valueProperty == null)
-            {
-                return;
-            }
-
             var value = _valueProperty.Value;
             if (_textField.value != value)
             {

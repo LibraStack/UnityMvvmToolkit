@@ -13,28 +13,33 @@ namespace BindableUIElementWrappers
         public BindableThemeSwitcherWrapper(BindableThemeSwitcher themeSwitcher, IObjectProvider objectProvider)
             : base(objectProvider)
         {
+            _valueProperty = GetProperty<bool>(themeSwitcher.BindingValuePath);
+
+            if (_valueProperty == null)
+            {
+                return;
+            }
+
             _themeSwitcher = themeSwitcher;
             _themeSwitcher.Switch += OnThemeSwitch;
+        }
 
-            _valueProperty = GetProperty<bool>(themeSwitcher.BindingValuePath);
+        public override void UpdateValues()
+        {
+            _themeSwitcher.SetValueWithoutNotify(_valueProperty.Value);
         }
 
         public void Dispose()
         {
-            _themeSwitcher.Switch -= OnThemeSwitch;
+            if (_valueProperty != null)
+            {
+                _themeSwitcher.Switch -= OnThemeSwitch;
+            }
         }
 
         private void OnThemeSwitch(object sender, bool value)
         {
             _valueProperty.Value = value;
-        }
-
-        public override void UpdateValues()
-        {
-            if (_valueProperty != null)
-            {
-                _themeSwitcher.SetValueWithoutNotify(_valueProperty.Value);
-            }
         }
     }
 }

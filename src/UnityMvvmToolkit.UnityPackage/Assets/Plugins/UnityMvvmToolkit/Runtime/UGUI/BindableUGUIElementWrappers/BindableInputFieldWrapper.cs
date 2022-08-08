@@ -27,11 +27,6 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElementWrappers
 
         public override void UpdateValues()
         {
-            if (_textProperty == null)
-            {
-                return;
-            }
-
             var value = _textProperty.Value;
             if (_inputField.text != value)
             {

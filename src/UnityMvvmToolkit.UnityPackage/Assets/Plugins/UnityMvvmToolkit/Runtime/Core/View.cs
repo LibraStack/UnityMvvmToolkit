@@ -10,7 +10,7 @@ namespace UnityMvvmToolkit.Core
         private TBindingContext _bindingContext;
         private IObjectProvider _objectProvider;
         private IBindableElementsWrapper _bindableElementsWrapper;
-        
+
         private List<IDisposable> _disposables;
         private Dictionary<string, HashSet<IBindablePropertyElement>> _bindablePropertyElements;
 
@@ -57,7 +57,7 @@ namespace UnityMvvmToolkit.Core
                 RegisterBindableElement(propertyName, bindablePropertyElement);
             }
 
-            if (updateElementValues)
+            if (updateElementValues && bindablePropertyElement.BindableProperties.Count > 0)
             {
                 bindablePropertyElement.UpdateValues();
             }
