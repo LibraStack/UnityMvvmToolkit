@@ -5,31 +5,31 @@ namespace UnityMvvmToolkit.Common
 {
     public class Command : ICommand
     {
-        private readonly Action _execute;
+        private readonly Action _action;
 
-        public Command(Action execute)
+        public Command(Action action)
         {
-            _execute = execute;
+            _action = action;
         }
 
         public void Execute()
         {
-            _execute?.Invoke();
+            _action?.Invoke();
         }
     }
 
     public class Command<T> : ICommand<T>
     {
-        private readonly Action<T> _execute;
+        private readonly Action<T> _action;
 
-        public Command(Action<T> execute)
+        public Command(Action<T> action)
         {
-            _execute = execute;
+            _action = action;
         }
 
         public void Execute(T parameter)
         {
-            _execute?.Invoke(parameter);
+            _action?.Invoke(parameter);
         }
     }
 }
