@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using UnityMvvmToolkit.Common.Interfaces;
 
 namespace UnityMvvmToolkit.Common
 {
-    public class View<TBindingContext> where TBindingContext : class, INotifyPropertyChanged
+    public class View<TBindingContext> : IDisposable where TBindingContext : class, INotifyPropertyChanged
     {
         private TBindingContext _bindingContext;
         private IObjectProvider _objectProvider;
         private IBindableElementsWrapper _bindableElementsWrapper;
+        
+        private List<IDisposable> _disposables;
         private Dictionary<string, HashSet<IBindablePropertyElement>> _bindablePropertyElements;
 
         public TBindingContext BindingContext => _bindingContext;
@@ -19,6 +22,8 @@ namespace UnityMvvmToolkit.Common
             _bindingContext = bindingContext;
             _objectProvider = objectProvider;
             _bindableElementsWrapper = elementsWrapper;
+
+            _disposables = new List<IDisposable>();
             _bindablePropertyElements = new Dictionary<string, HashSet<IBindablePropertyElement>>();
 
             return this;
@@ -37,6 +42,11 @@ namespace UnityMvvmToolkit.Common
         public IBindableElement RegisterBindableElement(IBindableUIElement bindableUiElement, bool updateElementValues)
         {
             var bindableElement = _bindableElementsWrapper.Wrap(bindableUiElement, _objectProvider);
+            if (bindableElement is IDisposable disposable)
+            {
+                _disposables.Add(disposable);
+            }
+
             if (bindableElement is not IBindablePropertyElement bindablePropertyElement)
             {
                 return bindableElement;
@@ -53,6 +63,14 @@ namespace UnityMvvmToolkit.Common
             }
 
             return bindableElement;
+        }
+
+        public void Dispose()
+        {
+            foreach (var disposable in _disposables)
+            {
+                disposable.Dispose();
+            }
         }
 
         private void RegisterBindableElement(string propertyName, IBindablePropertyElement bindablePropertyElement)

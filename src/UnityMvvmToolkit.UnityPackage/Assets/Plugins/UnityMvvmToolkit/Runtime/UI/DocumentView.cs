@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -14,7 +13,6 @@ namespace UnityMvvmToolkit.UI
     {
         private UIDocument _uiDocument;
         private View<TBindingContext> _view;
-        private List<IDisposable> _disposables;
 
         public TBindingContext BindingContext => _view.BindingContext;
         public VisualElement RootVisualElement => _uiDocument.rootVisualElement;
@@ -22,9 +20,7 @@ namespace UnityMvvmToolkit.UI
         private void Awake()
         {
             _uiDocument = GetComponent<UIDocument>();
-
             _view = CreateView(GetBindingContext(), GetBindableElementsWrapper());
-            _disposables = new List<IDisposable>();
 
             BindElements(_uiDocument.rootVisualElement); // TODO: Move to start?
         }
@@ -41,10 +37,7 @@ namespace UnityMvvmToolkit.UI
 
         private void OnDestroy()
         {
-            foreach (var disposable in _disposables)
-            {
-                disposable.Dispose();
-            }
+            _view.Dispose();
         }
 
         protected virtual TBindingContext GetBindingContext()
@@ -87,15 +80,9 @@ namespace UnityMvvmToolkit.UI
         {
             rootVisualElement.Query<VisualElement>().ForEach(visualElement =>
             {
-                if (visualElement is not IBindableUIElement bindableUIElement)
+                if (visualElement is IBindableUIElement bindableUIElement)
                 {
-                    return;
-                }
-
-                var bindableElement = _view.RegisterBindableElement(bindableUIElement, true);
-                if (bindableElement is IDisposable disposable)
-                {
-                    _disposables.Add(disposable);
+                    _view.RegisterBindableElement(bindableUIElement, true);
                 }
             });
         }

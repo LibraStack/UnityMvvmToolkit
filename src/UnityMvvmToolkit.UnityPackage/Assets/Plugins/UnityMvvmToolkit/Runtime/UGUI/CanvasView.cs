@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 using UnityMvvmToolkit.Common;
@@ -12,7 +11,6 @@ namespace UnityMvvmToolkit.UGUI
     {
         private GameObject _root;
         private View<TBindingContext> _view;
-        private List<IDisposable> _disposables;
 
         public GameObject RootElement => _root;
         public TBindingContext BindingContext => _view.BindingContext;
@@ -21,7 +19,6 @@ namespace UnityMvvmToolkit.UGUI
         {
             _root = gameObject;
             _view = CreateView(GetBindingContext(), GetBindableElementsWrapper());
-            _disposables = new List<IDisposable>();
 
             BindElements(_root); // TODO: Move to start?
         }
@@ -38,10 +35,7 @@ namespace UnityMvvmToolkit.UGUI
 
         private void OnDestroy()
         {
-            foreach (var disposable in _disposables)
-            {
-                disposable.Dispose();
-            }
+            _view.Dispose();
         }
 
         protected virtual TBindingContext GetBindingContext()
@@ -84,11 +78,7 @@ namespace UnityMvvmToolkit.UGUI
         {
             foreach (var bindableUIElement in rootElement.GetComponentsInChildren<IBindableUIElement>(true))
             {
-                var bindableElement = _view.RegisterBindableElement(bindableUIElement, true);
-                if (bindableElement is IDisposable disposable)
-                {
-                    _disposables.Add(disposable);
-                }
+                _view.RegisterBindableElement(bindableUIElement, true);
             }
         }
     }
