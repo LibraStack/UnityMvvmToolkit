@@ -9,12 +9,12 @@
   <!-- Sync code with Unity -->
   <!-- Consider clearing the destination folder -->
   <PropertyGroup>
-    <DestinationRoot>$(ProjectDir)..\UnityMvvmToolkit.UnityPackage\Assets\Plugins\UnityMvvmToolkit\Runtime\</DestinationRoot>
+    <DestinationRoot>$(ProjectDir)..\UnityMvvmToolkit.UnityPackage\Assets\Plugins\UnityMvvmToolkit\Runtime\Common\</DestinationRoot>
   </PropertyGroup>
   <ItemGroup>
     <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\$(ProjectName)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
   </Target>
 </Project>
