@@ -9,6 +9,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{A04A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityMvvmToolkit.Common", "src\UnityMvvmToolkit.Common\UnityMvvmToolkit.Common.csproj", "{A8734DD9-F957-4315-B270-1E3FD81F5537}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A9EFA272-7925-416B-A4B7-450672CD05C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityMvvmToolkit.UnitTests", "tests\UnityMvvmToolkit.UnitTests\UnityMvvmToolkit.UnitTests.csproj", "{DAE87E24-B2B1-4B61-B411-17201146670A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,12 +23,17 @@ Global
 		{A8734DD9-F957-4315-B270-1E3FD81F5537}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8734DD9-F957-4315-B270-1E3FD81F5537}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8734DD9-F957-4315-B270-1E3FD81F5537}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAE87E24-B2B1-4B61-B411-17201146670A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAE87E24-B2B1-4B61-B411-17201146670A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAE87E24-B2B1-4B61-B411-17201146670A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAE87E24-B2B1-4B61-B411-17201146670A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A8734DD9-F957-4315-B270-1E3FD81F5537} = {566BFBA3-9616-448A-B1AF-7750539D1A12}
+		{DAE87E24-B2B1-4B61-B411-17201146670A} = {A9EFA272-7925-416B-A4B7-450672CD05C7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F2B8E625-E8D2-4679-8F1B-9FB4E6532EA4}
