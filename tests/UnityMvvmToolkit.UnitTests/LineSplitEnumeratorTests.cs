@@ -7,7 +7,7 @@ public class LineSplitEnumeratorTests
 {
     [Theory]
     [InlineData("1,2,3,4,5", ',', 5)]
-    public void Split_ShouldSplitString_WhenParametersAreValid(string str, char separator, int expectation)
+    public void Split_ShouldSplitString_WhenStringIsValid(string str, char separator, int expectation)
     {
         // Arrange
         var index = 0;
@@ -19,7 +19,6 @@ public class LineSplitEnumeratorTests
             line.Index.Should().Be(index);
             index++;
         }
-
 
         // Assert
         index.Should().Be(expectation);
