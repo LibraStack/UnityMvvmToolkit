@@ -5,6 +5,7 @@ namespace UnityMvvmToolkit.Common.Internal.Structs
 {
     internal ref struct LineSplitEnumerator
     {
+        private int _index;
         private int _start;
         private ReadOnlySpan<char> _str;
         private readonly char _separator;
@@ -13,6 +14,7 @@ namespace UnityMvvmToolkit.Common.Internal.Structs
         internal LineSplitEnumerator(ReadOnlySpan<char> str, char separator, bool trimLines)
         {
             _str = str;
+            _index = 0;
             _start = 0;
             _separator = separator;
             _trimLines = trimLines;
@@ -36,25 +38,26 @@ namespace UnityMvvmToolkit.Common.Internal.Structs
             if (index == -1)
             {
                 _str = ReadOnlySpan<char>.Empty;
-                Current = CreateNewLine(_start, span);
+                Current = CreateNewLine(_index, _start, span);
 
                 return true;
             }
 
-            Current = CreateNewLine(_start, span.Slice(0, index));
+            Current = CreateNewLine(_index, _start, span.Slice(0, index));
 
-            _str = span.Slice(index + 1);
+            _index++;
             _start += index + 1;
+            _str = span.Slice(index + 1);
 
             return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private LineSplitData CreateNewLine(int start, ReadOnlySpan<char> data)
+        private LineSplitData CreateNewLine(int index, int start, ReadOnlySpan<char> data)
         {
             return _trimLines
-                ? new LineSplitData(start, data).Trim()
-                : new LineSplitData(start, data);
+                ? new LineSplitData(index, start, data).Trim()
+                : new LineSplitData(index, start, data);
         }
     }
 }

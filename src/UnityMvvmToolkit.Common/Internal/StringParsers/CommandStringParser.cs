@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityMvvmToolkit.Common.Extensions;
 using UnityMvvmToolkit.Common.Internal.Structs;
 
 namespace UnityMvvmToolkit.Common.Internal.StringParsers
@@ -12,11 +11,15 @@ namespace UnityMvvmToolkit.Common.Internal.StringParsers
         public CommandData GetCommandData(ReadOnlyMemory<char> commandStringData)
         {
             var commandData = new CommandData();
+            var isShortFormat = IsShortFormat(commandStringData);
 
             foreach (var line in Split(commandStringData))
             {
-                if (line.Data.IsEmptyOrWhiteSpace())
+                AssureLineIsNotEmpty(line.Data);
+
+                if (isShortFormat)
                 {
+                    commandData.SetValueByIndex(line.Index, commandStringData.Slice(line.Start, line.Length));
                     continue;
                 }
 
@@ -33,11 +36,6 @@ namespace UnityMvvmToolkit.Common.Internal.StringParsers
                 }
 
                 commandData.PropertyName = commandStringData.Slice(line.Start, line.Length);
-
-                if (commandData.IsReady)
-                {
-                    break;
-                }
             }
 
             return commandData;

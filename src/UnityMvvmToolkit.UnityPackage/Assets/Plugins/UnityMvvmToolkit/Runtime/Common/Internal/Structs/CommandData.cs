@@ -8,8 +8,21 @@ namespace UnityMvvmToolkit.Common.Internal.Structs
         public ReadOnlyMemory<char> ParameterValue { get; set; }
         public ReadOnlyMemory<char> ParameterConverterName { get; set; }
 
-        public bool IsReady => PropertyName.IsEmpty == false &&
-                               ParameterValue.IsEmpty == false &&
-                               ParameterConverterName.IsEmpty == false;
+        public void SetValueByIndex(int index, ReadOnlyMemory<char> value)
+        {
+            switch (index)
+            {
+                case 0:
+                    PropertyName = value;
+                    break;
+                case 1:
+                    ParameterValue = value;
+                    break;
+                case 2:
+                    ParameterConverterName = value;
+                    break;
+                default: throw new IndexOutOfRangeException(nameof(index));
+            }
+        }
     }
 }

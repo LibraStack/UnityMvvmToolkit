@@ -17,6 +17,12 @@ namespace UnityMvvmToolkit.Common.Internal.StringParsers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected bool IsShortFormat(ReadOnlyMemory<char> stringData)
+        {
+            return stringData.Span.Contains(OptionClose, out _) == false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected static bool IsBindingOption(ReadOnlySpan<char> optionOpen, LineSplitData line,
             ReadOnlyMemory<char> bindingStringData, out ReadOnlyMemory<char> optionValue)
         {
@@ -32,6 +38,15 @@ namespace UnityMvvmToolkit.Common.Internal.StringParsers
 
             optionValue = default;
             return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected void AssureLineIsNotEmpty(ReadOnlySpan<char> lineData)
+        {
+            if (lineData.IsEmptyOrWhiteSpace())
+            {
+                throw new NullReferenceException();
+            }
         }
     }
 }

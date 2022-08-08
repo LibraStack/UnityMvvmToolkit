@@ -7,7 +7,18 @@ namespace UnityMvvmToolkit.Common.Internal.Structs
         public ReadOnlyMemory<char> PropertyName { get; set; }
         public ReadOnlyMemory<char> ConverterName { get; set; }
 
-        public bool IsReady => PropertyName.IsEmpty == false &&
-                               ConverterName.IsEmpty == false;
+        public void SetValueByIndex(int index, ReadOnlyMemory<char> value)
+        {
+            switch (index)
+            {
+                case 0:
+                    PropertyName = value;
+                    break;
+                case 1:
+                    ConverterName = value;
+                    break;
+                default: throw new IndexOutOfRangeException(nameof(index));
+            }
+        }
     }
 }

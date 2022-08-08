@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityMvvmToolkit.Common.Extensions;
 using UnityMvvmToolkit.Common.Internal.Structs;
 
 namespace UnityMvvmToolkit.Common.Internal.StringParsers
@@ -10,30 +9,29 @@ namespace UnityMvvmToolkit.Common.Internal.StringParsers
 
         public PropertyData GetPropertyData(ReadOnlyMemory<char> propertyStringData)
         {
-            var bindingData = new PropertyData();
+            var propertyData = new PropertyData();
+            var isShortFormat = IsShortFormat(propertyStringData);
 
             foreach (var line in Split(propertyStringData))
             {
-                if (line.Data.IsEmptyOrWhiteSpace())
+                AssureLineIsNotEmpty(line.Data);
+
+                if (isShortFormat)
                 {
+                    propertyData.SetValueByIndex(line.Index, propertyStringData.Slice(line.Start, line.Length));
                     continue;
                 }
 
                 if (IsBindingOption(ConverterOpen, line, propertyStringData, out var converterName))
                 {
-                    bindingData.ConverterName = converterName;
+                    propertyData.ConverterName = converterName;
                     continue;
                 }
 
-                bindingData.PropertyName = propertyStringData.Slice(line.Start, line.Length);
-
-                if (bindingData.IsReady)
-                {
-                    break;
-                }
+                propertyData.PropertyName = propertyStringData.Slice(line.Start, line.Length);
             }
 
-            return bindingData;
+            return propertyData;
         }
     }
 }
