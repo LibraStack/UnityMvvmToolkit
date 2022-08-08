@@ -1,19 +1,12 @@
 ﻿using System;
-using Cysharp.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UIElements
 {
     public class CounterSlider : VisualElement
     {
-        private const string ThumbAnimationClassName = "slider__thumb--animation";
-
-        private bool _isDragMode;
-        private float _decreasePositionX;
-        private float _increasePositionX;
-
         private VisualElement _thumb;
+        private SliderManipulator _manipulator;
 
         public CounterSlider()
         {
@@ -27,14 +20,24 @@ namespace UIElements
             RegisterCallback<GeometryChangedEvent>(OnLayoutCalculated);
         }
 
-        public event EventHandler Increase;
-        public event EventHandler Decrease;
+        public event EventHandler Increase
+        {
+            add => _manipulator.Increase += value;
+            remove => _manipulator.Increase -= value;
+        }
+
+        public event EventHandler Decrease
+        {
+            add => _manipulator.Decrease += value;
+            remove => _manipulator.Decrease -= value;
+        }
 
         private void CreateLabel(string labelName, string labelText)
         {
             var label = new Label();
             label.text = labelText;
             label.name = labelName;
+            label.pickingMode = PickingMode.Ignore;
             label.AddToClassList("slider__label");
 
             Add(label);
@@ -59,71 +62,13 @@ namespace UIElements
 
         private void RegisterManipulator()
         {
-            var manipulator = new SliderManipulator();
-            manipulator.PointerDown += OnPointerDown;
-            manipulator.PointerMove += OnPointerMove;
-            manipulator.PointerUp += OnPointerUp;
-
-            this.AddManipulator(manipulator);
+            _manipulator = new SliderManipulator(this, _thumb);
+            this.AddManipulator(_manipulator);
         }
 
         private void OnLayoutCalculated(GeometryChangedEvent e)
         {
-            _decreasePositionX = _thumb.resolvedStyle.left - _thumb.resolvedStyle.width / 2;
-            _increasePositionX = _thumb.resolvedStyle.left + _thumb.resolvedStyle.width / 2;
-        }
-
-        private void OnPointerDown(EventBase eventBase, Vector2 localPosition)
-        {
-            if (eventBase.target == _thumb)
-            {
-                _isDragMode = true;
-                BeginThumbMove(localPosition);
-            }
-        }
-
-        private void OnPointerMove(EventBase eventBase, Vector2 localPosition)
-        {
-            if (_isDragMode)
-            {
-                SetThumbPosition(localPosition.x);
-            }
-        }
-
-        private void OnPointerUp(EventBase eventBase, Vector2 localPosition)
-        {
-            if (_isDragMode)
-            {
-                _isDragMode = false;
-                EndThumbMove(localPosition).Forget();
-            }
-        }
-
-        private void BeginThumbMove(Vector2 localPosition)
-        {
-            _thumb.RemoveFromClassList(ThumbAnimationClassName);
-            SetThumbPosition(localPosition.x);
-        }
-
-        private async UniTaskVoid EndThumbMove(Vector2 localPosition)
-        {
-            _thumb.AddToClassList(ThumbAnimationClassName);
-            await UniTask.Yield();
-            SetThumbPosition(resolvedStyle.width / 2);
-
-            if (localPosition.x >= _increasePositionX)
-            {
-                Increase?.Invoke(this, EventArgs.Empty);
-            }
-            else if (localPosition.x <= _decreasePositionX)
-            {
-                Decrease?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        private void SetThumbPosition(float value)
-        {
-            _thumb.style.left = value;
+            _manipulator.Initialize();
         }
 
         public new class UxmlFactory : UxmlFactory<CounterSlider, UxmlTraits>
