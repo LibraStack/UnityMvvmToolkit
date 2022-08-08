@@ -10,8 +10,7 @@ namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
         private readonly BindableButton _button;
         private readonly ICommandWrapper _commandWrapper;
 
-        protected BaseBindableButton(BindableButton button, IObjectProvider objectProvider)
-            : base(objectProvider)
+        protected BaseBindableButton(BindableButton button, IObjectProvider objectProvider) : base(objectProvider)
         {
             _commandWrapper = GetCommandWrapper(button.Command);
 
