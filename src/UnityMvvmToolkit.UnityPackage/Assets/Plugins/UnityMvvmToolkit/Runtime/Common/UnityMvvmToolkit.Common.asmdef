@@ -1,10 +1,8 @@
 {
-    "name": "UnityMvvmToolkit.UGUI",
+    "name": "UnityMvvmToolkit.Common",
     "rootNamespace": "",
     "references": [
-        "GUID:5c4878a33f8e8b04cb2f76d30bb7b0b0",
-        "GUID:d63bf47557a71534d82ecda7a3a700a2",
-        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+        "GUID:5c4878a33f8e8b04cb2f76d30bb7b0b0"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

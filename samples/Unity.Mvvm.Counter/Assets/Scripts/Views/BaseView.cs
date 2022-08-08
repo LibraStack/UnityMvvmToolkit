@@ -13,9 +13,14 @@ namespace Views
     {
         [SerializeField] private AppContext _appContext;
 
+        protected override void OnInit()
+        {
+            base.OnInit();
+            RootVisualElement.Q<ContentPage>()?.Initialize(_appContext.Resolve<IThemeService>());
+        }
+
         protected override TBindingContext GetBindingContext()
         {
-            RootVisualElement.Q<ContentPage>()?.Initialize(_appContext.Resolve<IThemeService>());
             return _appContext.Resolve<TBindingContext>();
         }
 

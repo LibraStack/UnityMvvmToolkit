@@ -1,90 +1,38 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UI
 {
     [RequireComponent(typeof(UIDocument))]
-    public abstract class DocumentView<TBindingContext> : MonoBehaviour
+    public abstract class DocumentView<TBindingContext> : MonoBehaviourView<TBindingContext>
         where TBindingContext : class, INotifyPropertyChanged
     {
         private UIDocument _uiDocument;
-        private View<TBindingContext> _view;
 
-        public TBindingContext BindingContext => _view.BindingContext;
         public VisualElement RootVisualElement => _uiDocument.rootVisualElement;
 
-        private void Awake()
+        protected override void OnInit()
         {
             _uiDocument = GetComponent<UIDocument>();
-            _view = CreateView(GetBindingContext(), GetBindableElementsWrapper());
-
-            BindElements(_uiDocument.rootVisualElement); // TODO: Move to start?
         }
 
-        private void OnEnable()
-        {
-            _view.EnableBinding();
-        }
-
-        private void OnDisable()
-        {
-            _view.DisableBinding();
-        }
-
-        private void OnDestroy()
-        {
-            _view.Dispose();
-        }
-
-        protected virtual TBindingContext GetBindingContext()
-        {
-            // TODO: Change DataContext dynamically?
-
-            if (typeof(TBindingContext).GetConstructor(Type.EmptyTypes) == null)
-            {
-                throw new InvalidOperationException(
-                    $"Cannot create an instance of the type parameter {typeof(TBindingContext)} because it does not have a parameterless constructor.");
-            }
-
-            return Activator.CreateInstance<TBindingContext>();
-        }
-
-        protected virtual IBindableElementsWrapper GetBindableElementsWrapper()
+        protected override IBindableElementsWrapper GetBindableElementsWrapper()
         {
             return new BindableElementsWrapper();
         }
 
-        protected virtual IConverter[] GetValueConverters()
+        protected override IEnumerable<IBindableUIElement> GetBindableUIElements()
         {
-            return null;
-        }
-
-        protected virtual IObjectProvider GetObjectProvider(TBindingContext bindingContext, IConverter[] converters)
-        {
-            return new BindingContextObjectProvider<TBindingContext>(bindingContext, converters);
-        }
-
-        private View<TBindingContext> CreateView(TBindingContext bindingContext,
-            IBindableElementsWrapper bindableElementsWrapper)
-        {
-            return new View<TBindingContext>()
-                .Configure(bindingContext, GetObjectProvider(bindingContext, GetValueConverters()),
-                    bindableElementsWrapper);
-        }
-
-        private void BindElements(VisualElement rootVisualElement)
-        {
-            rootVisualElement.Query<VisualElement>().ForEach(visualElement =>
-            {
-                if (visualElement is IBindableUIElement bindableUIElement)
-                {
-                    _view.RegisterBindableElement(bindableUIElement, true);
-                }
-            });
+            return RootVisualElement
+                .Query<VisualElement>()
+                .Where(element => element is IBindableUIElement)
+                .Build()
+                .Cast<IBindableUIElement>();
         }
     }
 }
