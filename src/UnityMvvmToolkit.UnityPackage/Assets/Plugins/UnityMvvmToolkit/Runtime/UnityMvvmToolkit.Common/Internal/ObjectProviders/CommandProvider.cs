@@ -89,7 +89,7 @@ namespace UnityMvvmToolkit.Common.Internal.ObjectProviders
                     new CommandWrapper((ICommand) propertyInfo.GetValue(BindingContext)));
             }
 
-            if (propertyType.GetGenericTypeDefinition() != typeof(ICommand<>))
+            if (propertyType.IsGenericType == false)
             {
                 throw new InvalidCastException(
                     $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(ICommand<>)} command.");
