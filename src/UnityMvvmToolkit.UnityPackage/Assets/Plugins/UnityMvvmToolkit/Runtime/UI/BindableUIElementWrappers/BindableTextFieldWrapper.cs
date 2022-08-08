@@ -15,20 +15,15 @@ namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
         public BindableTextFieldWrapper(BindableTextField textField, IObjectProvider objectProvider)
             : base(objectProvider)
         {
+            _valueProperty = GetProperty<string>(textField.BindingValuePath);
+
+            if (_valueProperty == null)
+            {
+                return;
+            }
+
             _textField = textField;
             _textField.RegisterValueChangedCallback(OnTextFieldValueChanged);
-
-            _valueProperty = GetProperty<string>(textField.BindingValuePath);
-        }
-
-        public void Dispose()
-        {
-            _textField.UnregisterValueChangedCallback(OnTextFieldValueChanged);
-        }
-
-        private void OnTextFieldValueChanged(ChangeEvent<string> e)
-        {
-            _valueProperty.Value = e.newValue;
         }
 
         public override void UpdateValues()
@@ -43,6 +38,16 @@ namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
             {
                 _textField.SetValueWithoutNotify(value);
             }
+        }
+
+        public void Dispose()
+        {
+            _textField?.UnregisterValueChangedCallback(OnTextFieldValueChanged);
+        }
+
+        private void OnTextFieldValueChanged(ChangeEvent<string> e)
+        {
+            _valueProperty.Value = e.newValue;
         }
     }
 }
