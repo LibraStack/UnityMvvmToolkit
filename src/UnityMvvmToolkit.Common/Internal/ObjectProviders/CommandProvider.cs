@@ -83,7 +83,7 @@ namespace UnityMvvmToolkit.Common.Internal.ObjectProviders
                     $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(IBaseCommand)} command."); // TODO: Conditional?
             }
 
-            if (propertyType.GetInterface(nameof(ICommand)) != null)
+            if (propertyType == typeof(ICommand) || propertyType.GetInterface(nameof(ICommand)) != null)
             {
                 return AddInstanceToCache<ICommandWrapper>(propertyName,
                     new CommandWrapper((ICommand) propertyInfo.GetValue(BindingContext)));
