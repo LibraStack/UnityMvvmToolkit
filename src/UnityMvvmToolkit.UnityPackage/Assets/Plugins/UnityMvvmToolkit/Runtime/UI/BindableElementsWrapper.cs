@@ -1,5 +1,5 @@
 ﻿using System;
-using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.UI.BindableUIElements;
 using UnityMvvmToolkit.UI.BindableUIElementWrappers;
 

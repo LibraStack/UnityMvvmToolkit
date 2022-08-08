@@ -3,7 +3,7 @@ using Interfaces.Services;
 using UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.UI;
 
 namespace Views

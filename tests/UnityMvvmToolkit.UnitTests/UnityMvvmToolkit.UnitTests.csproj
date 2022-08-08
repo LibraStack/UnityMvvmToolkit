@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\UnityMvvmToolkit.Common\UnityMvvmToolkit.Common.csproj" />
+      <ProjectReference Include="..\..\src\UnityMvvmToolkit.Core\UnityMvvmToolkit.Core.csproj" />
     </ItemGroup>
 
 </Project>

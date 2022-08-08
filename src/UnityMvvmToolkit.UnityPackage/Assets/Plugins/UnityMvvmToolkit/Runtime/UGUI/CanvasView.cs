@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using UnityEngine;
-using UnityMvvmToolkit.Common;
-using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UGUI
 {

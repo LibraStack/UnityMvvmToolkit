@@ -1,6 +1,6 @@
 ﻿using BindableUIElements;
-using UnityMvvmToolkit.Common;
-using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Interfaces;
 
 namespace BindableUIElementWrappers
 {

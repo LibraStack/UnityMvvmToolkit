@@ -1,5 +1,5 @@
 ﻿using UnityEngine.UIElements;
-using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UI.BindableUIElements
 {

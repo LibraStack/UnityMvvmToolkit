@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{566BFBA3-961
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{A04AE0B1-B475-44FD-AB92-37677624B6F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityMvvmToolkit.Common", "src\UnityMvvmToolkit.Common\UnityMvvmToolkit.Common.csproj", "{A8734DD9-F957-4315-B270-1E3FD81F5537}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityMvvmToolkit.Core", "src\UnityMvvmToolkit.Core\UnityMvvmToolkit.Core.csproj", "{A8734DD9-F957-4315-B270-1E3FD81F5537}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A9EFA272-7925-416B-A4B7-450672CD05C7}"
 EndProject

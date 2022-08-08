@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using UnityMvvmToolkit.Common.Internal.Structs;
+using UnityMvvmToolkit.Core.Internal.Structs;
 
 namespace UnityMvvmToolkit.UnitTests;
 

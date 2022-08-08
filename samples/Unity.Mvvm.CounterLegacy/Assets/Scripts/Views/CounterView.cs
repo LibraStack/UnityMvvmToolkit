@@ -1,5 +1,5 @@
-﻿using UnityMvvmToolkit.Common.Converters.ValueConverters;
-using UnityMvvmToolkit.Common.Interfaces;
+﻿using UnityMvvmToolkit.Core.Converters.ValueConverters;
+using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.UGUI;
 using ViewModels;
 

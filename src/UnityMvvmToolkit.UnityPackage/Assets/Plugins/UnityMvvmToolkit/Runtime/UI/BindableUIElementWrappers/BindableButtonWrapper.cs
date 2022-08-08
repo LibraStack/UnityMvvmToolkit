@@ -1,4 +1,4 @@
-﻿using UnityMvvmToolkit.Common.Interfaces;
+﻿using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.UI.BindableUIElements;
 
 namespace UnityMvvmToolkit.UI.BindableUIElementWrappers

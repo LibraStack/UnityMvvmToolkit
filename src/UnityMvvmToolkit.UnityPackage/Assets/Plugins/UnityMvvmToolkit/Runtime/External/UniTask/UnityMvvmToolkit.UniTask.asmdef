@@ -1,15 +1,23 @@
 {
-	"name": "UnityMvvmToolkit.UniTask",
-	"references": [
-		"UniTask",
-		"UnityMvvmToolkit.Common"
-	],
-	"autoReferenced": true,
-	"versionDefines": [
-		{
-			"name": "com.cysharp.unitask",
-			"expression": "",
-			"define": "UNITYMVVMTOOLKIT_UNITASK_SUPPORT"
-		}
-	]
+    "name": "UnityMvvmToolkit.UniTask",
+    "rootNamespace": "",
+    "references": [
+        "UnityMvvmToolkit.Core",
+        "UniTask"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "UNITYMVVMTOOLKIT_UNITASK_SUPPORT"
+        }
+    ],
+    "noEngineReferences": false
 }

@@ -4,7 +4,7 @@ namespace UnityMvvmToolkit.UniTask.Interfaces
 {
     using System.Threading;
     using Cysharp.Threading.Tasks;
-    using UnityMvvmToolkit.Common.Interfaces;
+    using UnityMvvmToolkit.Core.Interfaces;
 
     public interface IAsyncCommand : ICommand
     {

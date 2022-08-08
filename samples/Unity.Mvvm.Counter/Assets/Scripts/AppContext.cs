@@ -4,8 +4,8 @@ using Interfaces;
 using Interfaces.Services;
 using Services;
 using UnityEngine;
-using UnityMvvmToolkit.Common.Converters.ValueConverters;
-using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Core.Converters.ValueConverters;
+using UnityMvvmToolkit.Core.Interfaces;
 using ValueConverters;
 using ViewModels;
 

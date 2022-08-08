@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
 {

@@ -1,6 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
-using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
 {
