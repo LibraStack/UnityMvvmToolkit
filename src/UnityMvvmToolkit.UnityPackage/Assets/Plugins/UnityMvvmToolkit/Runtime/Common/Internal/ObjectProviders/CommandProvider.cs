@@ -116,7 +116,7 @@ namespace UnityMvvmToolkit.Common.Internal.ObjectProviders
                 args = new[]
                 {
                     command,
-                    parameterValue // TODO: Use delegate?
+                    parameterValue
                 };
 
                 genericCommandWrapperType = typeof(CommandWrapper<>).MakeGenericType(commandValueType);
@@ -150,17 +150,12 @@ namespace UnityMvvmToolkit.Common.Internal.ObjectProviders
                 ? GetConverter(targetType)
                 : GetConverter(targetType, converterName);
 
-            if (parameterConverter != null)
-            {
-                return parameterConverter;
-            }
-
-            if (converterName.IsEmpty)
+            if (parameterConverter == null)
             {
                 throw new NullReferenceException($"Parameter converter for {targetType} type is missing");
             }
 
-            throw new NullReferenceException($"Parameter converter '{converterName.ToString()}' not found.");
+            return parameterConverter;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -181,7 +176,7 @@ namespace UnityMvvmToolkit.Common.Internal.ObjectProviders
                 }
             }
 
-            return null;
+            throw new NullReferenceException($"Parameter converter '{converterName.ToString()}' not found.");
         }
     }
 }
