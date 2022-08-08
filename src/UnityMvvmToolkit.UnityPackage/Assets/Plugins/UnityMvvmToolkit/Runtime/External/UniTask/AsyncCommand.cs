@@ -4,14 +4,15 @@ namespace UnityMvvmToolkit.UniTask
 {
     using System;
     using Interfaces;
+    using System.Threading;
     using Cysharp.Threading.Tasks;
 
     public class AsyncCommand : IAsyncCommand
     {
         private AsyncLazy _executeTask;
-        private readonly Func<UniTask> _action;
+        private readonly Func<CancellationToken, UniTask> _action;
 
-        public AsyncCommand(Func<UniTask> action)
+        public AsyncCommand(Func<CancellationToken, UniTask> action)
         {
             _action = action;
         }
@@ -21,11 +22,11 @@ namespace UnityMvvmToolkit.UniTask
             ExecuteAsync().Forget();
         }
 
-        private async UniTask ExecuteAsync()
+        public async UniTask ExecuteAsync(CancellationToken cancellationToken = default)
         {
             if (_executeTask?.Task.Status.IsCompleted() ?? true)
             {
-                _executeTask = _action.Invoke().ToAsyncLazy();
+                _executeTask = _action.Invoke(cancellationToken).ToAsyncLazy();
             }
 
             await _executeTask;
@@ -35,9 +36,9 @@ namespace UnityMvvmToolkit.UniTask
     public class AsyncCommand<T> : IAsyncCommand<T>
     {
         private AsyncLazy _executeTask;
-        private readonly Func<T, UniTask> _action;
+        private readonly Func<T, CancellationToken, UniTask> _action;
 
-        public AsyncCommand(Func<T, UniTask> action)
+        public AsyncCommand(Func<T, CancellationToken, UniTask> action)
         {
             _action = action;
         }
@@ -47,11 +48,11 @@ namespace UnityMvvmToolkit.UniTask
             ExecuteAsync(parameter).Forget();
         }
 
-        private async UniTask ExecuteAsync(T parameter)
+        public async UniTask ExecuteAsync(T parameter, CancellationToken cancellationToken = default)
         {
             if (_executeTask?.Task.Status.IsCompleted() ?? true)
             {
-                _executeTask = _action.Invoke(parameter).ToAsyncLazy();
+                _executeTask = _action.Invoke(parameter, cancellationToken).ToAsyncLazy();
             }
 
             await _executeTask;
