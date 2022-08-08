@@ -43,10 +43,12 @@ namespace UIElements
         {
             var labelContainer = new VisualElement();
             labelContainer.name = containerName;
+            labelContainer.pickingMode = PickingMode.Ignore;
             labelContainer.AddToClassList("toggle-switch__label-container");
 
             var label = new Label();
             label.text = labelText;
+            label.pickingMode = PickingMode.Ignore;
             label.AddToClassList("toggle-switch__label");
             label.AddToClassList($"toggle-switch__label{labelClassNameModifier}");
 
@@ -62,6 +64,7 @@ namespace UIElements
 
             _thumb = new VisualElement();
             _thumb.name = "Thumb";
+            _thumb.pickingMode = PickingMode.Ignore;
             _thumb.AddToClassList("toggle-switch__track__thumb");
 
             _track.Add(_thumb);
@@ -80,7 +83,7 @@ namespace UIElements
 
         private void OnClick(ClickEvent e)
         {
-            e.StopPropagation();
+            e.StopImmediatePropagation();
             IsDarkMode = !IsDarkMode;
         }
 
