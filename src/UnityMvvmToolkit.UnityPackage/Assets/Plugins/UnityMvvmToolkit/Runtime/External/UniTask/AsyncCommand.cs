@@ -7,12 +7,11 @@ namespace UnityMvvmToolkit.UniTask
     using System.Threading;
     using Cysharp.Threading.Tasks;
 
-    public class AsyncCommand : IAsyncCommand
+    public class AsyncCommand : BaseAsyncCommand, IAsyncCommand
     {
-        private AsyncLazy _executeTask;
         private readonly Func<CancellationToken, UniTask> _action;
 
-        public AsyncCommand(Func<CancellationToken, UniTask> action)
+        public AsyncCommand(Func<CancellationToken, UniTask> action, Func<bool> canExecute = null) : base(canExecute)
         {
             _action = action;
         }
@@ -24,21 +23,27 @@ namespace UnityMvvmToolkit.UniTask
 
         public async UniTask ExecuteAsync(CancellationToken cancellationToken = default)
         {
-            if (_executeTask?.Task.Status.IsCompleted() ?? true)
+            if (ExecuteTask?.Task.Status.IsCompleted() ?? true)
             {
-                _executeTask = _action.Invoke(cancellationToken).ToAsyncLazy();
+                ExecuteTask = _action.Invoke(cancellationToken).ToAsyncLazy();
             }
 
-            await _executeTask;
+            try
+            {
+                await ExecuteTask;
+            }
+            finally
+            {
+                ExecuteTask = null;
+            }
         }
     }
 
-    public class AsyncCommand<T> : IAsyncCommand<T>
+    public class AsyncCommand<T> : BaseAsyncCommand, IAsyncCommand<T>
     {
-        private AsyncLazy _executeTask;
         private readonly Func<T, CancellationToken, UniTask> _action;
 
-        public AsyncCommand(Func<T, CancellationToken, UniTask> action)
+        public AsyncCommand(Func<T, CancellationToken, UniTask> action, Func<bool> canExecute = null) : base(canExecute)
         {
             _action = action;
         }
@@ -50,12 +55,19 @@ namespace UnityMvvmToolkit.UniTask
 
         public async UniTask ExecuteAsync(T parameter, CancellationToken cancellationToken = default)
         {
-            if (_executeTask?.Task.Status.IsCompleted() ?? true)
+            if (ExecuteTask?.Task.Status.IsCompleted() ?? true)
             {
-                _executeTask = _action.Invoke(parameter, cancellationToken).ToAsyncLazy();
+                ExecuteTask = _action.Invoke(parameter, cancellationToken).ToAsyncLazy();
             }
 
-            await _executeTask;
+            try
+            {
+                await ExecuteTask;
+            }
+            finally
+            {
+                ExecuteTask = null;
+            }
         }
     }
 }

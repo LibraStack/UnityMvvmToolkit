@@ -3,11 +3,11 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.Core
 {
-    public class Command : ICommand
+    public class Command : BaseCommand, ICommand
     {
         private readonly Action _action;
 
-        public Command(Action action)
+        public Command(Action action, Func<bool> canExecute = null) : base(canExecute)
         {
             _action = action;
         }
@@ -18,11 +18,11 @@ namespace UnityMvvmToolkit.Core
         }
     }
 
-    public class Command<T> : ICommand<T>
+    public class Command<T> : BaseCommand, ICommand<T>
     {
         private readonly Action<T> _action;
 
-        public Command(Action<T> action)
+        public Command(Action<T> action, Func<bool> canExecute = null) : base(canExecute)
         {
             _action = action;
         }
