@@ -42,14 +42,42 @@ namespace UnityMvvmToolkit.Core
         public IBindableElement RegisterBindableElement(IBindableUIElement bindableUiElement, bool updateElementValues)
         {
             var bindableElement = _bindableElementsWrapper.Wrap(bindableUiElement, _objectProvider);
-            if (bindableElement is IDisposable disposable)
+
+            TryInitialize(bindableElement);
+            TryRegisterPropertyElement(bindableElement, updateElementValues);
+
+            return bindableElement;
+        }
+
+        public void Dispose()
+        {
+            foreach (var disposable in _disposables)
+            {
+                disposable.Dispose();
+            }
+        }
+
+        private void TryInitialize(IBindableElement bindableElement)
+        {
+            var canInitialize = false;
+
+            if (bindableElement is IInitializable { CanInitialize: true } initializable)
+            {
+                canInitialize = true;
+                initializable.Initialize();
+            }
+
+            if (canInitialize && bindableElement is IDisposable disposable)
             {
                 _disposables.Add(disposable);
             }
+        }
 
+        private void TryRegisterPropertyElement(IBindableElement bindableElement, bool updateElementValues)
+        {
             if (bindableElement is not IBindablePropertyElement bindablePropertyElement)
             {
-                return bindableElement;
+                return;
             }
 
             foreach (var propertyName in bindablePropertyElement.BindableProperties)
@@ -60,16 +88,6 @@ namespace UnityMvvmToolkit.Core
             if (updateElementValues && bindablePropertyElement.BindableProperties.Count > 0)
             {
                 bindablePropertyElement.UpdateValues();
-            }
-
-            return bindableElement;
-        }
-
-        public void Dispose()
-        {
-            foreach (var disposable in _disposables)
-            {
-                disposable.Dispose();
             }
         }
 

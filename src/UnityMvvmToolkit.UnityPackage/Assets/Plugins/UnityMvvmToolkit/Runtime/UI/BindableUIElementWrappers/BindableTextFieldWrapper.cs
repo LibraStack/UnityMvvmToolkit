@@ -7,7 +7,7 @@ using UnityMvvmToolkit.UI.BindableUIElements;
 namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
 {
     // TODO: Reset value on leave.
-    public class BindableTextFieldWrapper : BindablePropertyElement, IDisposable
+    public class BindableTextFieldWrapper : BindablePropertyElement, IInitializable, IDisposable
     {
         private readonly BindableTextField _textField;
         private readonly IProperty<string> _valueProperty;
@@ -15,14 +15,14 @@ namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
         public BindableTextFieldWrapper(BindableTextField textField, IObjectProvider objectProvider)
             : base(objectProvider)
         {
-            _valueProperty = GetProperty<string>(textField.BindingValuePath);
-
-            if (_valueProperty == null)
-            {
-                return;
-            }
-
             _textField = textField;
+            _valueProperty = GetProperty<string>(textField.BindingValuePath);
+        }
+
+        public bool CanInitialize => _valueProperty != null;
+
+        public void Initialize()
+        {
             _textField.RegisterValueChangedCallback(OnTextFieldValueChanged);
         }
 
@@ -37,7 +37,7 @@ namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
 
         public void Dispose()
         {
-            _textField?.UnregisterValueChangedCallback(OnTextFieldValueChanged);
+            _textField.UnregisterValueChangedCallback(OnTextFieldValueChanged);
         }
 
         private void OnTextFieldValueChanged(ChangeEvent<string> e)

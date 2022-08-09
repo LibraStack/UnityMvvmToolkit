@@ -5,7 +5,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace BindableUIElementWrappers
 {
-    public class BindableThemeSwitcherWrapper : BindablePropertyElement, IDisposable
+    public class BindableThemeSwitcherWrapper : BindablePropertyElement, IInitializable, IDisposable
     {
         private readonly BindableThemeSwitcher _themeSwitcher;
         private readonly IProperty<bool> _valueProperty;
@@ -13,14 +13,14 @@ namespace BindableUIElementWrappers
         public BindableThemeSwitcherWrapper(BindableThemeSwitcher themeSwitcher, IObjectProvider objectProvider)
             : base(objectProvider)
         {
-            _valueProperty = GetProperty<bool>(themeSwitcher.BindingValuePath);
-
-            if (_valueProperty == null)
-            {
-                return;
-            }
-
             _themeSwitcher = themeSwitcher;
+            _valueProperty = GetProperty<bool>(themeSwitcher.BindingValuePath);
+        }
+
+        public bool CanInitialize => _valueProperty != null;
+
+        public void Initialize()
+        {
             _themeSwitcher.Switch += OnThemeSwitch;
         }
 
@@ -31,10 +31,7 @@ namespace BindableUIElementWrappers
 
         public void Dispose()
         {
-            if (_valueProperty != null)
-            {
-                _themeSwitcher.Switch -= OnThemeSwitch;
-            }
+            _themeSwitcher.Switch -= OnThemeSwitch;
         }
 
         private void OnThemeSwitch(object sender, bool value)

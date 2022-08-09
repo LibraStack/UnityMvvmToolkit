@@ -5,7 +5,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace BindableUIElementWrappers
 {
-    public class BindableCounterSliderWrapper : BindableCommandElement, IDisposable
+    public class BindableCounterSliderWrapper : BindableCommandElement, IInitializable, IDisposable
     {
         private readonly BindableCounterSlider _counterSlider;
         private readonly ICommand _increaseCommand;
@@ -17,29 +17,20 @@ namespace BindableUIElementWrappers
             _counterSlider = counterSlider;
             _increaseCommand = GetCommand<ICommand>(counterSlider.IncreaseCommand);
             _decreaseCommand = GetCommand<ICommand>(counterSlider.DecreaseCommand);
+        }
 
-            if (_increaseCommand != null)
-            {
-                _counterSlider.Increase += OnIncrease;
-            }
+        public bool CanInitialize => _increaseCommand != null && _decreaseCommand != null;
 
-            if (_decreaseCommand != null)
-            {
-                _counterSlider.Decrease += OnDecrease;
-            }
+        public void Initialize()
+        {
+            _counterSlider.Increase += OnIncrease;
+            _counterSlider.Decrease += OnDecrease;
         }
 
         public void Dispose()
         {
-            if (_increaseCommand != null)
-            {
-                _counterSlider.Increase -= OnIncrease;
-            }
-
-            if (_decreaseCommand != null)
-            {
-                _counterSlider.Decrease -= OnDecrease;
-            }
+            _counterSlider.Increase -= OnIncrease;
+            _counterSlider.Decrease -= OnDecrease;
         }
 
         private void OnIncrease(object sender, EventArgs e)
