@@ -1,0 +1,102 @@
+:root {
+    -unity-font-definition: url('project://database/Assets/UI%20Toolkit/Fonts/Roboto/Roboto-Light%20SDF.asset?fileID=11400000&guid=4a813aec472149149bd5470cbf533316&type=2#Roboto-Light SDF');
+}
+
+.top-panel {
+    margin-left: 56px;
+    margin-right: 56px;
+    margin-top: 56px;
+    margin-bottom: 56px;
+    justify-content: flex-end;
+    flex-grow: 1;
+}
+
+.bottom-panel {
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    border-top-color: rgb(39, 39, 39);
+    border-top-width: 2px;
+    margin-left: 56px;
+    margin-right: 56px;
+    margin-top: 56px;
+    margin-bottom: 56px;
+    padding-top: 64px;
+}
+
+.round-button {
+    width: 212px;
+    height: 212px;
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: 80px;
+    color: rgb(171, 198, 247);
+    background-color: rgb(23, 23, 23);
+    transition-duration: 85ms;
+    border-left-color: rgb(1, 1, 1);
+    border-right-color: rgb(1, 1, 1);
+    border-top-color: rgb(1, 1, 1);
+    border-bottom-color: rgb(1, 1, 1);
+}
+
+.round-button:hover:enabled {
+    font-size: 64px;
+    background-color: rgb(68, 68, 68);
+}
+
+.round-button--wide {
+    width: 464px;
+    border-top-left-radius: 96px;
+    border-bottom-left-radius: 96px;
+    border-top-right-radius: 96px;
+    border-bottom-right-radius: 96px;
+    -unity-text-align: middle-left;
+    padding-left: 88px;
+}
+
+.round-button--highlighted {
+    color: rgb(0, 0, 0);
+    background-color: rgb(184, 162, 208);
+}
+
+.round-button--highlighted:hover:enabled {
+    background-color: rgb(196, 180, 217);
+}
+
+.round-button__clear-label {
+    color: rgb(225, 53, 44);
+}
+
+.round-button__operation-label {
+    color: rgb(186, 164, 210);
+}
+
+.expression-label {
+    font-size: 112px;
+    -unity-text-align: middle-right;
+    color: rgb(171, 198, 247);
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+.result-label {
+    font-size: 72px;
+    -unity-text-align: upper-right;
+    color: rgb(99, 99, 99);
+    overflow: hidden;
+}
+
+.elements-row {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
