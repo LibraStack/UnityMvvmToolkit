@@ -4,7 +4,7 @@ using Interfaces;
 using MathOperations;
 using Models;
 using UnityEngine;
-using UnityMvvmToolkit.Core.Converters.ValueConverters;
+using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
 using ViewModels;
 
 public class AppContext : MonoBehaviour, IAppContext

@@ -3,12 +3,12 @@ using System.Runtime.CompilerServices;
 
 namespace UnityMvvmToolkit.Core.Interfaces
 {
-    public interface IParameterConverter : IConverter
+    public interface IParameterValueConverter : IValueConverter
     {
         Type TargetType { get; }
     }
 
-    public interface IParameterConverter<out TTargetType> : IParameterConverter
+    public interface IParameterValueConverter<out TTargetType> : IParameterValueConverter
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         TTargetType Convert(ReadOnlyMemory<char> parameter);

@@ -20,7 +20,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         protected TBindingContext BindingContext => _bindingContext;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected HashSet<T> GetConverters<T>(IEnumerable<IConverter> converters) where T : IConverter
+        protected HashSet<T> GetValueConverters<T>(IEnumerable<IValueConverter> converters) where T : IValueConverter
         {
             var result = new HashSet<T>();
 

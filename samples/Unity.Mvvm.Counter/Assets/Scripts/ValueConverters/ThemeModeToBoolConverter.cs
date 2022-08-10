@@ -1,10 +1,10 @@
 ﻿using System.Runtime.CompilerServices;
 using Enums;
-using UnityMvvmToolkit.Core.Converters.ValueConverters;
+using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
 
 namespace ValueConverters
 {
-    public class ThemeModeToBoolConverter : ValueConverter<ThemeMode, bool>
+    public class ThemeModeToBoolConverter : PropertyValueConverter<ThemeMode, bool>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Convert(ThemeMode value)

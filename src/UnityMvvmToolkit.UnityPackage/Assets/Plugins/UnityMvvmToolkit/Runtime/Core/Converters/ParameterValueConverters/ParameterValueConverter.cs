@@ -2,11 +2,11 @@
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Interfaces;
 
-namespace UnityMvvmToolkit.Core.Converters.ParameterConverters
+namespace UnityMvvmToolkit.Core.Converters.ParameterValueConverters
 {
-    public abstract class ParameterConverter<TTargetType> : IParameterConverter<TTargetType>
+    public abstract class ParameterValueConverter<TTargetType> : IParameterValueConverter<TTargetType>
     {
-        protected ParameterConverter()
+        protected ParameterValueConverter()
         {
             Name = GetType().Name;
             TargetType = typeof(TTargetType);

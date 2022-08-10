@@ -11,10 +11,10 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.PropertyWr
     {
         private readonly TObjectType _obj;
         private readonly Func<TObjectType, TSourceType> _getPropertyDelegate;
-        private readonly IValueConverter<TSourceType, TValueType> _valueConverter;
+        private readonly IPropertyValueConverter<TSourceType, TValueType> _valueConverter;
 
         public ReadOnlyPropertyWrapperWithConverter(TObjectType obj, PropertyInfo propertyInfo,
-            IValueConverter<TSourceType, TValueType> valueConverter)
+            IPropertyValueConverter<TSourceType, TValueType> valueConverter)
         {
             _obj = obj;
             _valueConverter = valueConverter;

@@ -2,11 +2,12 @@
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Interfaces;
 
-namespace UnityMvvmToolkit.Core.Converters.ValueConverters
+namespace UnityMvvmToolkit.Core.Converters.PropertyValueConverters
 {
-    public abstract class ValueConverter<TSourceType, TTargetType> : IValueConverter<TSourceType, TTargetType>
+    public abstract class PropertyValueConverter<TSourceType, TTargetType> 
+        : IPropertyValueConverter<TSourceType, TTargetType>
     {
-        protected ValueConverter()
+        protected PropertyValueConverter()
         {
             Name = GetType().Name;
             SourceType = typeof(TSourceType);

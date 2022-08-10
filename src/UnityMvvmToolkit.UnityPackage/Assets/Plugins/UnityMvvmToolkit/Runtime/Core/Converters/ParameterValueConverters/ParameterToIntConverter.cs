@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace UnityMvvmToolkit.Core.Converters.ParameterConverters
+namespace UnityMvvmToolkit.Core.Converters.ParameterValueConverters
 {
-    public class ParameterToIntConverter : ParameterConverter<int>
+    public class ParameterToIntConverter : ParameterValueConverter<int>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int Convert(ReadOnlyMemory<char> parameter)

@@ -54,12 +54,12 @@ namespace UnityMvvmToolkit.Common
             return Activator.CreateInstance<TBindingContext>();
         }
 
-        protected virtual IConverter[] GetValueConverters()
+        protected virtual IValueConverter[] GetValueConverters()
         {
-            return Array.Empty<IConverter>();
+            return Array.Empty<IValueConverter>();
         }
 
-        protected virtual IObjectProvider GetObjectProvider(TBindingContext bindingContext, IConverter[] converters)
+        protected virtual IObjectProvider GetObjectProvider(TBindingContext bindingContext, IValueConverter[] converters)
         {
             return new BindingContextObjectProvider<TBindingContext>(bindingContext, converters);
         }

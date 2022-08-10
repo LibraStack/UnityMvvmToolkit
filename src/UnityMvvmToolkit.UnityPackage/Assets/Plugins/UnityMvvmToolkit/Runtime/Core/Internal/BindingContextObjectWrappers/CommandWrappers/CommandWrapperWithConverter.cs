@@ -9,11 +9,11 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWra
     internal class CommandWrapperWithConverter<TCommandValueType> : BaseCommandWrapper, ICommandWrapperWithParameter
     {
         private readonly ICommand<TCommandValueType> _command;
-        private readonly IParameterConverter<TCommandValueType> _parameterConverter;
+        private readonly IParameterValueConverter<TCommandValueType> _parameterConverter;
         private readonly Dictionary<int, TCommandValueType> _parameters;
 
         public CommandWrapperWithConverter(ICommand<TCommandValueType> command,
-            IParameterConverter<TCommandValueType> parameterConverter) : base(command)
+            IParameterValueConverter<TCommandValueType> parameterConverter) : base(command)
         {
             _command = command;
             _parameterConverter = parameterConverter;

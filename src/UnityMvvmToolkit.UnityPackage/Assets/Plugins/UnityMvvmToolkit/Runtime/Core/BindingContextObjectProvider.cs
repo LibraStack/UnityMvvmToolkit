@@ -10,7 +10,7 @@ namespace UnityMvvmToolkit.Core
         private readonly CommandProvider<TBindingContext> _commandProvider;
         private readonly PropertyProvider<TBindingContext> _propertyProvider;
 
-        public BindingContextObjectProvider(TBindingContext bindingContext, IConverter[] converters)
+        public BindingContextObjectProvider(TBindingContext bindingContext, IValueConverter[] converters)
         {
             _commandProvider = new CommandProvider<TBindingContext>(bindingContext, converters);
             _propertyProvider = new PropertyProvider<TBindingContext>(bindingContext, converters);

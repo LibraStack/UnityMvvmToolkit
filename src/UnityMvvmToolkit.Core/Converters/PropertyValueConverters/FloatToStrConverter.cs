@@ -3,9 +3,9 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Extensions;
 
-namespace UnityMvvmToolkit.Core.Converters.ValueConverters
+namespace UnityMvvmToolkit.Core.Converters.PropertyValueConverters
 {
-    public class FloatToStrConverter : ValueConverter<float, string>
+    public class FloatToStrConverter : PropertyValueConverter<float, string>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string Convert(float value)

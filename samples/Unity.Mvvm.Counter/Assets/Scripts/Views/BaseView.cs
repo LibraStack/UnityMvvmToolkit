@@ -24,9 +24,9 @@ namespace Views
             return _appContext.Resolve<TBindingContext>();
         }
 
-        protected override IConverter[] GetValueConverters()
+        protected override IValueConverter[] GetValueConverters()
         {
-            return _appContext.Resolve<IConverter[]>();
+            return _appContext.Resolve<IValueConverter[]>();
         }
 
         protected override IBindableElementsWrapper GetBindableElementsWrapper()

@@ -1,8 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace UnityMvvmToolkit.Core.Converters.ValueConverters
+namespace UnityMvvmToolkit.Core.Converters.PropertyValueConverters
 {
-    public class IntToStrConverter : ValueConverter<int, string>
+    public class IntToStrConverter : PropertyValueConverter<int, string>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string Convert(int value)

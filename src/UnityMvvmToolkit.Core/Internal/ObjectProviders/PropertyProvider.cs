@@ -9,12 +9,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 {
     internal class PropertyProvider<TBindingContext> : ObjectProvider<TBindingContext>
     {
-        private readonly HashSet<IValueConverter> _valueConverters;
+        private readonly HashSet<IPropertyValueConverter> _propertyValueConverters;
 
-        internal PropertyProvider(TBindingContext bindingContext, IEnumerable<IConverter> converters)
+        internal PropertyProvider(TBindingContext bindingContext, IEnumerable<IValueConverter> converters)
             : base(bindingContext)
         {
-            _valueConverters = GetConverters<IValueConverter>(converters);
+            _propertyValueConverters = GetValueConverters<IPropertyValueConverter>(converters);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -82,7 +82,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IValueConverter GetValueConverter<TValueType>(Type sourceType, ReadOnlySpan<char> converterName)
+        private IPropertyValueConverter GetValueConverter<TValueType>(Type sourceType, ReadOnlySpan<char> converterName)
         {
             var valueConverter = converterName.IsEmpty
                 ? GetConverter(sourceType, typeof(TValueType))
@@ -102,16 +102,16 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IValueConverter GetConverter(Type sourceType, Type targetType)
+        private IPropertyValueConverter GetConverter(Type sourceType, Type targetType)
         {
-            return _valueConverters.FirstOrDefault(converter =>
+            return _propertyValueConverters.FirstOrDefault(converter =>
                 converter.SourceType == sourceType && converter.TargetType == targetType);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IValueConverter GetConverter(Type sourceType, Type targetType, ReadOnlySpan<char> converterName)
+        private IPropertyValueConverter GetConverter(Type sourceType, Type targetType, ReadOnlySpan<char> converterName)
         {
-            foreach (var converter in _valueConverters)
+            foreach (var converter in _propertyValueConverters)
             {
                 if (converter.SourceType == sourceType &&
                     converter.TargetType == targetType &&

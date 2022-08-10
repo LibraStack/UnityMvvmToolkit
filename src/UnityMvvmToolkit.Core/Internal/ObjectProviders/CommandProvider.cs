@@ -9,12 +9,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 {
     internal class CommandProvider<TBindingContext> : ObjectProvider<TBindingContext>
     {
-        private readonly HashSet<IParameterConverter> _parameterConverters;
+        private readonly HashSet<IParameterValueConverter> _parameterConverters;
 
-        internal CommandProvider(TBindingContext bindingContext, IEnumerable<IConverter> converters)
+        internal CommandProvider(TBindingContext bindingContext, IEnumerable<IValueConverter> converters)
             : base(bindingContext)
         {
-            _parameterConverters = GetConverters<IParameterConverter>(converters);
+            _parameterConverters = GetValueConverters<IParameterValueConverter>(converters);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -96,7 +96,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IParameterConverter GetParameterConverter(Type targetType, ReadOnlySpan<char> converterName)
+        private IParameterValueConverter GetParameterConverter(Type targetType, ReadOnlySpan<char> converterName)
         {
             var parameterConverter = converterName.IsEmpty
                 ? GetConverter(targetType)
@@ -111,13 +111,13 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IParameterConverter GetConverter(Type targetType)
+        private IParameterValueConverter GetConverter(Type targetType)
         {
             return _parameterConverters.FirstOrDefault(converter => converter.TargetType == targetType);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IParameterConverter GetConverter(Type targetType, ReadOnlySpan<char> converterName)
+        private IParameterValueConverter GetConverter(Type targetType, ReadOnlySpan<char> converterName)
         {
             foreach (var converter in _parameterConverters)
             {

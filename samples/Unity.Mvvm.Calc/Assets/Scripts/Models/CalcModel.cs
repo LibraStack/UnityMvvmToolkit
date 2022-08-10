@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Interfaces;
-using UnityMvvmToolkit.Core.Converters.ValueConverters;
+using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
 
 namespace Models
 {
