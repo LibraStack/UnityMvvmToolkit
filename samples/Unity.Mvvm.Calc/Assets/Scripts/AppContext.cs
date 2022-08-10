@@ -4,9 +4,7 @@ using Interfaces;
 using MathOperations;
 using Models;
 using UnityEngine;
-using UnityMvvmToolkit.Core.Converters.ParameterConverters;
 using UnityMvvmToolkit.Core.Converters.ValueConverters;
-using UnityMvvmToolkit.Core.Interfaces;
 using ViewModels;
 
 public class AppContext : MonoBehaviour, IAppContext
@@ -18,7 +16,6 @@ public class AppContext : MonoBehaviour, IAppContext
         _registeredTypes = new Dictionary<Type, object>();
 
         RegisterInstance(GetMathOperations());
-        RegisterInstance(GetValueConverters());
         RegisterInstance(new FloatToStrConverter());
 
         RegisterInstance(new CalcModel(this));
@@ -33,14 +30,6 @@ public class AppContext : MonoBehaviour, IAppContext
     private void RegisterInstance<T>(T instance)
     {
         _registeredTypes.Add(typeof(T), instance);
-    }
-
-    private IConverter[] GetValueConverters()
-    {
-        return new IConverter[]
-        {
-            new ParameterToStrConverter()
-        };
     }
 
     private IReadOnlyDictionary<char, IMathOperation> GetMathOperations()
