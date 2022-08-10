@@ -23,7 +23,7 @@ public class AppContext : MonoBehaviour, IAppContext
         RegisterInstance(new CounterViewModel());
         RegisterInstance<IDataStoreService>(new DataStoreService(this));
         RegisterInstance<IBindableElementsWrapper>(new CounterBindableElementsWrapper());
-        RegisterInstance(GetValueConverters());
+        RegisterInstance(GetConverters());
     }
 
     public T Resolve<T>()
@@ -36,7 +36,7 @@ public class AppContext : MonoBehaviour, IAppContext
         _registeredTypes.Add(typeof(T), instance);
     }
 
-    private IConverter[] GetValueConverters()
+    private IConverter[] GetConverters()
     {
         return new IConverter[]
         {
