@@ -9,30 +9,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 {
     internal class PropertyProvider<TBindingContext> : ObjectProvider<TBindingContext>
     {
-        private HashSet<IValueConverter> _valueConverters;
+        private readonly HashSet<IValueConverter> _valueConverters;
 
         internal PropertyProvider(TBindingContext bindingContext, IEnumerable<IConverter> converters)
             : base(bindingContext)
         {
-            InitializeConverters(converters);
-        }
-
-        private void InitializeConverters(IEnumerable<IConverter> converters)
-        {
-            if (converters == null)
-            {
-                return;
-            }
-            
-            _valueConverters = new HashSet<IValueConverter>();
-
-            foreach (var converter in converters)
-            {
-                if (converter is IValueConverter valueConverter)
-                {
-                    _valueConverters.Add(valueConverter);
-                }
-            }
+            _valueConverters = GetConverters<IValueConverter>(converters);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -102,11 +84,6 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private IValueConverter GetValueConverter<TValueType>(Type sourceType, ReadOnlySpan<char> converterName)
         {
-            if (_valueConverters == null)
-            {
-                throw new NullReferenceException(nameof(_valueConverters));
-            }
-
             var valueConverter = converterName.IsEmpty
                 ? GetConverter(sourceType, typeof(TValueType))
                 : GetConverter(sourceType, typeof(TValueType), converterName);

@@ -9,30 +9,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 {
     internal class CommandProvider<TBindingContext> : ObjectProvider<TBindingContext>
     {
-        private HashSet<IParameterConverter> _parameterConverters;
+        private readonly HashSet<IParameterConverter> _parameterConverters;
 
         internal CommandProvider(TBindingContext bindingContext, IEnumerable<IConverter> converters)
             : base(bindingContext)
         {
-            InitializeConverters(converters);
-        }
-
-        private void InitializeConverters(IEnumerable<IConverter> converters)
-        {
-            if (converters == null)
-            {
-                return;
-            }
-
-            _parameterConverters = new HashSet<IParameterConverter>();
-
-            foreach (var converter in converters)
-            {
-                if (converter is IParameterConverter parameterConverter)
-                {
-                    _parameterConverters.Add(parameterConverter);
-                }
-            }
+            _parameterConverters = GetConverters<IParameterConverter>(converters);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -116,11 +98,6 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private IParameterConverter GetParameterConverter(Type targetType, ReadOnlySpan<char> converterName)
         {
-            if (_parameterConverters == null)
-            {
-                throw new NullReferenceException(nameof(_parameterConverters));
-            }
-
             var parameterConverter = converterName.IsEmpty
                 ? GetConverter(targetType)
                 : GetConverter(targetType, converterName);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 {
@@ -17,6 +18,22 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         }
 
         protected TBindingContext BindingContext => _bindingContext;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected HashSet<T> GetConverters<T>(IEnumerable<IConverter> converters) where T : IConverter
+        {
+            var result = new HashSet<T>();
+
+            foreach (var converter in converters)
+            {
+                if (converter is T valueConverter)
+                {
+                    result.Add(valueConverter);
+                }
+            }
+
+            return result;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void AssurePropertyExist(string propertyName, out PropertyInfo propertyInfo)
