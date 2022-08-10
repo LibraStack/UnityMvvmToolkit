@@ -1,25 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Interfaces;
+using UnityMvvmToolkit.Core.Internal.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWrappers
 {
-    internal class CommandWrapperWithConverter<TCommandValueType> : BaseCommandWrapper
+    internal class CommandWrapperWithConverter<TCommandValueType> : BaseCommandWrapper, ICommandWrapperWithParameter
     {
-        private readonly TCommandValueType _parameter;
         private readonly ICommand<TCommandValueType> _command;
+        private readonly IParameterConverter<TCommandValueType> _parameterConverter;
+        private readonly Dictionary<int, TCommandValueType> _parameters;
 
-        public CommandWrapperWithConverter(ICommand<TCommandValueType> command, ReadOnlyMemory<char> parameter,
+        public CommandWrapperWithConverter(ICommand<TCommandValueType> command,
             IParameterConverter<TCommandValueType> parameterConverter) : base(command)
         {
             _command = command;
-            _parameter = parameterConverter.Convert(parameter);
+            _parameterConverter = parameterConverter;
+            _parameters = new Dictionary<int, TCommandValueType>();
+        }
+
+        public void SetParameter(int elementId, ReadOnlyMemory<char> parameter)
+        {
+            _parameters.Add(elementId, _parameterConverter.Convert(parameter));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override void Execute()
+        public void Execute(int elementId)
         {
-            _command?.Execute(_parameter);
+            _command?.Execute(_parameters[elementId]);
         }
     }
 }

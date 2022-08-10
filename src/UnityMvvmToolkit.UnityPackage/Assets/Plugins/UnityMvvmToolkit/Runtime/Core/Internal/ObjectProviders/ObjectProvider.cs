@@ -24,7 +24,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
             propertyInfo = _bindingContext.GetType().GetProperty(propertyName);
             if (propertyInfo == null)
             {
-                throw new NullReferenceException(nameof(propertyInfo));
+                throw new NullReferenceException($"Property '{propertyName}' not found.");
             }
         }
 

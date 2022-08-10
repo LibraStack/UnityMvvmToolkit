@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Interfaces;
+using UnityMvvmToolkit.Core.Internal.Interfaces;
 using UnityMvvmToolkit.Core.Internal.StringParsers;
 
 namespace UnityMvvmToolkit.Core
@@ -23,11 +24,18 @@ namespace UnityMvvmToolkit.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected ICommandWrapper GetCommandWrapper(string commandStringData)
+        protected ICommandWrapper GetCommandWrapper(int elementId, string commandStringData)
         {
             var commandData = _commandStringParser.GetCommandData(commandStringData.AsMemory());
-            return _objectProvider.GetCommandWrapper(commandData.PropertyName.ToString(), commandData.ParameterValue,
+            var commandWrapper = _objectProvider.GetCommandWrapper(commandData.PropertyName.ToString(),
                 commandData.ParameterConverterName);
+
+            if (commandWrapper is ICommandWrapperWithParameter commandWrapperWithParameter)
+            {
+                commandWrapperWithParameter.SetParameter(elementId, commandData.ParameterValue);
+            }
+
+            return commandWrapper;
         }
     }
 }

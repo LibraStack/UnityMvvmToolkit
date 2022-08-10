@@ -23,10 +23,9 @@ namespace UnityMvvmToolkit.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ICommandWrapper GetCommandWrapper(string propertyName, ReadOnlyMemory<char> parameterValue,
-            ReadOnlyMemory<char> parameterConverterName)
+        public ICommandWrapper GetCommandWrapper(string propertyName, ReadOnlyMemory<char> parameterConverterName)
         {
-            return _commandProvider.GetCommandWrapper(propertyName, parameterValue, parameterConverterName);
+            return _commandProvider.GetCommandWrapper(propertyName, parameterConverterName);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

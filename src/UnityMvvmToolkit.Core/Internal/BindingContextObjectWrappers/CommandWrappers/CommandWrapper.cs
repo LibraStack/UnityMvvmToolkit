@@ -3,7 +3,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWrappers
 {
-    internal class CommandWrapper : BaseCommandWrapper
+    internal class CommandWrapper : BaseCommandWrapper, ICommandWrapper
     {
         private readonly ICommand _command;
 
@@ -13,27 +13,9 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWra
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override void Execute()
+        public void Execute(int elementId)
         {
             _command?.Execute();
-        }
-    }
-
-    internal class CommandWrapper<T> : BaseCommandWrapper
-    {
-        private readonly T _parameter;
-        private readonly ICommand<T> _command;
-
-        public CommandWrapper(ICommand<T> command, T parameter) : base(command)
-        {
-            _command = command;
-            _parameter = parameter;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override void Execute()
-        {
-            _command?.Execute(_parameter);
         }
     }
 }

@@ -9,7 +9,6 @@ namespace UnityMvvmToolkit.Core.Interfaces
             ReadOnlyMemory<char> converterName);
 
         TCommand GetCommand<TCommand>(string propertyName) where TCommand : IBaseCommand;
-        ICommandWrapper GetCommandWrapper(string propertyName, ReadOnlyMemory<char> parameterValue,
-            ReadOnlyMemory<char> parameterConverterName);
+        ICommandWrapper GetCommandWrapper(string propertyName, ReadOnlyMemory<char> parameterConverterName);
     }
 }

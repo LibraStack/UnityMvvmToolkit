@@ -3,7 +3,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWrappers
 {
-    internal abstract class BaseCommandWrapper : ICommandWrapper
+    internal abstract class BaseCommandWrapper : IBaseCommand
     {
         private readonly IBaseCommand _baseCommand;
 
@@ -23,12 +23,9 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWra
             return _baseCommand.CanExecute();
         }
 
-        public abstract void Execute();
-
         public void RaiseCanExecuteChanged()
         {
             _baseCommand.RaiseCanExecuteChanged();
         }
     }
-
 }

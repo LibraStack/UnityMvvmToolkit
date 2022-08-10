@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWrappers;
 
@@ -61,8 +60,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ICommandWrapper GetCommandWrapper(string propertyName, ReadOnlyMemory<char> parameterValue,
-            ReadOnlyMemory<char> parameterConverterName)
+        public ICommandWrapper GetCommandWrapper(string propertyName, ReadOnlyMemory<char> parameterConverterName)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
             {
@@ -95,44 +93,21 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
                     $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(ICommand<>)} command.");
             }
 
-            object[] args;
-            Type genericCommandWrapperType;
-
-            var command = propertyInfo.GetValue(BindingContext);
             var commandValueType = propertyType.GenericTypeArguments[0];
-
-            if (parameterValue.IsEmptyOrWhiteSpace())
+            if (commandValueType == typeof(ReadOnlyMemory<char>))
             {
-                args = new[]
-                {
-                    command,
-                    default
-                };
-
-                genericCommandWrapperType = typeof(CommandWrapper<>).MakeGenericType(commandValueType);
+                return AddInstanceToCache<ICommandWrapper>(propertyName,
+                    new CommandWrapperWithoutConverter(
+                        (ICommand<ReadOnlyMemory<char>>) propertyInfo.GetValue(BindingContext)));
             }
-            else if (commandValueType == typeof(ReadOnlyMemory<char>))
+
+            var args = new[]
             {
-                args = new[]
-                {
-                    command,
-                    parameterValue
-                };
+                propertyInfo.GetValue(BindingContext),
+                GetParameterConverter(commandValueType, parameterConverterName.Span)
+            };
 
-                genericCommandWrapperType = typeof(CommandWrapper<>).MakeGenericType(commandValueType);
-            }
-            else
-            {
-                args = new[]
-                {
-                    command,
-                    parameterValue,
-                    GetParameterConverter(commandValueType, parameterConverterName.Span)
-                };
-
-                genericCommandWrapperType =
-                    typeof(CommandWrapperWithConverter<>).MakeGenericType(commandValueType);
-            }
+            var genericCommandWrapperType = typeof(CommandWrapperWithConverter<>).MakeGenericType(commandValueType);
 
             return AddInstanceToCache<ICommandWrapper>(propertyName,
                 Activator.CreateInstance(genericCommandWrapperType, args));
