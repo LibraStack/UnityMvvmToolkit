@@ -7,12 +7,11 @@ namespace UnityMvvmToolkit.Core
     public abstract class BaseCommand : IBaseCommand
     {
         private readonly Func<bool> _canExecute;
-        private bool _previousCanExecuteState;
+        private bool? _previousCanExecuteState;
 
         protected BaseCommand(Func<bool> canExecute)
         {
             _canExecute = canExecute;
-            _previousCanExecuteState = true;
         }
 
         public event EventHandler<bool> CanExecuteChanged;
