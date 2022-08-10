@@ -56,7 +56,7 @@ namespace UnityMvvmToolkit.Common
 
         protected virtual IConverter[] GetValueConverters()
         {
-            return null;
+            return Array.Empty<IConverter>();
         }
 
         protected virtual IObjectProvider GetObjectProvider(TBindingContext bindingContext, IConverter[] converters)
