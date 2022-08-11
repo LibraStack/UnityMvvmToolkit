@@ -47,6 +47,7 @@ ExportedObj/
 
 # Include Unity theme assets
 !*.tss
+!*.tss.meta
 
 # Unity generated files
 *.dwlt
