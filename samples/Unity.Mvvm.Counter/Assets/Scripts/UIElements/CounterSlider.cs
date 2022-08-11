@@ -5,12 +5,18 @@ namespace UIElements
 {
     public class CounterSlider : VisualElement
     {
+        private const string SliderClassName = "slider";
+        private const string SliderLabelClassName = "slider__label";
+        private const string SliderThumbClassName = "slider__thumb";
+        private const string SliderThumbIconClassName = "slider__thumb__icon";
+        private const string SliderThumbAnimationClassName = "slider__thumb--animation";
+
         private VisualElement _thumb;
         private SliderManipulator _manipulator;
 
         public CounterSlider()
         {
-            AddToClassList("slider");
+            AddToClassList(SliderClassName);
 
             CreateLabel("LabelLeft", "−");
             CreateLabel("LabelRight", "+");
@@ -38,7 +44,7 @@ namespace UIElements
             label.text = labelText;
             label.name = labelName;
             label.pickingMode = PickingMode.Ignore;
-            label.AddToClassList("slider__label");
+            label.AddToClassList(SliderLabelClassName);
 
             Add(label);
         }
@@ -47,13 +53,13 @@ namespace UIElements
         {
             _thumb = new VisualElement();
             _thumb.name = "Thumb";
-            _thumb.AddToClassList("slider__thumb");
-            _thumb.AddToClassList("slider__thumb--animation");
+            _thumb.AddToClassList(SliderThumbClassName);
+            _thumb.AddToClassList(SliderThumbAnimationClassName);
 
             var thumbIcon = new VisualElement();
             thumbIcon.name = "Icon";
             thumbIcon.pickingMode = PickingMode.Ignore;
-            thumbIcon.AddToClassList("slider__thumb__icon");
+            thumbIcon.AddToClassList(SliderThumbIconClassName);
 
             _thumb.Add(thumbIcon);
 

@@ -5,6 +5,12 @@ namespace UIElements
 {
     public class ThemeSwitcher : VisualElement
     {
+        private const string ToggleSwitchClassName = "toggle-switch";
+        private const string ToggleSwitchTrackClassName = "toggle-switch__track";
+        private const string ToggleSwitchTrackThumbClassName = "toggle-switch__track__thumb";
+        private const string ToggleSwitchLabelClassName = "toggle-switch__label";
+        private const string ToggleSwitchLabelContainerClassName = "toggle-switch__label-container";
+
         private VisualElement _track;
         private VisualElement _thumb;
 
@@ -16,7 +22,7 @@ namespace UIElements
 
         public ThemeSwitcher()
         {
-            AddToClassList("toggle-switch");
+            AddToClassList(ToggleSwitchClassName);
 
             CreateLabelContainer("LeftContainer", "Light", "--left");
             CreateTrack();
@@ -44,13 +50,13 @@ namespace UIElements
             var labelContainer = new VisualElement();
             labelContainer.name = containerName;
             labelContainer.pickingMode = PickingMode.Ignore;
-            labelContainer.AddToClassList("toggle-switch__label-container");
+            labelContainer.AddToClassList(ToggleSwitchLabelContainerClassName);
 
             var label = new Label();
             label.text = labelText;
             label.pickingMode = PickingMode.Ignore;
-            label.AddToClassList("toggle-switch__label");
-            label.AddToClassList($"toggle-switch__label{labelClassNameModifier}");
+            label.AddToClassList(ToggleSwitchLabelClassName);
+            label.AddToClassList($"{ToggleSwitchLabelClassName}{labelClassNameModifier}");
 
             labelContainer.Add(label);
             Add(labelContainer);
@@ -60,12 +66,12 @@ namespace UIElements
         {
             _track = new VisualElement();
             _track.name = "Track";
-            _track.AddToClassList("toggle-switch__track");
+            _track.AddToClassList(ToggleSwitchTrackClassName);
 
             _thumb = new VisualElement();
             _thumb.name = "Thumb";
             _thumb.pickingMode = PickingMode.Ignore;
-            _thumb.AddToClassList("toggle-switch__track__thumb");
+            _thumb.AddToClassList(ToggleSwitchTrackThumbClassName);
 
             _track.Add(_thumb);
             Add(_track);
