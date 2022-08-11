@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[DefaultExecutionOrder(-1)]
 public class App : MonoBehaviour
 {
     [SerializeField] private AppContext _appContext;

@@ -7,6 +7,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.Common
 {
+    [DefaultExecutionOrder(1)]
     public abstract class MonoBehaviourView<TBindingContext> : MonoBehaviour
         where TBindingContext : class, INotifyPropertyChanged
     {
