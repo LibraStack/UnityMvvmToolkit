@@ -348,11 +348,3 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-
-# Unity .meta files
-!samples/Unity.Mvvm.MainMenu/Assets/**/*.meta
-!src/UnityMvvmToolkit.UnityPackage/Assets/**/*.meta
-
-# Unity Packages folder
-!samples/Unity.Mvvm.MainMenu/Packages/*.json
-!src/UnityMvvmToolkit.UnityPackage/Packages/*.json

@@ -9,10 +9,12 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Mm]emoryCaptures/
-/[Uu]serSettings
+/[Uu]serSettings/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
-# !/[Aa]ssets/**/*.meta
+!/[Aa]ssets/**/*.meta
+!/[Aa]ssets/**/*.tss
+!/[Pp]ackages/*.json
 
 # Uncomment this line if you wish to ignore the asset store tools plugin
 [Aa]ssets/AssetStoreTools*
@@ -45,19 +47,15 @@ ExportedObj/
 *.opendb
 *.VC.db
 
-# Include Unity theme assets
-!*.tss
-!*.tss.meta
-
-# Unity generated files
+# Unity3D generated files
 *.dwlt
 
-# Unity generated meta files
+# Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta
 *.mdb.meta
 
-# Unity generated file on crash reports
+# Unity3D generated file on crash reports
 sysinfo.txt
 
 # Builds
