@@ -1,0 +1,31 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Styles/root.uss?fileID=7433441132597879392&amp;guid=62b4e13dd3cf90e4599aa965871c8936&amp;type=3#root" />
+    <Style src="project://database/Assets/UI%20Toolkit/Styles/main-view.uss?fileID=7433441132597879392&amp;guid=74499e5ab1abfe44ab2d476b057334b6&amp;type=3#main-view" />
+    <ui:VisualElement name="ContentPage" style="height: 100%; margin-left: 56px; margin-right: 56px; margin-top: 128px;">
+        <ui:VisualElement name="TopPanel" style="height: 15%; padding-left: 32px; padding-right: 32px; padding-top: 32px; padding-bottom: 32px; justify-content: space-around; min-height: 384px;">
+            <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="Monday, 3 Dec" binding-text-path="Date" style="font-size: 76px; color: rgb(26, 26, 26); -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/Fonts/Montserrat/Montserrat-Medium%20SDF.asset?fileID=11400000&amp;guid=83f05e081d656f64d883c52a5a98dbc9&amp;type=2#Montserrat-Medium SDF&apos;);" />
+            <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
+                <ui:VisualElement name="LeftPanel">
+                    <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="06" binding-text-path="CreatedTasks" style="font-size: 44px; -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/Fonts/Montserrat/Montserrat-SemiBold%20SDF.asset?fileID=11400000&amp;guid=47e732c5d593b784da8a2aae7dbec7f6&amp;type=2#Montserrat-SemiBold SDF&apos;); color: rgb(26, 26, 26);" />
+                    <ui:Label text="Created tasks" display-tooltip-when-elided="true" style="font-size: 42px; color: rgb(141, 141, 141); -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/Fonts/Montserrat/Montserrat-Medium%20SDF.asset?fileID=11400000&amp;guid=83f05e081d656f64d883c52a5a98dbc9&amp;type=2#Montserrat-Medium SDF&apos;);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="RightPanel">
+                    <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="03" binding-text-path="CompletedTasks" style="font-size: 44px; -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/Fonts/Montserrat/Montserrat-SemiBold%20SDF.asset?fileID=11400000&amp;guid=47e732c5d593b784da8a2aae7dbec7f6&amp;type=2#Montserrat-SemiBold SDF&apos;); color: rgb(26, 26, 26); -unity-text-align: upper-right;" />
+                    <ui:Label text="Completed tasks" display-tooltip-when-elided="true" style="font-size: 42px; color: rgb(141, 141, 141); -unity-font-definition: url(&apos;project://database/Assets/UI%20Toolkit/Fonts/Montserrat/Montserrat-Medium%20SDF.asset?fileID=11400000&amp;guid=83f05e081d656f64d883c52a5a98dbc9&amp;type=2#Montserrat-Medium SDF&apos;); -unity-text-align: upper-right;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="ListContainer" style="overflow: hidden; height: 85%; padding-top: 32px; padding-bottom: 312px;">
+            <UnityMvvmToolkit.UI.BindableUIElements.BindableScrollView scroll-deceleration-rate="0,135" elasticity="0.05" binding-items-source-path="TaskItems" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" touch-scroll-type="Elastic" />
+        </ui:VisualElement>
+        <ui:VisualElement name="BottomPanel" style="height: 312px; align-items: center; justify-content: flex-start; padding-top: 32px; background-image: url(&apos;project://database/Assets/UI%20Toolkit/Icons/fade_panel.png?fileID=2800000&amp;guid=2ebb72ec9ecf617468da26e6d45e5877&amp;type=3#fade_panel&apos;); position: absolute; bottom: 0; right: 0; left: 0; -unity-background-image-tint-color: rgb(250, 249, 250);">
+            <UnityMvvmToolkit.UI.BindableUIElements.BindableButton name="AddTaskButton" style="border-top-left-radius: 50%; border-bottom-left-radius: 50%; border-top-right-radius: 50%; border-bottom-right-radius: 50%; width: 164px; height: 164px; background-color: rgb(52, 210, 137); align-items: center; justify-content: center; border-left-color: rgb(52, 209, 135); border-right-color: rgb(52, 209, 135); border-top-color: rgb(52, 209, 135); border-bottom-color: rgb(52, 209, 135); display: none;">
+                <ui:VisualElement name="Icon" style="background-image: url(&apos;project://database/Assets/UI%20Toolkit/Icons/plus_icon.png?fileID=2800000&amp;guid=8443c9f8734ba644c9436acf236c8054&amp;type=3#plus_icon&apos;); width: 96px; height: 96px;" />
+            </UnityMvvmToolkit.UI.BindableUIElements.BindableButton>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <BindableUIElements.BindablePageBlocker name="Blocker" command="HideAddTaskDialogCommand" style="position: absolute; width: 100%; height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; background-color: rgba(0, 0, 0, 0.5);" />
+    <BindableUIElements.BindableAddTaskButton name="AddTaskButton" command="ShowAddTaskDialogCommand" binding-is-cancel-state-path="IsAddTaskButtonCancelState" class="add-task-button add-task-button--animation">
+        <ui:VisualElement name="Icon" picking-mode="Ignore" class="add-task-button__icon" />
+    </BindableUIElements.BindableAddTaskButton>
+</ui:UXML>

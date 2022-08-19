@@ -1,0 +1,3 @@
+* {
+    -unity-font-definition: url('project://database/Assets/UI%20Toolkit/Fonts/Roboto/Roboto-Regular%20SDF.asset?fileID=11400000&guid=7be8662760924e447867235199b99280&type=2#Roboto-Regular SDF');
+}

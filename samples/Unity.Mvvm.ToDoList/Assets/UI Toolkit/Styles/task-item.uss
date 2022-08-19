@@ -1,0 +1,110 @@
+:root {
+    --color-animation-duration: 150ms;
+}
+
+.task-item {
+    height: 160px;
+    padding-left: 172px;
+    padding-right: 128px;
+    padding-top: 0;
+    padding-bottom: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.task-item__icon-button {
+    position: absolute;
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    width: 128px;
+    height: 128px;
+    justify-content: center;
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    background-color: rgba(252, 251, 252, 0);
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    align-items: center;
+}
+
+.task-item__icon-button:hover:enabled {
+    background-color: rgb(242, 242, 242);
+}
+
+.task-item__label {
+    font-size: 48px;
+    color: rgb(54, 54, 54);
+    width: 100%;
+    height: 100%;
+    -unity-text-align: middle-left;
+    -unity-font-definition: url('project://database/Assets/UI%20Toolkit/Fonts/Montserrat/Montserrat-Medium%20SDF.asset?fileID=11400000&guid=83f05e081d656f64d883c52a5a98dbc9&type=2#Montserrat-Medium SDF');
+}
+
+.task-item__label--done {
+    color: rgb(198, 198, 198);
+}
+
+.task-item__label--animation {
+    transition-property: color;
+    transition-duration: var(--color-animation-duration);
+}
+
+.task-item__state-circle {
+    width: 64px;
+    height: 64px;
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    border-left-color: rgb(188, 188, 188);
+    border-right-color: rgb(188, 188, 188);
+    border-top-color: rgb(188, 188, 188);
+    border-bottom-color: rgb(188, 188, 188);
+    border-left-width: 8px;
+    border-right-width: 8px;
+    border-top-width: 8px;
+    border-bottom-width: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.task-item__state-circle--done {
+    border-left-color: rgb(52, 210, 137);
+    border-right-color: rgb(52, 210, 137);
+    border-top-color: rgb(52, 210, 137);
+    border-bottom-color: rgb(52, 210, 137);
+}
+
+.task-item__state-circle--animation {
+    transition-property: border-color;
+    transition-duration: var(--color-animation-duration);
+}
+
+.task-item__state-check {
+    background-image: url('project://database/Assets/UI%20Toolkit/Icons/check_icon_3.png?fileID=2800000&guid=00d78c71deea2114e8913faafe6bfafc&type=3#check_icon_3');
+    width: 0;
+    height: 0;
+    -unity-background-image-tint-color: rgb(52, 210, 137);
+}
+
+.task-item__state-check--done {
+    width: 40px;
+    height: 40px;
+}
+
+.task-item__state-check--animation {
+    transition-property: width height;
+    transition-duration: 150ms, 150ms;
+    transition-timing-function: ease-out-back, ease-out-back;
+}

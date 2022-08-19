@@ -1,0 +1,13 @@
+.mobile-input-adaptive-page {
+    height: 100%;
+    justify-content: flex-end;
+    padding-left: 64px;
+    padding-right: 64px;
+    padding-top: 64px;
+    padding-bottom: 408px;
+}
+
+.mobile-input-adaptive-page--animation {
+    transition-property: padding-bottom, opacity;
+    transition-duration: 150ms, 100ms;
+}

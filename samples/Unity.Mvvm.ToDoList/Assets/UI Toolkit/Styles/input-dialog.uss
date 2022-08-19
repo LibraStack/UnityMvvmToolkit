@@ -1,0 +1,90 @@
+.input-dialog {
+    background-color: rgb(250, 249, 250);
+    padding-left: 64px;
+    padding-right: 64px;
+    padding-top: 64px;
+    padding-bottom: 64px;
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    justify-content: space-between;
+}
+
+.input-dialog__header-label {
+    font-size: 48px;
+    color: rgb(26, 26, 26);
+    margin-bottom: 64px;
+}
+
+.input-dialog__text-field {
+    height: 112px;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 64px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+#unity-text-input {
+    background-color: rgb(250, 249, 250);
+    border-left-color: rgba(229, 229, 229, 255);
+    border-right-color: rgba(229, 229, 229, 255);
+    border-top-color: rgba(229, 229, 229, 255);
+    border-bottom-color: rgba(229, 229, 229, 255);
+    border-left-width: 3px;
+    border-right-width: 3px;
+    border-top-width: 3px;
+    border-bottom-width: 3px;
+    color: rgba(26, 26, 26, 255);
+    font-size: 44px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+#unity-text-input:hover:enabled {
+    background-color: rgba(242, 242, 242, 255);
+}
+
+.input-dialog__buttons-container {
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.input-dialog__save-button {
+    padding-left: 32px;
+    padding-right: 32px;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-left: 0;
+    margin-right: -32px;
+    margin-top: 0;
+    margin-bottom: 0;
+    height: 112px;
+    justify-content: center;
+    background-color: rgb(250, 249, 250);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+}
+
+.input-dialog__save-button:hover:enabled {
+    background-color: rgba(242, 242, 242, 255);
+}
+
+.input-dialog__save-button__label {
+    font-size: 48px;
+    color: rgb(52, 210, 137);
+}

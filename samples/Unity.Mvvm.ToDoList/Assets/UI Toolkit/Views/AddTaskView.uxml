@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Styles/root.uss?fileID=7433441132597879392&amp;guid=62b4e13dd3cf90e4599aa965871c8936&amp;type=3#root" />
+    <Style src="project://database/Assets/UI%20Toolkit/Styles/input-dialog.uss?fileID=7433441132597879392&amp;guid=86f991ceb865fef4da43c31ab1daf4af&amp;type=3#input-dialog" />
+    <Style src="project://database/Assets/UI%20Toolkit/Styles/mobile-input-adaptive-page.uss?fileID=7433441132597879392&amp;guid=74e872d05cc1d8b4d845b2489cc32207&amp;type=3#mobile-input-adaptive-page" />
+    <UIElements.MobileInputAdaptivePage offset-from-keyboard-px="64" picking-mode="Ignore" class="mobile-input-adaptive-page mobile-input-adaptive-page--animation">
+        <ui:VisualElement name="Dialog" class="input-dialog">
+            <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="Add Task" class="input-dialog__header-label" />
+            <BindableUIElements.BindableMobileTextField binding-value-path="TaskName" hide-mobile-input="true" class="input-dialog__text-field" />
+            <ui:VisualElement name="ButtonsContainer" class="input-dialog__buttons-container">
+                <UnityMvvmToolkit.UI.BindableUIElements.BindableButton command="AddTaskCommand" class="input-dialog__save-button">
+                    <ui:Label text="SAVE" class="input-dialog__save-button__label" />
+                </UnityMvvmToolkit.UI.BindableUIElements.BindableButton>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </UIElements.MobileInputAdaptivePage>
+</ui:UXML>
