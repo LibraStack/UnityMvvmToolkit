@@ -23,8 +23,8 @@ namespace ViewModels
             TaskItems = new ObservableCollection<TaskItemData>();
             TaskItems.CollectionChanged += OnTaskItemsCollectionChanged;
 
-            ShowAddTaskDialogCommand = new AsyncCommand(SetAddTaskDialogActive);
-            HideAddTaskDialogCommand = new AsyncCommand(HideAddTaskDialogAsync, IsAddTaskDialogActive);
+            ShowAddTaskDialogCommand = new AsyncLazyCommand(SetAddTaskDialogActive);
+            HideAddTaskDialogCommand = new AsyncLazyCommand(HideAddTaskDialogAsync, IsAddTaskDialogActive);
 
             SubscribeOnTaskAddMessage(appContext.Resolve<TaskBroker>()).Forget();
         }
