@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using Extensions;
+using UnityEngine;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.UI.BindableUIElements;
 
@@ -14,19 +16,25 @@ namespace BindableUIElements
             }
         }
 
-        public void Activate()
+        public async UniTask ActivateAsync()
         {
             visible = true;
+            style.opacity = 1;
+            await this.WaitForTransitionFinish();
         }
         
-        public void Deactivate()
+        public async UniTask DeactivateAsync()
         {
+            style.opacity = 0;
+            await this.WaitForTransitionFinish();
+            
             visible = false;
         }
 
         private void OnLayoutCalculated(GeometryChangedEvent e)
         {
-            Deactivate();
+            visible = false;
+            style.opacity = 0;
             UnregisterCallback<GeometryChangedEvent>(OnLayoutCalculated);
         }
 

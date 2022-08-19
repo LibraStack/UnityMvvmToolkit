@@ -8,7 +8,7 @@ namespace Extensions
     public static class VisualElementExtensions
     {
         public static async UniTask WaitForTransitionFinish(this VisualElement element, int timeoutMs = 1000,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default) // TODO: All transitions or Any?
         {
             if (AnyTransitionHasDuration(element) == false)
             {

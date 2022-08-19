@@ -3,10 +3,12 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Interfaces;
 using UnityMvvmToolkit.Core;
-using UnityMvvmToolkit.Core.Interfaces;
+using UnityMvvmToolkit.UniTask;
+using UnityMvvmToolkit.UniTask.Interfaces;
 
 namespace ViewModels
 {
@@ -18,18 +20,11 @@ namespace ViewModels
         {
             _dialogsService = appContext.Resolve<IDialogsService>();
 
-            TaskItems = new ObservableCollection<TaskItemData>
-            {
-                new("Add UnitTests"),
-                new("Create UGUI ListView"),
-                new("Write an article"),
-                new("Add UI Toolkit ListView"),
-                new("Fix Command bindings")
-            };
+            TaskItems = new ObservableCollection<TaskItemData>();
             TaskItems.CollectionChanged += OnTaskItemsCollectionChanged;
 
-            ShowAddTaskDialogCommand = new Command(SetAddTaskDialogActive);
-            HideAddTaskDialogCommand = new Command(HideAddTaskDialog, IsAddTaskDialogActive);
+            ShowAddTaskDialogCommand = new AsyncCommand(SetAddTaskDialogActive);
+            HideAddTaskDialogCommand = new AsyncCommand(HideAddTaskDialogAsync, IsAddTaskDialogActive);
 
             SubscribeOnTaskAddMessage(appContext.Resolve<TaskBroker>()).Forget();
         }
@@ -40,8 +35,8 @@ namespace ViewModels
         public bool IsAddTaskButtonCancelState => IsAddTaskDialogActive();
         public ObservableCollection<TaskItemData> TaskItems { get; }
 
-        public ICommand ShowAddTaskDialogCommand { get; }
-        public ICommand HideAddTaskDialogCommand { get; }
+        public IAsyncCommand ShowAddTaskDialogCommand { get; }
+        public IAsyncCommand HideAddTaskDialogCommand { get; }
 
         private bool IsAddTaskDialogActive() => _dialogsService.IsAddTaskDialogActive;
 
@@ -50,38 +45,44 @@ namespace ViewModels
             TaskItems.CollectionChanged -= OnTaskItemsCollectionChanged;
         }
 
-        private void SetAddTaskDialogActive()
+        private async UniTask SetAddTaskDialogActive(CancellationToken cancellationToken = default)
         {
             if (IsAddTaskDialogActive())
             {
-                HideAddTaskDialog();
+                await HideAddTaskDialogAsync(cancellationToken);
             }
             else
             {
-                ShowAddTaskDialog();
+                await ShowAddTaskDialogAsync(cancellationToken);
             }
         }
 
-        private void ShowAddTaskDialog()
+        private async UniTask ShowAddTaskDialogAsync(CancellationToken cancellationToken = default)
         {
-            _dialogsService.ShowAddTaskDialog();
+            var showDialogTask = _dialogsService.ShowAddTaskDialogAsync();
+            
             HideAddTaskDialogCommand.RaiseCanExecuteChanged();
             OnPropertyChanged(nameof(IsAddTaskButtonCancelState));
+
+            await showDialogTask;
         }
 
-        private void HideAddTaskDialog()
+        private async UniTask HideAddTaskDialogAsync(CancellationToken cancellationToken = default)
         {
-            _dialogsService.HideAddTaskDialog();
+            var hideDialogTask = _dialogsService.HideAddTaskDialogAsync();
+            
             HideAddTaskDialogCommand.RaiseCanExecuteChanged();
             OnPropertyChanged(nameof(IsAddTaskButtonCancelState));
+
+            await hideDialogTask;
         }
 
         private async UniTaskVoid SubscribeOnTaskAddMessage(TaskBroker taskBroker)
         {
             await foreach (var task in taskBroker.Subscribe())
             {
-                TaskItems.Add(new TaskItemData(task));
-                HideAddTaskDialog();
+                TaskItems.Add(new TaskItemData { Name = task });
+                await HideAddTaskDialogAsync();
             }
         }
 

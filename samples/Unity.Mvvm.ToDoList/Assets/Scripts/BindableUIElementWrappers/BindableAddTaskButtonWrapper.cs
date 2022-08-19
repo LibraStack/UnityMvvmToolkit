@@ -2,13 +2,14 @@
 using BindableUIElements;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
+using UnityMvvmToolkit.UniTask.Interfaces;
 
 namespace BindableUIElementWrappers
 {
     public class BindableAddTaskButtonWrapper : BindablePropertyElement, IInitializable, IDisposable
     {
         private readonly BindableAddTaskButton _addTaskButton;
-        private readonly ICommand _command;
+        private readonly IAsyncCommand _asyncCommand;
         private readonly IReadOnlyProperty<bool> _isCancelStateProperty;
 
         public BindableAddTaskButtonWrapper(BindableAddTaskButton addTaskButton, IObjectProvider objectProvider)
@@ -16,11 +17,11 @@ namespace BindableUIElementWrappers
         {
             _addTaskButton = addTaskButton;
 
-            _command = GetCommand<ICommand>(_addTaskButton.Command);
+            _asyncCommand = GetCommand<IAsyncCommand>(_addTaskButton.Command);
             _isCancelStateProperty = GetReadOnlyProperty<bool>(_addTaskButton.BindingIsCancelStatePath);
         }
 
-        public bool CanInitialize => _command != null && _isCancelStateProperty != null;
+        public bool CanInitialize => _asyncCommand != null && _isCancelStateProperty != null;
 
         public void Initialize()
         {
@@ -39,7 +40,7 @@ namespace BindableUIElementWrappers
 
         private void OnButtonClicked()
         {
-            _command.Execute();
+            _asyncCommand.Execute();
         }
     }
 }

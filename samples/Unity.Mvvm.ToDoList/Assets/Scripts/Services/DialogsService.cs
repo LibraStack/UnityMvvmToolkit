@@ -1,4 +1,5 @@
-﻿using Interfaces;
+﻿using Cysharp.Threading.Tasks;
+using Interfaces;
 using Views;
 
 namespace Services
@@ -16,16 +17,14 @@ namespace Services
 
         public bool IsAddTaskDialogActive => _addTaskDialogView.IsDialogActive;
 
-        public void ShowAddTaskDialog()
+        public async UniTask ShowAddTaskDialogAsync()
         {
-            _main.ActivateBlocker();
-            _addTaskDialogView.ShowDialog();
+            await UniTask.WhenAll(_main.ActivateBlockerAsync(), _addTaskDialogView.ShowDialogAsync());
         }
 
-        public void HideAddTaskDialog()
+        public async UniTask HideAddTaskDialogAsync()
         {
-            _main.DeactivateBlocker();
-            _addTaskDialogView.HideDialog();
+            await UniTask.WhenAll(_main.DeactivateBlockerAsync(), _addTaskDialogView.HideDialogAsync());
             _addTaskDialogView.BindingContext.TaskName = string.Empty;
         }
     }

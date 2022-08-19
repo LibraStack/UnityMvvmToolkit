@@ -1,7 +1,6 @@
 ﻿using System;
-using Extensions;
+using Cysharp.Threading.Tasks;
 using UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 using ViewModels;
 
@@ -11,7 +10,7 @@ namespace Views
     {
         private MobileInputAdaptivePage _mobileInputAdaptivePage;
 
-        public bool IsDialogActive => RootVisualElement?.visible ?? false;
+        public bool IsDialogActive => _mobileInputAdaptivePage?.IsActivated ?? false;
         
         protected override void OnInit()
         {
@@ -19,14 +18,14 @@ namespace Views
             _mobileInputAdaptivePage = RootVisualElement.Q<MobileInputAdaptivePage>();
         }
 
-        public void ShowDialog()
+        public async UniTask ShowDialogAsync()
         {
-            _mobileInputAdaptivePage.Activate();
+            await _mobileInputAdaptivePage.ActivateAsync();
         }
 
-        public void HideDialog()
+        public async UniTask HideDialogAsync()
         {
-            _mobileInputAdaptivePage.Deactivate();
+            await _mobileInputAdaptivePage.DeactivateAsync();
         }
 
         public void Dispose()

@@ -9,5 +9,5 @@
 
 .mobile-input-adaptive-page--animation {
     transition-property: padding-bottom, opacity;
-    transition-duration: 150ms, 100ms;
+    transition-duration: 150ms, 65ms;
 }

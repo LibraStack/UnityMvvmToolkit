@@ -32,20 +32,28 @@ namespace UIElements
 
         public float OffsetFromKeyboardPx { get; set; }
 
-        public void Activate()
+        public bool IsActivated => _isActivated;
+        
+        public async UniTask ActivateAsync()
         {
+            _isActivated = true;
+            
             if (IsScreenKeyboardSupported())
             {
-                ActivateAsync().Forget();
+                ActivateKeyboardTrackingAsync().Forget();
             }
 
             SetVisible(true);
             SetOpacity(1);
             SetPaddingBottom(_defaultPaddingBottom);
+
+            await this.WaitForTransitionFinish();
         }
 
-        public async void Deactivate()
+        public async UniTask DeactivateAsync()
         {
+            _isActivated = false;
+            
             if (IsScreenKeyboardSupported())
             {
                 _inputDialog.HideScreenKeyboard();
@@ -56,7 +64,7 @@ namespace UIElements
             SetPaddingBottom(_initialPaddingBottom);
 
             await this.WaitForTransitionFinish();
-            
+
             SetVisible(false);
         }
 
@@ -78,15 +86,16 @@ namespace UIElements
             SetVisible(false);
             SetOpacity(0);
             SetPaddingBottom(_initialPaddingBottom);
+            
             UnregisterCallback<GeometryChangedEvent>(OnLayoutCalculated);
         }
 
-        private void SetVisible(bool value)
+        private void SetVisible(bool value) // TODO: Move to another place?
         {
             parent.visible = value;
         }
 
-        private async UniTaskVoid ActivateAsync()
+        private async UniTaskVoid ActivateKeyboardTrackingAsync()
         {
             if (_trackKeyboardActivityTask?.Task.Status.IsCompleted() ?? true)
             {

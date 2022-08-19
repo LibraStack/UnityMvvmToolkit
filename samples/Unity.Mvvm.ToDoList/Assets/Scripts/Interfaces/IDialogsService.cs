@@ -1,10 +1,12 @@
-﻿namespace Interfaces
+﻿using Cysharp.Threading.Tasks;
+
+namespace Interfaces
 {
     public interface IDialogsService
     {
         bool IsAddTaskDialogActive { get; }
         
-        void ShowAddTaskDialog();
-        void HideAddTaskDialog();
+        UniTask ShowAddTaskDialogAsync();
+        UniTask HideAddTaskDialogAsync();
     }
 }

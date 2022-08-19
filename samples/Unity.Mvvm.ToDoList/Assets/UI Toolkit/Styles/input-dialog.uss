@@ -1,5 +1,5 @@
 .input-dialog {
-    background-color: rgb(250, 249, 250);
+    background-color: var(--background-color);
     padding-left: 64px;
     padding-right: 64px;
     padding-top: 64px;
@@ -12,8 +12,8 @@
 }
 
 .input-dialog__header-label {
-    font-size: 48px;
-    color: rgb(26, 26, 26);
+    font-size: var(--font-size-h2);
+    color: var(--font-color);
     margin-bottom: 64px;
 }
 
@@ -30,7 +30,8 @@
 }
 
 #unity-text-input {
-    background-color: rgb(250, 249, 250);
+    --unity-cursor-color: var(--accent-color);
+    background-color: var(--background-color);
     border-left-color: rgba(229, 229, 229, 255);
     border-right-color: rgba(229, 229, 229, 255);
     border-top-color: rgba(229, 229, 229, 255);
@@ -39,8 +40,8 @@
     border-right-width: 3px;
     border-top-width: 3px;
     border-bottom-width: 3px;
-    color: rgba(26, 26, 26, 255);
-    font-size: 44px;
+    color: var(--font-color);
+    font-size: var(--font-size-h3);
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -50,7 +51,7 @@
 }
 
 #unity-text-input:hover:enabled {
-    background-color: rgba(242, 242, 242, 255);
+    background-color: var(--background-color--hover);
 }
 
 .input-dialog__buttons-container {
@@ -69,7 +70,7 @@
     margin-bottom: 0;
     height: 112px;
     justify-content: center;
-    background-color: rgb(250, 249, 250);
+    background-color: var(--background-color);
     border-left-width: 0;
     border-right-width: 0;
     border-top-width: 0;
@@ -81,10 +82,10 @@
 }
 
 .input-dialog__save-button:hover:enabled {
-    background-color: rgba(242, 242, 242, 255);
+    background-color: var(--background-color--hover);
 }
 
 .input-dialog__save-button__label {
-    font-size: 48px;
-    color: rgb(52, 210, 137);
+    font-size: var(--font-size-h2);
+    color: var(--accent-color);
 }

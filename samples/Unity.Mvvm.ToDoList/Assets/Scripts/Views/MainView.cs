@@ -1,4 +1,5 @@
 ﻿using BindableUIElements;
+using Cysharp.Threading.Tasks;
 using UnityEngine.UIElements;
 using ViewModels;
 
@@ -11,17 +12,17 @@ namespace Views
         protected override void OnInit()
         {
             base.OnInit();
-            _blocker = RootVisualElement.Q<BindablePageBlocker>("Blocker");
+            _blocker = RootVisualElement.Q<BindablePageBlocker>("Blocker"); // TODO: Move?
         }
 
-        public void ActivateBlocker()
+        public async UniTask ActivateBlockerAsync()
         {
-            _blocker.Activate();
+            await _blocker.ActivateAsync();
         }
 
-        public void DeactivateBlocker()
+        public async UniTask DeactivateBlockerAsync()
         {
-            _blocker.Deactivate();
+            await _blocker.DeactivateAsync();
         }
     }
 }

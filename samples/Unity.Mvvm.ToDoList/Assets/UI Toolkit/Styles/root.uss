@@ -1,3 +1,17 @@
 * {
-    -unity-font-definition: url('project://database/Assets/UI%20Toolkit/Fonts/Roboto/Roboto-Regular%20SDF.asset?fileID=11400000&guid=7be8662760924e447867235199b99280&type=2#Roboto-Regular SDF');
+    -unity-font-definition: url('project://database/Assets/UI%20Toolkit/Fonts/Montserrat/Montserrat-Medium%20SDF.asset?fileID=11400000&guid=83f05e081d656f64d883c52a5a98dbc9&type=2#Montserrat-Medium SDF');
+}
+
+:root {
+    --background-color: rgba(250, 249, 250, 255);
+    --background-color--hover: rgba(242, 242, 242, 255);
+    --accent-color: rgba(52, 210, 137, 255);
+    --accent-color--hover: rgba(48, 194, 127, 255);
+    --accent-color--cancel: rgba(213, 87, 88, 255);
+    --accent-color--cancel--hover: rgba(199, 81, 82, 255);
+    --font-color: rgb(26, 26, 26);
+    --font-size-h1: 76px;
+    --font-size-h2: 48px;
+    --font-size-h3: 44px;
+    --font-size-h4: 42px;
 }
