@@ -14,7 +14,7 @@ namespace UnityMvvmToolkit.UI
     {
         private UIDocument _uiDocument;
 
-        public VisualElement RootVisualElement => _uiDocument.rootVisualElement;
+        public VisualElement RootVisualElement => _uiDocument == null ? null : _uiDocument.rootVisualElement;
 
         protected override void OnInit()
         {
