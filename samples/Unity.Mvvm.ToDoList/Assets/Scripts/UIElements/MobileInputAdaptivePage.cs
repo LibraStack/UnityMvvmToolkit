@@ -3,16 +3,15 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Controllers;
 using Cysharp.Threading.Tasks;
-using Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityMvvmToolkit.UniTask;
 using Utilities;
 
 namespace UIElements
 {
     public class MobileInputAdaptivePage : VisualElement, IDisposable
     {
-        private bool _isActivated;
         private float _parentHeight;
         private float _initialPaddingBottom;
         private float _defaultPaddingBottom;
@@ -31,13 +30,10 @@ namespace UIElements
         }
 
         public float OffsetFromKeyboardPx { get; set; }
-
-        public bool IsActivated => _isActivated;
+        public bool IsActivated => _trackKeyboardActivityTask is { Task: { Status: UniTaskStatus.Pending } };
         
         public async UniTask ActivateAsync()
         {
-            _isActivated = true;
-            
             if (IsScreenKeyboardSupported())
             {
                 ActivateKeyboardTrackingAsync().Forget();
@@ -47,13 +43,11 @@ namespace UIElements
             SetOpacity(1);
             SetPaddingBottom(_defaultPaddingBottom);
 
-            await this.WaitForTransitionFinish();
+            await this.WaitForLongestTransition();
         }
 
         public async UniTask DeactivateAsync()
         {
-            _isActivated = false;
-            
             if (IsScreenKeyboardSupported())
             {
                 _inputDialog.HideScreenKeyboard();
@@ -63,7 +57,7 @@ namespace UIElements
             SetOpacity(0);
             SetPaddingBottom(_initialPaddingBottom);
 
-            await this.WaitForTransitionFinish();
+            await this.WaitForLongestTransition();
 
             SetVisible(false);
         }
@@ -107,7 +101,6 @@ namespace UIElements
 
         private async UniTask TrackKeyboardActivityAsync()
         {
-            _isActivated = true;
             _cancellationTokenSource = new CancellationTokenSource();
 
             try
@@ -138,8 +131,6 @@ namespace UIElements
             finally
             {
                 _cancellationTokenSource?.Dispose();
-                
-                _isActivated = false;
                 _cancellationTokenSource = null;
             }
         }

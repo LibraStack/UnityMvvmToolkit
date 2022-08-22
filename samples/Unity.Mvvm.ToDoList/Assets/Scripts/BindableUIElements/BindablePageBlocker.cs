@@ -1,8 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
-using Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.UI.BindableUIElements;
+using UnityMvvmToolkit.UniTask;
 
 namespace BindableUIElements
 {
@@ -20,13 +20,13 @@ namespace BindableUIElements
         {
             visible = true;
             style.opacity = 1;
-            await this.WaitForTransitionFinish();
+            await this.WaitForLongestTransition();
         }
         
         public async UniTask DeactivateAsync()
         {
             style.opacity = 0;
-            await this.WaitForTransitionFinish();
+            await this.WaitForLongestTransition();
             
             visible = false;
         }
