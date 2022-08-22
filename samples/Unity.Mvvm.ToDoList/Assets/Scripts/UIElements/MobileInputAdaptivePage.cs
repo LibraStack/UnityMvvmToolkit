@@ -12,13 +12,13 @@ namespace UIElements
 {
     public class MobileInputAdaptivePage : VisualElement, IDisposable
     {
+        private bool _isActivated;
         private float _parentHeight;
         private float _initialPaddingBottom;
         private float _defaultPaddingBottom;
         private float? _paddingBottomWithKeyboard;
         private MobileInputDialogController _inputDialog;
 
-        private AsyncLazy _trackKeyboardActivityTask;
         private CancellationTokenSource _cancellationTokenSource;
 
         public MobileInputAdaptivePage()
@@ -29,14 +29,21 @@ namespace UIElements
             }
         }
 
+        public bool IsActivated => _isActivated;
         public float OffsetFromKeyboardPx { get; set; }
-        public bool IsActivated => _trackKeyboardActivityTask is { Task: { Status: UniTaskStatus.Pending } };
-        
+
         public async UniTask ActivateAsync()
         {
+            if (_isActivated)
+            {
+                return;
+            }
+            
+            _isActivated = true;
+            
             if (IsScreenKeyboardSupported())
             {
-                ActivateKeyboardTrackingAsync().Forget();
+                TrackKeyboardActivityAsync().Forget();
             }
 
             SetVisible(true);
@@ -48,6 +55,13 @@ namespace UIElements
 
         public async UniTask DeactivateAsync()
         {
+            if (_isActivated == false)
+            {
+                return;
+            }
+            
+            _isActivated = false;
+            
             if (IsScreenKeyboardSupported())
             {
                 _inputDialog.HideScreenKeyboard();
@@ -89,17 +103,7 @@ namespace UIElements
             parent.visible = value;
         }
 
-        private async UniTaskVoid ActivateKeyboardTrackingAsync()
-        {
-            if (_trackKeyboardActivityTask?.Task.Status.IsCompleted() ?? true)
-            {
-                _trackKeyboardActivityTask = TrackKeyboardActivityAsync().ToAsyncLazy();
-            }
-
-            await _trackKeyboardActivityTask;
-        }
-
-        private async UniTask TrackKeyboardActivityAsync()
+        private async UniTaskVoid TrackKeyboardActivityAsync()
         {
             _cancellationTokenSource = new CancellationTokenSource();
 
@@ -107,7 +111,7 @@ namespace UIElements
             {
                 var cancellationToken = _cancellationTokenSource.Token;
 
-                while (cancellationToken.IsCancellationRequested == false)
+                while (_isActivated)
                 {
                     if (TouchScreenKeyboard.visible == false)
                     {
