@@ -20,13 +20,13 @@ namespace BindableUIElements
         {
             visible = true;
             style.opacity = 1;
-            await this.WaitForLongestTransition();
+            await this.WaitForLongestTransitionEnd();
         }
         
         public async UniTask DeactivateAsync()
         {
             style.opacity = 0;
-            await this.WaitForLongestTransition();
+            await this.WaitForLongestTransitionEnd();
             
             visible = false;
         }

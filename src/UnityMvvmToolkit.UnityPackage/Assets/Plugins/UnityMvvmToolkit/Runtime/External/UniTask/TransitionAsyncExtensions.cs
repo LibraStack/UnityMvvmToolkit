@@ -16,7 +16,7 @@ namespace UnityMvvmToolkit.UniTask
         private const char Dash = '-';
         private const int DefaultTimeoutMs = 2500;
 
-        public static async UniTask WaitForLongestTransition(this VisualElement element,
+        public static async UniTask WaitForLongestTransitionEnd(this VisualElement element,
             CancellationToken cancellationToken = default)
         {
             var maxTransitionDelay = element.resolvedStyle.transitionDuration.Max(duration =>

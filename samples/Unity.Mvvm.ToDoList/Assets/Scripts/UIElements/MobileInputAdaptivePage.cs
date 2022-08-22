@@ -43,7 +43,7 @@ namespace UIElements
             SetOpacity(1);
             SetPaddingBottom(_defaultPaddingBottom);
 
-            await this.WaitForLongestTransition();
+            await this.WaitForLongestTransitionEnd();
         }
 
         public async UniTask DeactivateAsync()
@@ -57,7 +57,7 @@ namespace UIElements
             SetOpacity(0);
             SetPaddingBottom(_initialPaddingBottom);
 
-            await this.WaitForLongestTransition();
+            await this.WaitForLongestTransitionEnd();
 
             SetVisible(false);
         }
