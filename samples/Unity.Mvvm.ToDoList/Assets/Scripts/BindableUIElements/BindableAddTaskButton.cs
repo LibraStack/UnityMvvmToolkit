@@ -1,40 +1,33 @@
-﻿using UnityEngine.UIElements;
-using UnityMvvmToolkit.UI.BindableUIElements;
+﻿using UIElements;
+using UnityEngine.UIElements;
+using UnityMvvmToolkit.Core.Interfaces;
 
 namespace BindableUIElements
 {
-    public class BindableAddTaskButton : BindableButton
+    public class BindableAddTaskButton : AddTaskButton, IBindableUIElement
     {
-        private const string CancelStateClassName = "add-task-button--cancel";
-
-        public string BindingIsCancelStatePath { get; set; }
-
-        public void SetState(bool isCancelState)
-        {
-            if (isCancelState)
-            {
-                AddToClassList(CancelStateClassName);
-            }
-            else
-            {
-                RemoveFromClassList(CancelStateClassName);
-            }
-        }
+        public string AddCommand { get; set; }
+        public string CancelCommand { get; set; }
 
         public new class UxmlFactory : UxmlFactory<BindableAddTaskButton, UxmlTraits>
         {
         }
 
-        public new class UxmlTraits : BindableButton.UxmlTraits
+        public new class UxmlTraits : AddTaskButton.UxmlTraits
         {
-            private readonly UxmlStringAttributeDescription _isCancelStateAttribute = new()
-                { name = "binding-is-cancel-state-path", defaultValue = string.Empty };
+            private readonly UxmlStringAttributeDescription _addCommandAttribute = new()
+                { name = "add-command", defaultValue = "" };
+
+            private readonly UxmlStringAttributeDescription _cancelCommandAttribute = new()
+                { name = "cancel-command", defaultValue = "" };
 
             public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
             {
                 base.Init(visualElement, bag, context);
-                ((BindableAddTaskButton) visualElement).BindingIsCancelStatePath =
-                    _isCancelStateAttribute.GetValueFromBag(bag, context);
+
+                var bindableButton = (BindableAddTaskButton) visualElement;
+                bindableButton.AddCommand = _addCommandAttribute.GetValueFromBag(bag, context);
+                bindableButton.CancelCommand = _cancelCommandAttribute.GetValueFromBag(bag, context);
             }
         }
     }

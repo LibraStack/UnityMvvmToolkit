@@ -6,41 +6,43 @@ using UnityMvvmToolkit.UniTask.Interfaces;
 
 namespace BindableUIElementWrappers
 {
-    public class BindableAddTaskButtonWrapper : BindablePropertyElement, IInitializable, IDisposable
+    public class BindableAddTaskButtonWrapper : BindableCommandElement, IInitializable, IDisposable
     {
         private readonly BindableAddTaskButton _addTaskButton;
-        private readonly IAsyncCommand _asyncCommand;
-        private readonly IReadOnlyProperty<bool> _isCancelStateProperty;
+        private readonly IAsyncCommand _addTaskCommand;
+        private readonly IAsyncCommand _cancelCommand;
 
         public BindableAddTaskButtonWrapper(BindableAddTaskButton addTaskButton, IObjectProvider objectProvider)
             : base(objectProvider)
         {
             _addTaskButton = addTaskButton;
 
-            _asyncCommand = GetCommand<IAsyncCommand>(_addTaskButton.Command);
-            _isCancelStateProperty = GetReadOnlyProperty<bool>(_addTaskButton.BindingIsCancelStatePath);
+            _addTaskCommand = GetCommand<IAsyncCommand>(addTaskButton.AddCommand);
+            _cancelCommand = GetCommand<IAsyncCommand>(addTaskButton.CancelCommand);
         }
 
-        public bool CanInitialize => _asyncCommand != null && _isCancelStateProperty != null;
+        public bool CanInitialize => _addTaskCommand != null && _cancelCommand != null;
 
         public void Initialize()
         {
-            _addTaskButton.clicked += OnButtonClicked;
-        }
-
-        public override void UpdateValues()
-        {
-            _addTaskButton.SetState(_isCancelStateProperty.Value);
+            _addTaskButton.AddTask += OnAddTaskClicked;
+            _addTaskButton.Cancel += OnCancelClicked;
         }
 
         public void Dispose()
         {
-            _addTaskButton.clicked -= OnButtonClicked;
+            _addTaskButton.AddTask -= OnAddTaskClicked;
+            _addTaskButton.Cancel -= OnCancelClicked;
         }
 
-        private void OnButtonClicked()
+        private void OnAddTaskClicked(object sender, EventArgs e)
         {
-            _asyncCommand.Execute();
+            _addTaskCommand.Execute();
+        }
+
+        private void OnCancelClicked(object sender, EventArgs e)
+        {
+            _cancelCommand.Execute();
         }
     }
 }

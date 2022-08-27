@@ -23,8 +23,8 @@ namespace ViewModels
             TaskItems = new ObservableCollection<TaskItemData>();
             TaskItems.CollectionChanged += OnTaskItemsCollectionChanged;
 
-            ShowAddTaskDialogCommand = new AsyncLazyCommand(SetAddTaskDialogActive);
-            HideAddTaskDialogCommand = new AsyncLazyCommand(HideAddTaskDialogAsync, IsAddTaskDialogActive);
+            ShowAddTaskDialogCommand = new AsyncLazyCommand(ShowAddTaskDialogAsync);
+            HideAddTaskDialogCommand = new AsyncLazyCommand(HideAddTaskDialogAsync);
 
             SubscribeOnTaskAddMessage(appContext.Resolve<TaskBroker>()).Forget();
         }
@@ -32,37 +32,22 @@ namespace ViewModels
         public string Date => GetTodayDate();
         public int CreatedTasks => TaskItems.Count;
         public int CompletedTasks => TaskItems.Count(data => data.IsDone);
-        public bool IsAddTaskButtonCancelState => IsAddTaskDialogActive();
+        public bool IsAddTaskDialogActive => _dialogsService.IsAddTaskDialogActive;
         public ObservableCollection<TaskItemData> TaskItems { get; }
 
         public IAsyncCommand ShowAddTaskDialogCommand { get; }
         public IAsyncCommand HideAddTaskDialogCommand { get; }
-
-        private bool IsAddTaskDialogActive() => _dialogsService.IsAddTaskDialogActive;
 
         public void Dispose()
         {
             TaskItems.CollectionChanged -= OnTaskItemsCollectionChanged;
         }
 
-        private async UniTask SetAddTaskDialogActive(CancellationToken cancellationToken = default)
-        {
-            if (IsAddTaskDialogActive())
-            {
-                await HideAddTaskDialogAsync(cancellationToken);
-            }
-            else
-            {
-                await ShowAddTaskDialogAsync(cancellationToken);
-            }
-        }
-
         private async UniTask ShowAddTaskDialogAsync(CancellationToken cancellationToken = default)
         {
             var showDialogTask = _dialogsService.ShowAddTaskDialogAsync();
-            
-            HideAddTaskDialogCommand.RaiseCanExecuteChanged();
-            OnPropertyChanged(nameof(IsAddTaskButtonCancelState));
+
+            OnPropertyChanged(nameof(IsAddTaskDialogActive));
 
             await showDialogTask;
         }
@@ -70,9 +55,8 @@ namespace ViewModels
         private async UniTask HideAddTaskDialogAsync(CancellationToken cancellationToken = default)
         {
             var hideDialogTask = _dialogsService.HideAddTaskDialogAsync();
-            
-            HideAddTaskDialogCommand.RaiseCanExecuteChanged();
-            OnPropertyChanged(nameof(IsAddTaskButtonCancelState));
+
+            OnPropertyChanged(nameof(IsAddTaskDialogActive));
 
             await hideDialogTask;
         }
