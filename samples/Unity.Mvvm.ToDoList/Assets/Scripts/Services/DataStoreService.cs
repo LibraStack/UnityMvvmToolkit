@@ -1,6 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 using Cysharp.Threading.Tasks;
 using Interfaces;
@@ -19,13 +20,13 @@ namespace Services
         private readonly string _dataFilePath;
 
         private AsyncLazy _saveDataTask;
-        private AsyncLazy<Collection<TaskItemData>> _loadDataTask;
+        private AsyncLazy<TaskItemData[]> _loadDataTask;
 
         public DataStoreService(IAppContext appContext)
         {
             _mainViewModel = appContext.Resolve<MainViewModel>();
             _dataFilePath = Path.Combine(Application.persistentDataPath, DataFileName);
-            _serializer = new XmlSerializer(typeof(Collection<TaskItemData>));
+            _serializer = new XmlSerializer(typeof(TaskItemData[]));
         }
 
         public async void Enable()
@@ -66,7 +67,7 @@ namespace Services
             await _saveDataTask;
         }
 
-        private async UniTask<Collection<TaskItemData>> LoadDataAsync()
+        private async UniTask<TaskItemData[]> LoadDataAsync()
         {
             if (_loadDataTask?.Task.Status.IsCompleted() ?? true)
             {
@@ -76,13 +77,13 @@ namespace Services
             return await _loadDataTask;
         }
 
-        private async UniTask SaveDataAsync(string filePath, Collection<TaskItemData> taskItems)
+        private async UniTask SaveDataAsync(string filePath, IEnumerable<TaskItemData> taskItems)
         {
             await using var writeStream = File.Create(filePath);
-            _serializer.Serialize(writeStream, taskItems);
+            _serializer.Serialize(writeStream, taskItems.ToArray());
         }
 
-        private async UniTask<Collection<TaskItemData>> LoadDataAsync(string filePath)
+        private async UniTask<TaskItemData[]> LoadDataAsync(string filePath)
         {
             if (File.Exists(filePath) == false)
             {
@@ -90,18 +91,24 @@ namespace Services
             }
 
             await using var readStream = File.OpenRead(filePath);
-            return (Collection<TaskItemData>) _serializer.Deserialize(readStream);
+            return (TaskItemData[]) _serializer.Deserialize(readStream);
         }
 
-        private Collection<TaskItemData> GetDefaultDataSet()
+        private TaskItemData[] GetDefaultDataSet()
         {
-            return new Collection<TaskItemData>
+            return new TaskItemData[]
             {
                 new() { Name = "Add UnitTests" },
-                new() { Name = "Create UGUI ListView" },
-                new() { Name = "Write an article" },
-                new() { Name = "Add UI Toolkit ListView" },
-                new() { Name = "Fix Command bindings" }
+                new() { Name = "Add UGUI ListView" },
+                new() { Name = "Add UI Toolkit ListView", IsDone = true },
+                new() { Name = "Provide Custom Binding String Parser" },
+                new() { Name = "Publish to OpenUPM" },
+                new() { Name = "Fix Command Binding Issue", IsDone = true },
+                new() { Name = "Add AsyncCommand", IsDone = true },
+                new() { Name = "Add AsyncLazyCommand", IsDone = true },
+                new() { Name = "Add Counter Sample", IsDone = true },
+                new() { Name = "Add Calculator Sample", IsDone = true },
+                new() { Name = "Add ToDoList Sample", IsDone = true }
             };
         }
     }
