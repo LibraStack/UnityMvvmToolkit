@@ -18,9 +18,9 @@ public class ToDoListBindableElementsWrapper : BindableElementsWrapper
     {
         return bindableUiElement switch
         {
-            BindableListView listView => new BindableTaskListWrapper(listView, _taskItemAsset, objectProvider),
             BindableScrollView scrollView => new BindableTaskScrollViewWrapper(scrollView, _taskItemAsset, objectProvider),
-            BindableAddTaskButton addTaskButton => new BindableAddTaskButtonWrapper(addTaskButton, objectProvider),
+            BindablePageBlocker pageBlocker => new BindableBinaryStateButtonWrapper(pageBlocker, objectProvider),
+            BindableAddTaskButton addTaskButton => new BindableBinaryStateButtonWrapper(addTaskButton, objectProvider),
 
             _ => base.Wrap(bindableUiElement, objectProvider)
         };

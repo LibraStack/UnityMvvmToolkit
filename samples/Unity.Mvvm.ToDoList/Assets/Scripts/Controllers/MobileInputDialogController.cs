@@ -22,9 +22,9 @@ namespace Controllers
 
         public bool IsMobileInputHidden()
         {
-            if (_textField is BindableMobileTextField mobileTextField)
+            if (_textField is BindableMobileInputField mobileInputField)
             {
-                return mobileTextField.HideMobileInput;
+                return mobileInputField.HideMobileInput;
             }
 
             return false;

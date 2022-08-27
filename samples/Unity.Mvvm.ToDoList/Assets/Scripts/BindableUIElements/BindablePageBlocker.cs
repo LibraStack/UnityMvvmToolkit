@@ -1,12 +1,10 @@
-﻿using Cysharp.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UIElements;
-using UnityMvvmToolkit.UI.BindableUIElements;
 using UnityMvvmToolkit.UniTask;
 
 namespace BindableUIElements
 {
-    public class BindablePageBlocker : BindableButton
+    public class BindablePageBlocker : BindableBinaryStateButton
     {
         public BindablePageBlocker()
         {
@@ -16,19 +14,23 @@ namespace BindableUIElements
             }
         }
 
-        public async UniTask ActivateAsync()
+        public override void Activate()
         {
             visible = true;
             style.opacity = 1;
-            await this.WaitForLongestTransitionEnd();
         }
-        
-        public async UniTask DeactivateAsync()
+
+        public override async void Deactivate()
         {
-            style.opacity = 0;
-            await this.WaitForLongestTransitionEnd();
-            
-            visible = false;
+            try
+            {
+                style.opacity = 0;
+                await this.WaitForLongestTransitionEnd();
+            }
+            finally
+            {
+                visible = false;
+            }
         }
 
         private void OnLayoutCalculated(GeometryChangedEvent e)
@@ -42,7 +44,7 @@ namespace BindableUIElements
         {
         }
 
-        public new class UxmlTraits : BindableButton.UxmlTraits
+        public new class UxmlTraits : BindableBinaryStateButton.UxmlTraits
         {
         }
     }

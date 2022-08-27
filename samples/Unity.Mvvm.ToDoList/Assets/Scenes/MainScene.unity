@@ -405,8 +405,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83be9ce2f58f495ab65441ae1cd26ea2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mainView: {fileID: 517324896}
-  _addTaskDialogView: {fileID: 902899402}
+  _addTaskView: {fileID: 902899402}
   _taskItemAsset: {fileID: 9197481963319205126, guid: a96c152c88351b2498d749137769ab10, type: 3}
 --- !u!4 &1328904794
 Transform:

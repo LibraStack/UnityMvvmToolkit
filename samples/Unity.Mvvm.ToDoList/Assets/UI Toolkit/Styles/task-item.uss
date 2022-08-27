@@ -49,6 +49,8 @@
     height: 100%;
     -unity-text-align: middle-left;
     -unity-font-definition: url('project://database/Assets/UI%20Toolkit/Fonts/Montserrat/Montserrat-Medium%20SDF.asset?fileID=11400000&guid=83f05e081d656f64d883c52a5a98dbc9&type=2#Montserrat-Medium SDF');
+    overflow: hidden;
+    white-space: normal;
 }
 
 .task-item__label--done {

@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Controllers;
 using Cysharp.Threading.Tasks;
+using Interfaces;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.UniTask;
@@ -10,7 +11,7 @@ using Utilities;
 
 namespace UIElements
 {
-    public class MobileInputAdaptivePage : VisualElement, IDisposable
+    public class MobileInputAdaptivePage : VisualElement, IKeyboardHeightRecipient, IDisposable
     {
         private bool _isActivated;
         private float _parentHeight;
@@ -29,7 +30,6 @@ namespace UIElements
             }
         }
 
-        public bool IsActivated => _isActivated;
         public float OffsetFromKeyboardPx { get; set; }
 
         public async UniTask ActivateAsync()
@@ -98,7 +98,7 @@ namespace UIElements
             UnregisterCallback<GeometryChangedEvent>(OnLayoutCalculated);
         }
 
-        private void SetVisible(bool value) // TODO: Move to another place?
+        private void SetVisible(bool value)
         {
             parent.visible = value;
         }
@@ -167,16 +167,18 @@ namespace UIElements
         private async UniTask ResizePageAsync(CancellationToken cancellationToken)
         {
             var includeInput = _inputDialog.IsMobileInputHidden() == false;
-
-            var keyboardHeight = await MobileUtilities.GetRelativeKeyboardHeightAsync(includeInput, _parentHeight,
-                height =>
-                {
-                    style.paddingBottom = height > _defaultPaddingBottom
-                        ? height + OffsetFromKeyboardPx
-                        : _defaultPaddingBottom;
-                }, cancellationToken);
+            var keyboardHeight =
+                await MobileUtilities.GetRelativeKeyboardHeightAsync(includeInput, _parentHeight, this,
+                    cancellationToken);
 
             _paddingBottomWithKeyboard = keyboardHeight + OffsetFromKeyboardPx;
+        }
+
+        public void ReceiveHeight(int keyboardHeight)
+        {
+            style.paddingBottom = keyboardHeight > _defaultPaddingBottom
+                ? keyboardHeight + OffsetFromKeyboardPx
+                : _defaultPaddingBottom;
         }
 
         public new class UxmlFactory : UxmlFactory<MobileInputAdaptivePage, UxmlTraits>

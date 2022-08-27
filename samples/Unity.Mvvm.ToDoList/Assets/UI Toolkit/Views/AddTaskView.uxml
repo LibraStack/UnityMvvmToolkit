@@ -5,7 +5,7 @@
     <UIElements.MobileInputAdaptivePage offset-from-keyboard-px="64" picking-mode="Ignore" class="mobile-input-adaptive-page mobile-input-adaptive-page--animation">
         <ui:VisualElement name="Dialog" class="input-dialog">
             <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="Add Task" class="input-dialog__header-label" />
-            <BindableUIElements.BindableMobileTextField binding-value-path="TaskName" hide-mobile-input="true" class="input-dialog__text-field" />
+            <BindableUIElements.BindableMobileInputField binding-value-path="TaskName" hide-mobile-input="true" class="input-dialog__text-field" />
             <ui:VisualElement name="ButtonsContainer" class="input-dialog__buttons-container">
                 <UnityMvvmToolkit.UI.BindableUIElements.BindableButton command="AddTaskCommand" class="input-dialog__save-button">
                     <ui:Label text="SAVE" class="input-dialog__save-button__label" />

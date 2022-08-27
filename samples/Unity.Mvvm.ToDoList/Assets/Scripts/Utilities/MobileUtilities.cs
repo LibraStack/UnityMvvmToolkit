@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Interfaces;
 using UnityEngine;
 
 namespace Utilities
@@ -38,21 +39,21 @@ namespace Utilities
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static UniTask<int> GetKeyboardHeightAsync(bool includeInput,
-            Action<int> actionOnHeightUpdate = null, CancellationToken cancellationToken = default)
+            IKeyboardHeightRecipient heightRecipient = null, CancellationToken cancellationToken = default)
         {
-            return GetKeyboardHeightAsync(includeInput, null, actionOnHeightUpdate, cancellationToken);
+            return GetKeyboardHeightAsync(includeInput, null, heightRecipient, cancellationToken);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static UniTask<int> GetRelativeKeyboardHeightAsync(bool includeInput, float contentPageHeight,
-            Action<int> actionOnHeightUpdate = null, CancellationToken cancellationToken = default)
+            IKeyboardHeightRecipient heightRecipient = null, CancellationToken cancellationToken = default)
         {
-            return GetKeyboardHeightAsync(includeInput, contentPageHeight, actionOnHeightUpdate, cancellationToken);
+            return GetKeyboardHeightAsync(includeInput, contentPageHeight, heightRecipient, cancellationToken);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static async UniTask<int> GetKeyboardHeightAsync(bool includeInput, float? contentPageHeight,
-            Action<int> actionOnHeightUpdate, CancellationToken cancellationToken)
+            IKeyboardHeightRecipient heightRecipient, CancellationToken cancellationToken)
         {
             var result = 0;
             var iterations = 100;
@@ -69,7 +70,7 @@ namespace Utilities
                 {
                     result = keyboardHeight;
                     keyboardHeight = int.MinValue;
-                    actionOnHeightUpdate?.Invoke(result);
+                    heightRecipient?.ReceiveHeight(result);
                 }
                 else if (keyboardHeight == result)
                 {

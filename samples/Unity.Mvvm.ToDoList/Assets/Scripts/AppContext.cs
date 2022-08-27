@@ -10,11 +10,8 @@ using Views;
 
 public class AppContext : MonoBehaviour, IAppContext, IDisposable
 {
-    [SerializeField] private MainView _mainView;
-    [SerializeField] private AddTaskDialogView _addTaskDialogView;
-    
-    [Space]
     [SerializeField] private VisualTreeAsset _taskItemAsset;
+    [SerializeField] private AddTaskDialogView _addTaskView;
 
     private List<IDisposable> _disposables;
     private Dictionary<Type, object> _registeredTypes;
@@ -23,9 +20,8 @@ public class AppContext : MonoBehaviour, IAppContext, IDisposable
     {
         _disposables = new List<IDisposable>();
         _registeredTypes = new Dictionary<Type, object>();
-
-        RegisterInstance(_mainView);
-        RegisterInstance(_addTaskDialogView);
+        
+        RegisterInstance(_addTaskView);
         
         RegisterInstance(new TaskBroker());
         RegisterInstance<IDialogsService>(new DialogsService(this));

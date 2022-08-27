@@ -3,7 +3,7 @@
     <Style src="project://database/Assets/UI%20Toolkit/Styles/main-view.uss?fileID=7433441132597879392&amp;guid=74499e5ab1abfe44ab2d476b057334b6&amp;type=3#main-view" />
     <ui:VisualElement name="ContentPage" class="main-view__content-page">
         <ui:VisualElement name="TopPanel" class="content-page__top-panel">
-            <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="Monday, 3 Dec" binding-text-path="Date" class="content-page__top-panel__header-label" />
+            <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="Monday, 3 Dec" binding-text-path="Date" class="content-page__top-panel__header-label" style="white-space: normal;" />
             <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
                 <ui:VisualElement name="LeftPanel">
                     <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="06" binding-text-path="CreatedTasks" class="content-page__top-panel__data-label" />
@@ -20,8 +20,8 @@
         </ui:VisualElement>
         <ui:VisualElement name="BottomPanel" class="content-page__bottom-panel" />
     </ui:VisualElement>
-    <BindableUIElements.BindablePageBlocker name="Blocker" command="HideAddTaskDialogCommand" class="main-view__blocker main-view__blocker--animation" />
-    <BindableUIElements.BindableAddTaskButton name="AddTaskButton" add-command="ShowAddTaskDialogCommand" cancel-command="HideAddTaskDialogCommand" class="add-task-button add-task-button--animation">
+    <BindableUIElements.BindablePageBlocker name="Blocker" command="ChangeAddTaskDialogVisibilityCommand" binding-state-path="IsAddTaskDialogActive" class="main-view__blocker main-view__blocker--animation" />
+    <BindableUIElements.BindableAddTaskButton name="AddTaskButton" command="ChangeAddTaskDialogVisibilityCommand" binding-state-path="IsAddTaskDialogActive" class="add-task-button add-task-button--animation">
         <ui:VisualElement name="Icon" picking-mode="Ignore" class="add-task-button__icon" />
     </BindableUIElements.BindableAddTaskButton>
 </ui:UXML>

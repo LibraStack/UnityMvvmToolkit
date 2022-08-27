@@ -1,34 +1,27 @@
-﻿using UIElements;
-using UnityEngine.UIElements;
-using UnityMvvmToolkit.Core.Interfaces;
+﻿using UnityEngine.UIElements;
 
 namespace BindableUIElements
 {
-    public class BindableAddTaskButton : AddTaskButton, IBindableUIElement
+    public class BindableAddTaskButton : BindableBinaryStateButton
     {
-        public string AddCommand { get; set; }
-        public string CancelCommand { get; set; }
+        private const string CancelStateClassName = "add-task-button--cancel";
+
+        public override void Activate()
+        {
+            AddToClassList(CancelStateClassName);
+        }
+
+        public override void Deactivate()
+        {
+            RemoveFromClassList(CancelStateClassName);
+        }
 
         public new class UxmlFactory : UxmlFactory<BindableAddTaskButton, UxmlTraits>
         {
         }
 
-        public new class UxmlTraits : AddTaskButton.UxmlTraits
+        public new class UxmlTraits : BindableBinaryStateButton.UxmlTraits
         {
-            private readonly UxmlStringAttributeDescription _addCommandAttribute = new()
-                { name = "add-command", defaultValue = "" };
-
-            private readonly UxmlStringAttributeDescription _cancelCommandAttribute = new()
-                { name = "cancel-command", defaultValue = "" };
-
-            public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
-            {
-                base.Init(visualElement, bag, context);
-
-                var bindableButton = (BindableAddTaskButton) visualElement;
-                bindableButton.AddCommand = _addCommandAttribute.GetValueFromBag(bag, context);
-                bindableButton.CancelCommand = _cancelCommandAttribute.GetValueFromBag(bag, context);
-            }
         }
     }
 }

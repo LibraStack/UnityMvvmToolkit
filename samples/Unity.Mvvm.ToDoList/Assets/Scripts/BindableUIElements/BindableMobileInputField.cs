@@ -4,7 +4,7 @@ using UnityMvvmToolkit.UI.BindableUIElements;
 
 namespace BindableUIElements
 {
-    public class BindableMobileTextField : BindableTextField
+    public class BindableMobileInputField : BindableTextField
     {
         public bool HideMobileInput
         {
@@ -12,7 +12,7 @@ namespace BindableUIElements
             set => TouchScreenKeyboard.hideInput = value;
         }
 
-        public new class UxmlFactory : UxmlFactory<BindableMobileTextField, UxmlTraits>
+        public new class UxmlFactory : UxmlFactory<BindableMobileInputField, UxmlTraits>
         {
         }
 
@@ -24,7 +24,7 @@ namespace BindableUIElements
             public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
             {
                 base.Init(visualElement, bag, context);
-                ((BindableMobileTextField) visualElement).HideMobileInput =
+                ((BindableMobileInputField) visualElement).HideMobileInput =
                     _hideMobileInputAttribute.GetValueFromBag(bag, context);
             }
         }
