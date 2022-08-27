@@ -8,7 +8,7 @@ using UnityMvvmToolkit.UI;
 
 namespace Views
 {
-    public class BaseView<TBindingContext> : DocumentView<TBindingContext>
+    public abstract class BaseView<TBindingContext> : DocumentView<TBindingContext>
         where TBindingContext : class, INotifyPropertyChanged
     {
         [SerializeField] private AppContext _appContext;
