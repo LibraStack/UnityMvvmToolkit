@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.chebanovdd.unitymvvmtoolkit": {
-      "version": "file:D:/Projects/Rider/UnityMvvmToolkit/src/UnityMvvmToolkit.UnityPackage/Assets/Plugins/UnityMvvmToolkit",
+      "version": "file:../../../src/UnityMvvmToolkit.UnityPackage/Assets/Plugins/UnityMvvmToolkit",
       "depth": 0,
       "source": "local",
       "dependencies": {}
