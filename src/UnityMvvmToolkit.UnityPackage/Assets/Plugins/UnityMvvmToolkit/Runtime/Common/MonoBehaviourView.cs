@@ -44,8 +44,6 @@ namespace UnityMvvmToolkit.Common
 
         protected virtual TBindingContext GetBindingContext()
         {
-            // TODO: Change DataContext dynamically?
-
             if (typeof(TBindingContext).GetConstructor(Type.EmptyTypes) == null)
             {
                 throw new InvalidOperationException(
