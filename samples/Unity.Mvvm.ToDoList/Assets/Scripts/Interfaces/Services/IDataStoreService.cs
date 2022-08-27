@@ -1,4 +1,4 @@
-﻿namespace Interfaces
+﻿namespace Interfaces.Services
 {
     public interface IDataStoreService
     {

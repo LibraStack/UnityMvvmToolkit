@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 
-namespace Interfaces
+namespace Interfaces.Services
 {
     public interface IDialogsService
     {

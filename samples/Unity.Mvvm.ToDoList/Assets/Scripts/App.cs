@@ -1,4 +1,4 @@
-﻿using Interfaces;
+﻿using Interfaces.Services;
 using UnityEngine;
 
 public class App : MonoBehaviour
