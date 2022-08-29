@@ -2,8 +2,8 @@
 using BindableUIElementWrappers;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UI;
-using UnityMvvmToolkit.UI.BindableUIElements;
+using UnityMvvmToolkit.UITK;
+using UnityMvvmToolkit.UITK.BindableUIElements;
 
 public class ToDoListBindableElementsWrapper : BindableElementsWrapper
 {

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityMvvmToolkit.UI;
+using UnityMvvmToolkit.UITK;
 using ViewModels;
 
 namespace Views

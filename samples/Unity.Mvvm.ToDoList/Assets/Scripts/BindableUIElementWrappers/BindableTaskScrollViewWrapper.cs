@@ -2,8 +2,8 @@
 using Extensions;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UI.BindableUIElements;
-using UnityMvvmToolkit.UI.BindableUIElementWrappers;
+using UnityMvvmToolkit.UITK.BindableUIElements;
+using UnityMvvmToolkit.UITK.BindableUIElementWrappers;
 
 namespace BindableUIElementWrappers
 {

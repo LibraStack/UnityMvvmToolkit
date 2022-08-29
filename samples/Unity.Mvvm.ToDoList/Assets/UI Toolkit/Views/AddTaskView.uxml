@@ -4,12 +4,12 @@
     <Style src="project://database/Assets/UI%20Toolkit/Styles/mobile-input-adaptive-page.uss?fileID=7433441132597879392&amp;guid=74e872d05cc1d8b4d845b2489cc32207&amp;type=3#mobile-input-adaptive-page" />
     <UIElements.MobileInputAdaptivePage offset-from-keyboard-px="64" picking-mode="Ignore" class="mobile-input-adaptive-page mobile-input-adaptive-page--animation">
         <ui:VisualElement name="Dialog" class="input-dialog">
-            <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="Add Task" class="input-dialog__header-label" />
+            <UnityMvvmToolkit.UITK.BindableUIElements.BindableLabel text="Add Task" class="input-dialog__header-label" />
             <BindableUIElements.BindableMobileInputField binding-value-path="TaskName" hide-mobile-input="true" class="input-dialog__text-field" />
             <ui:VisualElement name="ButtonsContainer" class="input-dialog__buttons-container">
-                <UnityMvvmToolkit.UI.BindableUIElements.BindableButton command="AddTaskCommand" class="input-dialog__save-button">
+                <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton command="AddTaskCommand" class="input-dialog__save-button">
                     <ui:Label text="SAVE" class="input-dialog__save-button__label" />
-                </UnityMvvmToolkit.UI.BindableUIElements.BindableButton>
+                </UnityMvvmToolkit.UITK.BindableUIElements.BindableButton>
             </ui:VisualElement>
         </ui:VisualElement>
     </UIElements.MobileInputAdaptivePage>

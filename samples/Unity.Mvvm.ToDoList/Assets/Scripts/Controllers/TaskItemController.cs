@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine.UIElements;
-using UnityMvvmToolkit.UI.BindableUIElements;
+using UnityMvvmToolkit.UITK.BindableUIElements;
 
 namespace Controllers
 {

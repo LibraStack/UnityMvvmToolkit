@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Interfaces;
 using UnityEngine.UIElements;
-using UnityMvvmToolkit.UI.BindableUIElements;
+using UnityMvvmToolkit.UITK.BindableUIElements;
 
 namespace BindableUIElements
 {

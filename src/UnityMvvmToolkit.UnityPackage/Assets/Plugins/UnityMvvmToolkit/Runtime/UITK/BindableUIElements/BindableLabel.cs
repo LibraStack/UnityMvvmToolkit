@@ -1,7 +1,7 @@
 ﻿using UnityEngine.UIElements;
 using UnityMvvmToolkit.Core.Interfaces;
 
-namespace UnityMvvmToolkit.UI.BindableUIElements
+namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
     public class BindableLabel : Label, IBindableUIElement
     {

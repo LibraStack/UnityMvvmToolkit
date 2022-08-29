@@ -7,9 +7,9 @@ using UnityEngine.Pool;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UI.BindableUIElements;
+using UnityMvvmToolkit.UITK.BindableUIElements;
 
-namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
+namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
 {
     public abstract class BindableScrollViewWrapper<TItem, TData> : IBindableElement, IInitializable, IDisposable
         where TData : ICollectionItemData

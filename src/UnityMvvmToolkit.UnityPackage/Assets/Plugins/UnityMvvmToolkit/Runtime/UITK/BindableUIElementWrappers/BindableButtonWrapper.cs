@@ -1,7 +1,7 @@
 ﻿using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UI.BindableUIElements;
+using UnityMvvmToolkit.UITK.BindableUIElements;
 
-namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
+namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
 {
     public class BindableButtonWrapper : BaseBindableButton
     {

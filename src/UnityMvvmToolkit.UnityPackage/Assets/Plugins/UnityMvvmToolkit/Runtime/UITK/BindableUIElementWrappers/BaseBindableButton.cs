@@ -1,9 +1,9 @@
 ﻿using System;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UI.BindableUIElements;
+using UnityMvvmToolkit.UITK.BindableUIElements;
 
-namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
+namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
 {
     public abstract class BaseBindableButton : BindableCommandElement, IInitializable, IDisposable
     {

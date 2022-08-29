@@ -4,9 +4,9 @@ using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UI.BindableUIElements;
+using UnityMvvmToolkit.UITK.BindableUIElements;
 
-namespace UnityMvvmToolkit.UI.BindableUIElementWrappers
+namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
 {
     public abstract class BindableListViewWrapper<TItem, TData> : IBindableElement, IInitializable, IDisposable
     {

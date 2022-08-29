@@ -1,5 +1,5 @@
 {
-    "name": "UnityMvvmToolkit.UI",
+    "name": "UnityMvvmToolkit.UITK",
     "rootNamespace": "",
     "references": [
         "GUID:5c4878a33f8e8b04cb2f76d30bb7b0b0",

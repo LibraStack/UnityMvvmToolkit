@@ -3,20 +3,20 @@
     <Style src="project://database/Assets/UI%20Toolkit/Styles/main-view.uss?fileID=7433441132597879392&amp;guid=74499e5ab1abfe44ab2d476b057334b6&amp;type=3#main-view" />
     <ui:VisualElement name="ContentPage" class="main-view__content-page">
         <ui:VisualElement name="TopPanel" class="content-page__top-panel">
-            <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="Monday, 3 Dec" binding-text-path="Date" class="content-page__top-panel__header-label" style="white-space: normal;" />
+            <UnityMvvmToolkit.UITK.BindableUIElements.BindableLabel text="Monday, 3 Dec" binding-text-path="Date" class="content-page__top-panel__header-label" style="white-space: normal;" />
             <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
                 <ui:VisualElement name="LeftPanel">
-                    <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="06" binding-text-path="CreatedTasks" class="content-page__top-panel__data-label" />
+                    <UnityMvvmToolkit.UITK.BindableUIElements.BindableLabel text="06" binding-text-path="CreatedTasks" class="content-page__top-panel__data-label" />
                     <ui:Label text="Created tasks" class="content-page__top-panel__info-label" />
                 </ui:VisualElement>
                 <ui:VisualElement name="RightPanel">
-                    <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel text="03" binding-text-path="CompletedTasks" class="content-page__top-panel__data-label" style="-unity-text-align: upper-right;" />
+                    <UnityMvvmToolkit.UITK.BindableUIElements.BindableLabel text="03" binding-text-path="CompletedTasks" class="content-page__top-panel__data-label" style="-unity-text-align: upper-right;" />
                     <ui:Label text="Completed tasks" class="content-page__top-panel__info-label" style="-unity-text-align: upper-right;" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="ListContainer" class="content-page__list-container">
-            <UnityMvvmToolkit.UI.BindableUIElements.BindableScrollView scroll-deceleration-rate="0,135" elasticity="0.05" binding-items-source-path="TaskItems" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" touch-scroll-type="Elastic" />
+            <UnityMvvmToolkit.UITK.BindableUIElements.BindableScrollView scroll-deceleration-rate="0,135" elasticity="0.05" binding-items-source-path="TaskItems" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" touch-scroll-type="Elastic" />
         </ui:VisualElement>
         <ui:VisualElement name="BottomPanel" class="content-page__bottom-panel" />
     </ui:VisualElement>

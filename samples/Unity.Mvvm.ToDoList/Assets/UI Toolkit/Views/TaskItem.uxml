@@ -2,14 +2,14 @@
     <Style src="project://database/Assets/UI%20Toolkit/Styles/root.uss?fileID=7433441132597879392&amp;guid=62b4e13dd3cf90e4599aa965871c8936&amp;type=3#root" />
     <Style src="project://database/Assets/UI%20Toolkit/Styles/task-item.uss?fileID=7433441132597879392&amp;guid=f273a979e4932904da77fe5506dde6f1&amp;type=3#task-item" />
     <ui:VisualElement class="task-item">
-        <UnityMvvmToolkit.UI.BindableUIElements.BindableButton name="StateButton" class="task-item__icon-button task-item__state-circle--animation">
+        <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton name="StateButton" class="task-item__icon-button task-item__state-circle--animation">
             <ui:VisualElement picking-mode="Ignore" name="Circle" class="task-item__state-circle">
                 <ui:VisualElement name="Check" picking-mode="Ignore" class="task-item__state-check task-item__state-check--animation" />
             </ui:VisualElement>
-        </UnityMvvmToolkit.UI.BindableUIElements.BindableButton>
-        <UnityMvvmToolkit.UI.BindableUIElements.BindableLabel name="TitleLabel" text="10 min Meditation" class="task-item__label task-item__label--animation" />
-        <UnityMvvmToolkit.UI.BindableUIElements.BindableButton name="RemoveButton" class="task-item__icon-button" style="position: absolute; right: 0;">
+        </UnityMvvmToolkit.UITK.BindableUIElements.BindableButton>
+        <UnityMvvmToolkit.UITK.BindableUIElements.BindableLabel name="TitleLabel" text="10 min Meditation" class="task-item__label task-item__label--animation" />
+        <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton name="RemoveButton" class="task-item__icon-button" style="position: absolute; right: 0;">
             <ui:VisualElement name="Icon" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/UI%20Toolkit/Icons/delete_icon.png?fileID=2800000&amp;guid=120c3296efeda4a4db3523f7922af22e&amp;type=3#delete_icon&apos;); width: 64px; height: 64px; -unity-background-image-tint-color: rgb(192, 192, 192); align-items: center;" />
-        </UnityMvvmToolkit.UI.BindableUIElements.BindableButton>
+        </UnityMvvmToolkit.UITK.BindableUIElements.BindableButton>
     </ui:VisualElement>
 </ui:UXML>

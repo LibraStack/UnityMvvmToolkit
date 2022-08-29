@@ -1,7 +1,7 @@
 ﻿using BindableUIElements;
 using BindableUIElementWrappers;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UI;
+using UnityMvvmToolkit.UITK;
 
 public class CounterBindableElementsWrapper : BindableElementsWrapper
 {

@@ -4,7 +4,7 @@ using UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UI;
+using UnityMvvmToolkit.UITK;
 
 namespace Views
 {

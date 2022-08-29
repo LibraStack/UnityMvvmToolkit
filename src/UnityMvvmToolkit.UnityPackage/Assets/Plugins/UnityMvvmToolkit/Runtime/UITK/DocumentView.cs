@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Core.Interfaces;
 
-namespace UnityMvvmToolkit.UI
+namespace UnityMvvmToolkit.UITK
 {
     [RequireComponent(typeof(UIDocument))]
     public abstract class DocumentView<TBindingContext> : MonoBehaviourView<TBindingContext>

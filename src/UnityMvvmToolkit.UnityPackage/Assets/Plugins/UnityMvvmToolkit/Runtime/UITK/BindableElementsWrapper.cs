@@ -1,9 +1,9 @@
 ﻿using System;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UI.BindableUIElements;
-using UnityMvvmToolkit.UI.BindableUIElementWrappers;
+using UnityMvvmToolkit.UITK.BindableUIElements;
+using UnityMvvmToolkit.UITK.BindableUIElementWrappers;
 
-namespace UnityMvvmToolkit.UI
+namespace UnityMvvmToolkit.UITK
 {
     public class BindableElementsWrapper : IBindableElementsWrapper
     {
