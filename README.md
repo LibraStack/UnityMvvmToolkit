@@ -2,19 +2,20 @@
 
 A package that brings data-binding to your Unity project.
 
+![git-main](https://user-images.githubusercontent.com/28132516/187478087-909fc50b-778b-4827-8090-c5a66d7b6b11.png)
+
 ## :open_book: Table of Contents
 
 - [About](#pencil-about)
-  - [Restrictions](#restrictions)
   - [Samples](#samples)
 - [Folder Structure](#cactus-folder-structure)
 - [Installation](#gear-installation)
+  - [IL2CPP restriction](#il2cpp-restriction)
 - [How To Use](#rocket-how-to-use)
-  - [Add new icons set](#add-new-icons-set)
   - [Custom control]
-- [External Assets](#external-assets)
+- [External Assets](#cherries-external-assets)
   - [UniTask](#unitask)
-- [Benchmarks](#benchmarks)
+- [Benchmarks](#chart_with_upwards_trend-benchmarks)
 - [Contributing](#bookmark_tabs-contributing)
   - [Discussions](#discussions)
   - [Report a bug](#report-a-bug)
@@ -24,22 +25,19 @@ A package that brings data-binding to your Unity project.
 
 ## :pencil: About
 
-The **UnityMvvmToolkit** is designed to accelerate the development of MVVM applications in Unity. Use the samples as a starting point for understanding how to utilize the package.
+The **UnityMvvmToolkit** is a package that allows you to bind UI elements in your `UI Document` or `Canvas` to data sources in your app. Use the samples as a starting point for understanding how to utilize the package.
 
-<!--This repository contains initial samples for how to utilize the package.
-
-It mostly designed for UI Toolkit but you can use it with UGUI as well.-->
-
-It is built around the following principles:
-- ...
-- ...
-- ...
-
-### Restrictions
-
-...
+#### Key features:
+- Runtime data-binding
+- UI Toolkit & uGUI integration
+- Multiple-properties binding
+- Custom UI Elements support
+- Compatible with [UniTask](https://github.com/Cysharp/UniTask)
+- Mono & IL2CPP support[*](#il2cpp-restriction)
 
 ### Samples
+
+The following example shows the **UnityMvvmToolkit** in action using the **Counter** app.
 
 <details open><summary><b>CounterView</b></summary>
 <br />
@@ -109,17 +107,19 @@ public class CounterViewModel : ViewModel
     <td align="center">ToDoList</td>
   </tr>
   <tr>
-    <td align="center">
+    <td align="center" width=32%>
       <video src="https://user-images.githubusercontent.com/28132516/187030099-a440bc89-4c28-44e3-9898-9894eac5bff4.mp4" alt="CounterSample" />
     </td>
-    <td align="center">
-      <video src="https://user-images.githubusercontent.com/28132516/187030102-2b02c663-31cb-4d63-a764-4be9484359f0.mp4" alt="CalculatorSample" />
+    <td align="center" width=32%>
+      <video src="https://user-images.githubusercontent.com/28132516/187471982-4acdeddb-ec4d-45b6-a2a3-4198a03760de.mp4" alt="CalculatorSample" />
     </td>
-    <td align="center">
+    <td align="center" width=32%>
       <video src="https://user-images.githubusercontent.com/28132516/187030101-ad1f2123-59d5-4d1e-a9ca-ab983589e52f.mp4" alt="ToDoListSample" />
     </td>
   </tr>
 </table>
+
+> You will find all the samples in the `samples` folder.
 
 ## :cactus: Folder Structure
 
@@ -133,18 +133,16 @@ public class CounterViewModel : ViewModel
     ├── src
     │   ├── UnityMvvmToolkit.Core
     │   └── UnityMvvmToolkit.UnityPackage
+    │       ...
     │       ├── Core      # Auto-generated
     │       ├── Common
     │       ├── External
     │       ├── UGUI
-    │       └── UI        # UI Toolkit
+    │       └── UITK
     │
     ├── UnityMvvmToolkit.sln
 
 ## :gear: Installation
-
-Dependencies:
-- Unity UnityMvvmToolkit: [UniTask](https://openupm.com/packages/com.cysharp.unitask/)
 
 You can install UnityMvvmToolkit in one of the following ways:
 
@@ -174,22 +172,61 @@ You can install UnityMvvmToolkit in one of the following ways:
   You can add `https://github.com/ChebanovDD/UnityMvvmToolkit.git?path=src/UnityMvvmToolkit.UnityPackage/Assets/Plugins/UnityMvvmToolkit` to the Package Manager.
 
   If you want to set a target version, UnityMvvmToolkit uses the `v*.*.*` release tag, so you can specify a version like `#v0.1.0`. For example `https://github.com/ChebanovDD/UnityMvvmToolkit.git?path=src/UnityMvvmToolkit.UnityPackage/Assets/Plugins/UnityMvvmToolkit#v0.1.0`.
-
-  > **Note:** Dependencies must be installed before installing the package.
   
 </details>
 
-### [Releases Page](https://github.com/ChebanovDD/UnityMvvmToolkit/releases)
+### IL2CPP restriction
 
-- ...
-- ...
-- ...
+The **UnityMvvmToolkit** uses generic virtual methods under the hood to create bindable properties, but `IL2CPP` in `Unity 2021` does not support [Full Generic Sharing](https://blog.unity.com/technology/feature-preview-il2cpp-full-generic-sharing-in-unity-20221-beta) this restriction will be removed in `Unity 2022`.
 
-> **Note:** Dependencies must be installed before installing the packages.
+To work around this issue in `Unity 2021` you need to change the `IL2CPP Code Generation` setting in the `Build Settings` window to `Faster (smaller) builds`.
+
+<details><summary>Instruction</summary>
+<br />
+
+![build-settings](https://user-images.githubusercontent.com/28132516/187468236-4b455b62-48ef-4e9c-9a3f-83391833c3c0.png)
+
+</details>
 
 ## :rocket: How To Use
 
-### Add new icons set
+The package contains a collection of standard, self-contained, lightweight types that provide a starting implementation for building apps using the MVVM pattern.
+
+The included types are:
+
+- ViewModel
+- CanvasView<TBindingContext>
+- DocumentView<TBindingContext>
+- Command
+- Command\<T\>
+- AsyncCommand
+- AsyncCommand\<T\>
+- AsyncLazyCommand
+- AsyncLazyCommand\<T\>
+- CommandWrapper
+- ICommand
+- ICommand\<T\>
+- IAsyncCommand
+- IAsyncCommand\<T\>
+- ICommandWrapper
+
+### ViewModel
+
+The `ViewModel` is a base class for objects that are observable by implementing the INotifyPropertyChanged interface. It can be used as a starting point for all kinds of objects that need to support property change notification.
+
+### CanvasView
+
+### DocumentView
+
+### Command
+
+The `Command` and `Command<T>` are ICommand implementations that can expose a method or delegate to the view. These types act as a way to bind commands between the viewmodel and UI elements.
+
+### Property value converter
+
+### Parameter value converter
+
+### Custom control
 
 ...
 
@@ -208,7 +245,36 @@ You can install UnityMvvmToolkit in one of the following ways:
 
 ## :chart_with_upwards_trend: Benchmarks
 
-...
+<details><summary>Environment</summary>
+<br />
+<pre>
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19041.1165 (2004/May2020Update/20H1)
+Intel Core i7-8700 CPU 3.20GHz (Coffee Lake), 1 CPU, 12 logical and 6 physical cores
+.NET SDK=5.0.301
+  [Host]     : .NET 5.0.7 (5.0.721.25508), X64 RyuJIT
+  DefaultJob : .NET 5.0.7 (5.0.721.25508), X64 RyuJIT
+</pre>
+</details>
+
+#### Set & Get value type (int)
+
+<pre>
+|              Method |        Mean |     Error |    StdDev |  Ratio |  Gen 0 | Gen 1 | Gen 2 | Allocated |
+|-------------------- |------------:|----------:|----------:|-------:|-------:|------:|------:|----------:|
+| DirectPropertyUsage |   0.4904 ns | 0.0364 ns | 0.0358 ns |   1.00 |      - |     - |     - |         - |
+|    UnityMvvmToolkit |   3.4734 ns | 0.0925 ns | 0.0865 ns |   7.13 |      - |     - |     - |         - |
+|          Reflection | 225.5382 ns | 4.4920 ns | 4.8063 ns | 463.38 | 0.0176 |     - |     - |     112 B |
+</pre>
+
+#### Complex binding
+
+<pre>
+|           Method |       Mean |    Error |   StdDev | Ratio |  Gen 0 | Gen 1 | Gen 2 | Allocated |
+|----------------- |-----------:|---------:|---------:|------:|-------:|------:|------:|----------:|
+|   ManualApproach |   209.3 ns |  3.02 ns |  2.35 ns |  1.00 | 0.0458 |     - |     - |     288 B |
+| UnityMvvmToolkit |   418.1 ns |  7.82 ns |  8.04 ns |  2.00 | 0.0458 |     - |     - |     288 B |
+|       Reflection | 1,566.4 ns | 31.01 ns | 33.18 ns |  7.46 | 0.0725 |     - |     - |     464 B |
+</pre>
 
 ## :bookmark_tabs: Contributing
 
