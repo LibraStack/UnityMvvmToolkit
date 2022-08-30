@@ -8,6 +8,6 @@
             <BindableUIElements.BindableCountLabel text="25" binding-text-path="Count" class="count-label count-label--animation" />
         </ui:VisualElement>
         <BindableUIElements.BindableThemeSwitcher binding-value-path="ThemeMode, Converter={ThemeModeToBoolConverter}" />
-        <BindableUIElements.BindableCounterSlider increase-command="IncreaseCommand" decrease-command="DecreaseCommand" style="margin-bottom: 15%;" />
+        <BindableUIElements.BindableCounterSlider increment-command="IncrementCommand" decrement-command="DecrementCommand" style="margin-bottom: 15%;" />
     </BindableUIElements.BindableContentPage>
 </ui:UXML>

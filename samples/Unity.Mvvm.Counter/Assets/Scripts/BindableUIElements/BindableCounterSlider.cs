@@ -6,8 +6,8 @@ namespace BindableUIElements
 {
     public class BindableCounterSlider : CounterSlider, IBindableUIElement
     {
-        public string IncreaseCommand { get; set; }
-        public string DecreaseCommand { get; set; }
+        public string IncrementCommand { get; set; }
+        public string DecrementCommand { get; set; }
 
         public new class UxmlFactory : UxmlFactory<BindableCounterSlider, UxmlTraits>
         {
@@ -15,19 +15,19 @@ namespace BindableUIElements
 
         public new class UxmlTraits : CounterSlider.UxmlTraits
         {
-            private readonly UxmlStringAttributeDescription _increaseCommandAttribute = new()
-                { name = "increase-command", defaultValue = "" };
+            private readonly UxmlStringAttributeDescription _incrementCommandAttribute = new()
+                { name = "increment-command", defaultValue = "" };
 
-            private readonly UxmlStringAttributeDescription _decreaseCommandAttribute = new()
-                { name = "decrease-command", defaultValue = "" };
+            private readonly UxmlStringAttributeDescription _decrementCommandAttribute = new()
+                { name = "decrement-command", defaultValue = "" };
 
             public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
             {
                 base.Init(visualElement, bag, context);
 
                 var bindableCounterSlider = (BindableCounterSlider) visualElement;
-                bindableCounterSlider.IncreaseCommand = _increaseCommandAttribute.GetValueFromBag(bag, context);
-                bindableCounterSlider.DecreaseCommand = _decreaseCommandAttribute.GetValueFromBag(bag, context);
+                bindableCounterSlider.IncrementCommand = _incrementCommandAttribute.GetValueFromBag(bag, context);
+                bindableCounterSlider.DecrementCommand = _decrementCommandAttribute.GetValueFromBag(bag, context);
             }
         }
     }

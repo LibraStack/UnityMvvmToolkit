@@ -11,8 +11,8 @@ namespace ViewModels
 
         public CounterViewModel()
         {
-            IncreaseCommand = new Command(IncreaseCount);
-            DecreaseCommand = new Command(DecreaseCount);
+            IncrementCommand = new Command(IncrementCount);
+            DecrementCommand = new Command(DecrementCount);
         }
 
         public int Count
@@ -27,17 +27,10 @@ namespace ViewModels
             set => Set(ref _themeMode, value);
         }
 
-        public ICommand IncreaseCommand { get; }
-        public ICommand DecreaseCommand { get; }
+        public ICommand IncrementCommand { get; }
+        public ICommand DecrementCommand { get; }
 
-        private void IncreaseCount()
-        {
-            Count++;
-        }
-
-        private void DecreaseCount()
-        {
-            Count--;
-        }
+        private void IncrementCount() => Count++;
+        private void DecrementCount() => Count--;
     }
 }

@@ -22,8 +22,8 @@ namespace UIElements
             _thumb = thumb;
         }
 
-        public event EventHandler Increase;
-        public event EventHandler Decrease;
+        public event EventHandler Increment;
+        public event EventHandler Decrement;
 
         public void Initialize()
         {
@@ -77,11 +77,11 @@ namespace UIElements
 
             if (localPosition.x >= _increasePositionX)
             {
-                Increase?.Invoke(this, EventArgs.Empty);
+                Increment?.Invoke(this, EventArgs.Empty);
             }
             else if (localPosition.x <= _decreasePositionX)
             {
-                Decrease?.Invoke(this, EventArgs.Empty);
+                Decrement?.Invoke(this, EventArgs.Empty);
             }
         }
 

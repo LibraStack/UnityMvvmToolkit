@@ -8,39 +8,39 @@ namespace BindableUIElementWrappers
     public class BindableCounterSliderWrapper : BindableCommandElement, IInitializable, IDisposable
     {
         private readonly BindableCounterSlider _counterSlider;
-        private readonly ICommand _increaseCommand;
-        private readonly ICommand _decreaseCommand;
+        private readonly ICommand _incrementCommand;
+        private readonly ICommand _decrementCommand;
 
         public BindableCounterSliderWrapper(BindableCounterSlider counterSlider, IObjectProvider objectProvider)
             : base(objectProvider)
         {
             _counterSlider = counterSlider;
-            _increaseCommand = GetCommand<ICommand>(counterSlider.IncreaseCommand);
-            _decreaseCommand = GetCommand<ICommand>(counterSlider.DecreaseCommand);
+            _incrementCommand = GetCommand<ICommand>(counterSlider.IncrementCommand);
+            _decrementCommand = GetCommand<ICommand>(counterSlider.DecrementCommand);
         }
 
-        public bool CanInitialize => _increaseCommand != null && _decreaseCommand != null;
+        public bool CanInitialize => _incrementCommand != null && _decrementCommand != null;
 
         public void Initialize()
         {
-            _counterSlider.Increase += OnIncrease;
-            _counterSlider.Decrease += OnDecrease;
+            _counterSlider.Increment += OnIncrement;
+            _counterSlider.Decrement += OnDecrement;
         }
 
         public void Dispose()
         {
-            _counterSlider.Increase -= OnIncrease;
-            _counterSlider.Decrease -= OnDecrease;
+            _counterSlider.Increment -= OnIncrement;
+            _counterSlider.Decrement -= OnDecrement;
         }
 
-        private void OnIncrease(object sender, EventArgs e)
+        private void OnIncrement(object sender, EventArgs e)
         {
-            _increaseCommand.Execute();
+            _incrementCommand.Execute();
         }
 
-        private void OnDecrease(object sender, EventArgs e)
+        private void OnDecrement(object sender, EventArgs e)
         {
-            _decreaseCommand.Execute();
+            _decrementCommand.Execute();
         }
     }
 }

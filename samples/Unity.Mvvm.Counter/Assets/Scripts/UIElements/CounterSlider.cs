@@ -26,16 +26,16 @@ namespace UIElements
             RegisterCallback<GeometryChangedEvent>(OnLayoutCalculated);
         }
 
-        public event EventHandler Increase
+        public event EventHandler Increment
         {
-            add => _manipulator.Increase += value;
-            remove => _manipulator.Increase -= value;
+            add => _manipulator.Increment += value;
+            remove => _manipulator.Increment -= value;
         }
 
-        public event EventHandler Decrease
+        public event EventHandler Decrement
         {
-            add => _manipulator.Decrease += value;
-            remove => _manipulator.Decrease -= value;
+            add => _manipulator.Decrement += value;
+            remove => _manipulator.Decrement -= value;
         }
 
         private void CreateLabel(string labelName, string labelText)
