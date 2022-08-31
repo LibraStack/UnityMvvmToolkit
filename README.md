@@ -11,9 +11,12 @@ A package that brings data-binding to your Unity project.
 - [Folder Structure](#cactus-folder-structure)
 - [Installation](#gear-installation)
   - [IL2CPP restriction](#il2cpp-restriction)
+- [Introduction](#ledger-introduction)
+- [Quick start](#watch-quick-start)
 - [How To Use](#rocket-how-to-use)
-  - [Custom control]
-- [External Assets](#cherries-external-assets)
+  - [Data-binding](#data-binding)
+  - [Create custom control](#create-custom-control)
+- [External Assets](#link-external-assets)
   - [UniTask](#unitask)
 - [Benchmarks](#chart_with_upwards_trend-benchmarks)
 - [Contributing](#bookmark_tabs-contributing)
@@ -27,7 +30,7 @@ A package that brings data-binding to your Unity project.
 
 The **UnityMvvmToolkit** is a package that allows you to bind UI elements in your `UI Document` or `Canvas` to data sources in your app. Use the samples as a starting point for understanding how to utilize the package.
 
-#### Key features:
+Key features:
 - Runtime data-binding
 - UI Toolkit & uGUI integration
 - Multiple-properties binding
@@ -49,10 +52,12 @@ The following example shows the **UnityMvvmToolkit** in action using the **Count
             <BindableCountLabel binding-text-path="Count" class="count-label count-label--animation" />
         </VisualElement>
         <BindableThemeSwitcher binding-value-path="ThemeMode, Converter={ThemeModeToBoolConverter}" />
-        <BindableCounterSlider increase-command="IncreaseCommand" decrease-command="DecreaseCommand" />
+        <BindableCounterSlider increment-command="IncrementCommand" decrement-command="DecrementCommand" />
     </BindableContentPage>
 </UXML>
 ```
+
+> **Note:** The namespaces are omitted to make the example more readable.
 
 </details>
 
@@ -67,8 +72,8 @@ public class CounterViewModel : ViewModel
 
     public CounterViewModel()
     {
-        IncreaseCommand = new Command(IncreaseCount);
-        DecreaseCommand = new Command(DecreaseCount);
+        IncrementCommand = new Command(IncrementCount);
+        DecrementCommand = new Command(DecrementCount);
     }
 
     public int Count
@@ -83,18 +88,11 @@ public class CounterViewModel : ViewModel
         set => Set(ref _themeMode, value);
     }
 
-    public ICommand IncreaseCommand { get; }
-    public ICommand DecreaseCommand { get; }
+    public ICommand IncrementCommand { get; }
+    public ICommand DecrementCommand { get; }
 
-    private void IncreaseCount()
-    {
-        Count++;
-    }
-
-    private void DecreaseCount()
-    {
-        Count--;
-    }
+    private void IncrementCount() => Count++;
+    private void DecrementCount() => Count--;
 }
 ```
 
@@ -107,13 +105,13 @@ public class CounterViewModel : ViewModel
     <td align="center">ToDoList</td>
   </tr>
   <tr>
-    <td align="center" width=32%>
+    <td align="center" width=25%>
       <video src="https://user-images.githubusercontent.com/28132516/187030099-a440bc89-4c28-44e3-9898-9894eac5bff4.mp4" alt="CounterSample" />
     </td>
-    <td align="center" width=32%>
+    <td align="center" width=25%>
       <video src="https://user-images.githubusercontent.com/28132516/187471982-4acdeddb-ec4d-45b6-a2a3-4198a03760de.mp4" alt="CalculatorSample" />
     </td>
-    <td align="center" width=32%>
+    <td align="center" width=25%>
       <video src="https://user-images.githubusercontent.com/28132516/187030101-ad1f2123-59d5-4d1e-a9ca-ab983589e52f.mp4" alt="ToDoListSample" />
     </td>
   </tr>
@@ -188,49 +186,406 @@ To work around this issue in `Unity 2021` you need to change the `IL2CPP Code Ge
 
 </details>
 
-## :rocket: How To Use
+## :ledger: Introduction
 
 The package contains a collection of standard, self-contained, lightweight types that provide a starting implementation for building apps using the MVVM pattern.
 
 The included types are:
-
-- ViewModel
-- CanvasView<TBindingContext>
-- DocumentView<TBindingContext>
-- Command
-- Command\<T\>
-- AsyncCommand
-- AsyncCommand\<T\>
-- AsyncLazyCommand
-- AsyncLazyCommand\<T\>
-- CommandWrapper
-- ICommand
-- ICommand\<T\>
-- IAsyncCommand
-- IAsyncCommand\<T\>
-- ICommandWrapper
+- [ViewModel](#viewmodel)
+- [CanvasView\<TBindingContext\>](#canvasviewtbindingcontext)
+- [DocumentView\<TBindingContext\>](#documentviewtbindingcontext)
+- [Command & Command\<T\>](#command--commandt)
+- [AsyncCommand & AsyncCommand\<T\>](#asynccommand--asynccommandt)
+- [AsyncLazyCommand & AsyncLazyCommand\<T\>](#asynclazycommand--asynclazycommandt)
+- [CommandWrapper](#commandwrapper)
+- [PropertyValueConverter\<TSourceType, TTargetType\>](#propertyvalueconvertertsourcetype-ttargettype)
+- [ParameterValueConverter\<TTargetType\>](#parametervalueconverterttargettype)
+- [ICommand & ICommand\<T\>](#command--commandt)
+- [IAsyncCommand & IAsyncCommand\<T\>](#asynccommand--asynccommandt)
+- [ICommandWrapper](#commandwrapper)
+- [IPropertyValueConverter\<TSourceType, TTargetType\>](#propertyvalueconvertertsourcetype-ttargettype)
+- [IParameterValueConverter\<TTargetType\>](#parametervalueconverterttargettype)
 
 ### ViewModel
 
-The `ViewModel` is a base class for objects that are observable by implementing the INotifyPropertyChanged interface. It can be used as a starting point for all kinds of objects that need to support property change notification.
+The `ViewModel` is a base class for objects that are observable by implementing the `INotifyPropertyChanged` interface. It can be used as a starting point for all kinds of objects that need to support property change notification.
 
-### CanvasView
+Key functionality:
+- Provides a base implementation for `INotifyPropertyChanged`, exposing the `PropertyChanged` events
+- Provides a series of `Set` methods that can be used to easily set property values from types inheriting from `ViewModel`, and to automatically raise the appropriate events
 
-### DocumentView
+#### Simple property
 
-### Command
+Here's an example of how to implement notification support to a custom property:
 
-The `Command` and `Command<T>` are ICommand implementations that can expose a method or delegate to the view. These types act as a way to bind commands between the viewmodel and UI elements.
+```csharp
+public class CounterViewModel : ViewModel
+{
+    private int _count;
 
-### Property value converter
+    public int Count
+    {
+        get => _count;
+        set => Set(ref _count, value);
+    }
+}
+```
 
-### Parameter value converter
+The provided `Set<T>(ref T, T, string)` method checks the current value of the property, and updates it if different, and then also raises the `PropertyChanged` event automatically. The property name is automatically captured through the use of the `[CallerMemberName]` attribute, so there's no need to manually specify which property is being updated.
 
-### Custom control
+#### Wrapping a model
 
-...
+To inject notification support to models, that don't implement the `INotifyPropertyChanged` interface, `ViewModel` provides a dedicated `Set<TModel, T>(T, T, TModel, Action<TModel, T>, string)` method for this:
 
-## :cherries: External Assets
+```csharp
+public class UserViewModel : ViewModel
+{
+    private readonly User _user;
+
+    public UserViewModel(User user)
+    {
+        _user = user;
+    }
+
+    public string Name
+    {
+        get => _user.Name;
+        set => Set(_user.Name, value, _user, (user, name) => user.Name = name);
+    }
+}
+```
+
+### CanvasView\<TBindingContext\>
+
+### DocumentView\<TBindingContext\>
+
+### Command & Command\<T\>
+
+The `Command` and `Command<T>` are `ICommand` implementations that can expose a method or delegate to the view. These types act as a way to bind commands between the viewmodel and UI elements.
+
+Key functionality:
+- Provide a base implementation of the `ICommand` interface
+- Implement the `ICommand` & `ICommand<T>` interface, which exposes a `RaiseCanExecuteChanged` method to raise the `CanExecuteChanged` event
+- Expose constructor taking delegates like `Action` and `Action<T>`, which allow the wrapping of standard methods and lambda expressions
+
+The following shows how to set up a simple command:
+
+```csharp
+using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Interfaces;
+
+public class CounterViewModel : ViewModel
+{
+    private int _count;
+
+    public CounterViewModel()
+    {
+        IncrementCommand = new Command(IncrementCount);
+    }
+
+    public int Count
+    {
+        get => _count;
+        set => Set(ref _count, value);
+    }
+
+    public ICommand IncrementCommand { get; }
+
+    private void IncrementCount() => Count++;
+}
+```
+
+And the relative UI could then be (using UXML):
+
+```xml
+<ui:UXML ...>
+    <UnityMvvmToolkit.UITK.BindableUIElements.BindableLabel binding-text-path="Count" />
+    <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton command="IncrementCommand" />
+</ui:UXML>
+```
+
+The `BindableButton` binds to the `ICommand` in the viewmodel, which wraps the private `IncrementCount` method. The `BindableLabel` displays the value of the `Count` property and is updated every time the property value changes.
+
+> **Note:** You need to define `IntToStrConverter` to convert int to string.
+
+### AsyncCommand & AsyncCommand\<T\>
+
+The `AsyncCommand` and `AsyncCommand<T>` are `ICommand` implementations that extend the functionalities offered by `Command`, with support for asynchronous operations.
+
+Key functionality:
+- Extend the functionalities of the synchronous commands included in the package, with support for UniTask-returning delegates
+- Can wrap asynchronous functions with a `CancellationToken` parameter to support cancelation, and they implement a `DisableOnExecution` logic
+- Implement the `IAsyncCommand` & `IAsyncCommand<T>` interfaces, which allows to replace a command with a custom implementation, if needed
+
+Let's say we want to download an image from the web and display it as soon as it downloads:
+
+```csharp
+public class ImageViewerViewModel : ViewModel
+{
+    private readonly IImageDownloader _imageDownloader;
+    private Texture2D _texture;
+
+    public ImageViewerViewModel(IImageDownloader imageDownloader)
+    {
+        _imageDownloader = imageDownloader;
+        DownloadImageCommand = new AsyncCommand(DownloadImageAsync);
+    }
+
+    public Texture2D Image
+    {
+        get => _texture;
+        private set => Set(ref _texture, value);
+    }
+
+    public IAsyncCommand DownloadImageCommand { get; }
+
+    private async UniTask DownloadImageAsync(CancellationToken cancellationToken = default)
+    {
+        Image = await _imageDownloader.DownloadRandomImageAsync(cancellationToken);
+    }
+}
+```
+
+With the related UI code:
+
+```xml
+<ui:UXML ...>
+    <BindableUIElements.BindableImage binding-image-path="Image" style="width: 256px; height: 256px;" />
+    <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton command="DownloadImageCommand">
+        <ui:Label text="Download Image" />
+    </UnityMvvmToolkit.UITK.BindableUIElements.BindableButton>
+</ui:UXML>
+```
+
+To disable the `BindableButton` while an async operation is running, simply set the `DisableOnExecution` property of the `AsyncCommand` to `true`:
+
+```csharp
+public class ImageViewerViewModel : ViewModel
+{
+    ...
+
+    public ImageViewerViewModel(IImageDownloader imageDownloader)
+    {
+        _imageDownloader = imageDownloader;
+        DownloadImageCommand = new AsyncLazyCommand(DownloadImageAsync) { DisableOnExecution = true };
+    }
+
+    ...
+}
+```
+
+> **Note:** You need to import the [UniTask](https://github.com/Cysharp/UniTask) package in order to use async commands.
+
+### AsyncLazyCommand & AsyncLazyCommand\<T\>
+
+The `AsyncLazyCommand` and `AsyncLazyCommand<T>` are have the same functionality as the `AsyncCommand`'s, except they prevent the async operation from being run multiple times.
+
+Let's imagine a scenario similar to the one described in the `AsyncCommand` sample, but a user clicks the `Download Image` button several times during the async operation is running. In this case, `AsyncLazyCommand` will ignore all clicks until previous async operation has completed.
+
+> **Note:** You need to import the [UniTask](https://github.com/Cysharp/UniTask) package in order to use async commands.
+
+### CommandWrapper
+
+### PropertyValueConverter\<TSourceType, TTargetType\>
+
+### ParameterValueConverter\<TTargetType\>
+
+## :watch: Quick start
+
+Once the `UnityMVVMToolkit` is installed, create a class `MyFirstViewModel` and inherit from the `ViewModel`.
+
+```csharp
+using UnityMvvmToolkit.Core;
+
+public class MyFirstViewModel : ViewModel
+{
+    private string _text;
+
+    public MyFirstViewModel()
+    {
+        _text = "Hello World";
+    }
+
+    public string Text
+    {
+        get => _text;
+        set => Set(ref _text, value);
+    }
+}
+```
+
+#### UI Toolkit
+
+Create a class `MyFirstDocumentView` and inherit from the `DocumentView<TBindingContext>`.
+
+```csharp
+using UnityMvvmToolkit.UITK;
+
+public class MyFirstDocumentView : DocumentView<MyFirstViewModel>
+{
+}
+```
+
+Create a file `MyFirstView.uxml`, add a `BindableLabel` control and set the `binding-text-path` to `Text`.
+
+```xml
+<ui:UXML ...>
+    <UnityMvvmToolkit.UITK.BindableUIElements.BindableLabel binding-text-path="Text" />
+</ui:UXML>
+```
+
+Add `UI Document` to the scene, set the `MyFirstView.uxml` as a `Source Asset` and add the `MyFirstDocumentView` component to it.
+
+<details><summary>UI Document Inspector</summary>
+<br />
+
+![ui-document-inspector](https://user-images.githubusercontent.com/28132516/187613060-e20a139d-72fc-4088-b8d5-f9a01f5afa5b.png)
+
+</details>
+
+#### Unity UI (uGUI)
+
+Create a class `MyFirstCanvasView` and inherit from the `CanvasView<TBindingContext>`.
+
+```csharp
+using UnityMvvmToolkit.UGUI;
+
+public class MyFirstCanvasView : CanvasView<MyFirstViewModel>
+{
+}
+```
+
+Add `Canvas` to the scene, and add the `MyFirstCanvasView` component to it.
+
+<details><summary>Canvas Inspector</summary>
+<br />
+
+![canvas-inspector](https://user-images.githubusercontent.com/28132516/187613633-2c61c82e-ac25-4319-8e8d-1954eb4be197.png)
+
+</details>
+
+Add a `Text - TextMeshPro` UI element to the canvas, add the `BindableLabel` component to it and set the `BindingTextPath` to `Text`.
+
+<details><summary>Canvas Text Inspector</summary>
+<br />
+
+![canvas-text-inspector](https://user-images.githubusercontent.com/28132516/187614103-ad42d000-b3b7-4265-96a6-f6d4db6e8978.png)
+
+</details>
+
+## :rocket: How To Use
+
+### Data-binding
+
+### Create custom control
+
+```csharp
+public class Image : VisualElement
+{
+    public void SetImage(Texture2D image)
+    {
+        // To prevent memory leaks.
+        style.backgroundImage.Release(); // Object.Destroy(background.value.texture);
+        style.backgroundImage = new StyleBackground(image);
+    }
+
+    public new class UxmlFactory : UxmlFactory<Image, UxmlTraits> {}
+    
+    public new class UxmlTraits : VisualElement.UxmlTraits {}
+}
+```
+
+```csharp
+public class BindableImage : Image, IBindableUIElement
+{
+    public string BindingImagePath { get; set; }
+
+    public new class UxmlFactory : UxmlFactory<BindableImage, UxmlTraits> {}
+
+    public new class UxmlTraits : Image.UxmlTraits
+    {
+        private readonly UxmlStringAttributeDescription _bindingImageAttribute = new()
+            { name = "binding-image-path", defaultValue = "" };
+
+        public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
+        {
+            base.Init(visualElement, bag, context);
+            ((BindableImage) visualElement).BindingImagePath = _bindingImageAttribute.GetValueFromBag(bag, context);
+        }
+    }
+}
+```
+
+```csharp
+public class BindableImageWrapper : BindablePropertyElement
+{
+    private readonly BindableImage _bindableImage;
+    private readonly IReadOnlyProperty<Texture2D> _imageProperty;
+
+    public BindableImageWrapper(BindableImage bindableImage, IObjectProvider objectProvider) : base(objectProvider)
+    {
+        _bindableImage = bindableImage;
+        _imageProperty = GetReadOnlyProperty<Texture2D>(bindableImage.BindingImagePath);
+    }
+
+    public override void UpdateValues()
+    {
+        _bindableImage.SetImage(_imageProperty.Value);
+    }
+}
+```
+
+```csharp
+public class CustomBindableElementsWrapper : BindableElementsWrapper
+{
+    public override IBindableElement Wrap(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
+    {
+        return bindableUiElement switch
+        {
+            BindableImage bindableImage => new BindableImageWrapper(bindableImage, objectProvider),
+
+            _ => base.Wrap(bindableUiElement, objectProvider)
+        };
+    }
+}
+```
+
+```csharp
+public class ImageViewerViewModel : ViewModel
+{
+    ...
+
+    public Texture2D Image
+    {
+        get => _texture;
+        private set => Set(ref _texture, value);
+    }
+
+    ...
+}
+```
+
+```csharp
+public class ImageViewerView : DocumentView<ImageViewerViewModel>
+{
+    ...
+
+    protected override IBindableElementsWrapper GetBindableElementsWrapper()
+    {
+        return new CustomBindableElementsWrapper();
+    }
+}
+```
+
+```xml
+<UXML>
+    ...
+    <BindableImage binding-image-path="Image" />
+    ...
+</UXML>
+```
+
+## :link: External Assets
 
 ### UniTask
 
@@ -245,6 +600,8 @@ The `Command` and `Command<T>` are ICommand implementations that can expose a me
 
 ## :chart_with_upwards_trend: Benchmarks
 
+The **UnityMvvmToolkit** uses delegates to get and set property values. This approach avoids boxing and unboxing for value types, and the performance improvements are really significant. In particular, this approach is ~65x faster than the one that uses standard `GetValue` and `SetValue` methods, and does not make any memory allocations at all.
+
 <details><summary>Environment</summary>
 <br />
 <pre>
@@ -256,7 +613,7 @@ Intel Core i7-8700 CPU 3.20GHz (Coffee Lake), 1 CPU, 12 logical and 6 physical c
 </pre>
 </details>
 
-#### Set & Get value type (int)
+#### Set & Get integer value
 
 <pre>
 |              Method |        Mean |     Error |    StdDev |  Ratio |  Gen 0 | Gen 1 | Gen 2 | Allocated |
