@@ -214,6 +214,8 @@ Key functionality:
 - Provides a base implementation for `INotifyPropertyChanged`, exposing the `PropertyChanged` events
 - Provides a series of `Set` methods that can be used to easily set property values from types inheriting from `ViewModel`, and to automatically raise the appropriate events
 
+> **Note:** In case your viewmodel doesn't have a parameterless constructor, you need to override the `GetBindingContext` method on the view.
+
 #### Simple property
 
 Here's an example of how to implement notification support to a custom property:
@@ -257,7 +259,77 @@ public class UserViewModel : ViewModel
 
 ### CanvasView\<TBindingContext\>
 
+The `CanvasView<TBindingContext>` is a base class for `uGUI` view's.
+
+Key functionality:
+- Provides a base implementation for `Canvas` based view
+- Automatically searches for bindable UI elements on the `Canvas`
+- Allows to override the base viewmodel instance creation
+- Allows to define 'property' & 'parameter' value converters
+- Allows to define custom UI elements
+
+```csharp
+public class CounterView : CanvasView<CounterViewModel>
+{
+    ...
+    
+    // Override the base viewmodel instance creation.
+    // Required in case there is no default constructor for the viewmodel.
+    protected override CounterViewModel GetBindingContext()
+    {
+        return _appContext.Resolve<CounterViewModel>();
+    }
+
+    // Define 'property' & 'parameter' value converters.
+    protected override IValueConverter[] GetValueConverters()
+    {
+        return _appContext.Resolve<IValueConverter[]>();
+    }
+
+    // Define custom UI elements.
+    protected override IBindableElementsFactory GetBindableElementsFactory()
+    {
+        return _appContext.Resolve<IBindableElementsFactory>();
+    }
+}
+```
+
 ### DocumentView\<TBindingContext\>
+
+The `DocumentView<TBindingContext>` is a base class for `UI Toolkit` view's.
+
+Key functionality:
+- Provides a base implementation for `UI Document` based view
+- Automatically searches for bindable UI elements on the `UI Document`
+- Allows to override the base viewmodel instance creation
+- Allows to define 'property' & 'parameter' value converters
+- Allows to define custom UI elements
+
+```csharp
+public class CounterView : DocumentView<CounterViewModel>
+{
+    ...
+    
+    // Override the base viewmodel instance creation.
+    // Required in case there is no default constructor for the viewmodel.
+    protected override CounterViewModel GetBindingContext()
+    {
+        return _appContext.Resolve<CounterViewModel>();
+    }
+
+    // Define 'property' & 'parameter' value converters.
+    protected override IValueConverter[] GetValueConverters()
+    {
+        return _appContext.Resolve<IValueConverter[]>();
+    }
+
+    // Define custom UI elements.
+    protected override IBindableElementsFactory GetBindableElementsFactory()
+    {
+        return _appContext.Resolve<IBindableElementFactory>();
+    }
+}
+```
 
 ### Command & Command\<T\>
 
@@ -298,9 +370,9 @@ public class CounterViewModel : ViewModel
 And the relative UI could then be (using UXML):
 
 ```xml
-<ui:UXML ...>
-    <UnityMvvmToolkit.UITK.BindableUIElements.BindableLabel binding-text-path="Count" />
-    <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton command="IncrementCommand" />
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableLabel binding-text-path="Count" />
+    <uitk:BindableButton command="IncrementCommand" />
 </ui:UXML>
 ```
 
@@ -349,11 +421,11 @@ public class ImageViewerViewModel : ViewModel
 With the related UI code:
 
 ```xml
-<ui:UXML ...>
-    <BindableUIElements.BindableImage binding-image-path="Image" style="width: 256px; height: 256px;" />
-    <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton command="DownloadImageCommand">
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <BindableImage binding-image-path="Image" />
+    <uitk:BindableButton command="DownloadImageCommand">
         <ui:Label text="Download Image" />
-    </UnityMvvmToolkit.UITK.BindableUIElements.BindableButton>
+    </uitk:BindableButton>
 </ui:UXML>
 ```
 
@@ -386,9 +458,15 @@ Let's imagine a scenario similar to the one described in the `AsyncCommand` samp
 
 ### CommandWrapper
 
+...
+
 ### PropertyValueConverter\<TSourceType, TTargetType\>
 
+...
+
 ### ParameterValueConverter\<TTargetType\>
+
+...
 
 ## :watch: Quick start
 
@@ -429,8 +507,8 @@ public class MyFirstDocumentView : DocumentView<MyFirstViewModel>
 Create a file `MyFirstView.uxml`, add a `BindableLabel` control and set the `binding-text-path` to `Text`.
 
 ```xml
-<ui:UXML ...>
-    <UnityMvvmToolkit.UITK.BindableUIElements.BindableLabel binding-text-path="Text" />
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableLabel binding-text-path="Text" />
 </ui:UXML>
 ```
 
@@ -476,6 +554,37 @@ Add a `Text - TextMeshPro` UI element to the canvas, add the `BindableLabel` com
 ## :rocket: How To Use
 
 ### Data-binding
+
+The package contains a set of standard bindable UI elements out of the box.
+
+The included UI elements are:
+- [BindableLabel](bindablelabel)
+- [BindableTextField](bindabletextfield)
+- [BindableButton](bindablebutton)
+- [BindableListView](bindablelistview)
+- [BindableScrollView](bindablescrollview)
+
+> **Note:** The `ListView` & `ScrollView` are provided for `UI Toolkit` only.
+
+#### BindableLabel
+
+`OneWay` binding
+
+#### BindableTextField
+
+`TwoWay` binding
+
+#### BindableButton
+
+...
+
+#### BindableListView
+
+...
+
+#### BindableScrollView
+
+...
 
 ### Create custom control
 
@@ -536,15 +645,15 @@ public class BindableImageWrapper : BindablePropertyElement
 ```
 
 ```csharp
-public class CustomBindableElementsWrapper : BindableElementsWrapper
+public class CustomBindableElementsFactory : BindableElementsFactory
 {
-    public override IBindableElement Wrap(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
+    public override IBindableElement Create(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
     {
         return bindableUiElement switch
         {
             BindableImage bindableImage => new BindableImageWrapper(bindableImage, objectProvider),
 
-            _ => base.Wrap(bindableUiElement, objectProvider)
+            _ => base.Create(bindableUiElement, objectProvider)
         };
     }
 }
@@ -570,9 +679,9 @@ public class ImageViewerView : DocumentView<ImageViewerViewModel>
 {
     ...
 
-    protected override IBindableElementsWrapper GetBindableElementsWrapper()
+    protected override IBindableElementsFactory GetBindableElementsFactory()
     {
-        return new CustomBindableElementsWrapper();
+        return new CustomBindableElementsFactory();
     }
 }
 ```
@@ -589,14 +698,58 @@ public class ImageViewerView : DocumentView<ImageViewerViewModel>
 
 ### UniTask
 
-#### Async commands
+To enable [async commands](#asynccommand--asynccommandt) support, you need to add the [UniTask](https://github.com/Cysharp/UniTask) package to your project.
 
-...
-<!--For IAsyncCommand support, it is required to import com.demigiant.unitask from OpenUPM or-->
+In addition to async commands **UnityMvvmToolkit** provides extensions to make [USS transition's](https://docs.unity3d.com/Manual/UIE-Transitions.html) awaitable.
 
-#### Transition async extensions
+For example, your `VisualElement` has the following transitions:
+```css
+.panel--animation {
+    transition-property: opacity, padding-bottom;
+    transition-duration: 65ms, 150ms;
+}
+```
 
-...
+You can `await` these transitions using several methods:
+```csharp
+public async UniTask DeactivatePanel()
+{
+    try
+    {
+        panel.style.opacity = 0;
+        panel.style.paddingBottom = 0;
+        
+        // Await for the 'opacity' || 'paddingBottom' to end or cancel.
+        await panel.WaitForAnyTransitionEnd();
+        
+        // Await for the 'opacity' & 'paddingBottom' to end or cancel.
+        await panel.WaitForAllTransitionsEnd();
+        
+        // Await 150ms.
+        await panel.WaitForLongestTransitionEnd();
+
+        // Await 65ms.
+        await panel.WaitForTransitionEnd(0);
+        
+        // Await for the 'paddingBottom' to end or cancel.
+        await panel.WaitForTransitionEnd(new StylePropertyName("padding-bottom"));
+        
+        // Await for the 'paddingBottom' to end or cancel.
+        // Uses ReadOnlySpan to match property names to avoid memory allocation.
+        await panel.WaitForTransitionEnd(nameof(panel.style.paddingBottom));
+        
+        // Await for the 'opacity' || 'paddingBottom' to end or cancel.
+        // You can write your own transition predicates, just implement a 'ITransitionPredicate' interface.
+        await panel.WaitForTransitionEnd(new TransitionAnyPredicate());
+    }
+    finally
+    {
+        panel.visible = false;
+    }
+}
+```
+
+> **Note:** All transition extensions have a `timeoutMs` parameter (default value is `2500ms`).
 
 ## :chart_with_upwards_trend: Benchmarks
 
