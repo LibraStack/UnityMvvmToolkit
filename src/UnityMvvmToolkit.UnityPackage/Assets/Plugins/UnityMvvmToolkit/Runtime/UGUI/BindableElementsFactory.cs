@@ -1,18 +1,18 @@
 ﻿using System;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UITK.BindableUIElements;
-using UnityMvvmToolkit.UITK.BindableUIElementWrappers;
+using UnityMvvmToolkit.UGUI.BindableUGUIElements;
+using UnityMvvmToolkit.UGUI.BindableUGUIElementWrappers;
 
-namespace UnityMvvmToolkit.UITK
+namespace UnityMvvmToolkit.UGUI
 {
-    public class BindableElementsWrapper : IBindableElementsWrapper
+    public class BindableElementsFactory : IBindableElementsFactory
     {
-        public virtual IBindableElement Wrap(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
+        public virtual IBindableElement Create(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
         {
             return bindableUiElement switch
             {
                 BindableLabel label => new BindableLabelWrapper(label, objectProvider),
-                BindableTextField textField => new BindableTextFieldWrapper(textField, objectProvider),
+                BindableInputField inputField => new BindableInputFieldWrapper(inputField, objectProvider),
                 BindableButton button => new BindableButtonWrapper(button, objectProvider),
 
                 _ => throw new NotImplementedException(

@@ -9,7 +9,7 @@ namespace UnityMvvmToolkit.Core
     {
         private TBindingContext _bindingContext;
         private IObjectProvider _objectProvider;
-        private IBindableElementsWrapper _bindableElementsWrapper;
+        private IBindableElementsFactory _bindableElementsFactory;
 
         private List<IDisposable> _disposables;
         private Dictionary<string, HashSet<IBindablePropertyElement>> _bindablePropertyElements;
@@ -17,11 +17,11 @@ namespace UnityMvvmToolkit.Core
         public TBindingContext BindingContext => _bindingContext;
 
         public View<TBindingContext> Configure(TBindingContext bindingContext, IObjectProvider objectProvider,
-            IBindableElementsWrapper elementsWrapper)
+            IBindableElementsFactory elementsFactory)
         {
             _bindingContext = bindingContext;
             _objectProvider = objectProvider;
-            _bindableElementsWrapper = elementsWrapper;
+            _bindableElementsFactory = elementsFactory;
 
             _disposables = new List<IDisposable>();
             _bindablePropertyElements = new Dictionary<string, HashSet<IBindablePropertyElement>>();
@@ -41,7 +41,7 @@ namespace UnityMvvmToolkit.Core
 
         public IBindableElement RegisterBindableElement(IBindableUIElement bindableUiElement, bool updateElementValues)
         {
-            var bindableElement = _bindableElementsWrapper.Wrap(bindableUiElement, _objectProvider);
+            var bindableElement = _bindableElementsFactory.Create(bindableUiElement, _objectProvider);
 
             TryInitialize(bindableElement);
             TryRegisterPropertyElement(bindableElement, updateElementValues);

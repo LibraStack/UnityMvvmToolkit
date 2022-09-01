@@ -5,16 +5,16 @@ using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.UITK;
 using UnityMvvmToolkit.UITK.BindableUIElements;
 
-public class ToDoListBindableElementsWrapper : BindableElementsWrapper
+public class ToDoListBindableElementsFactory : BindableElementsFactory
 {
     private readonly VisualTreeAsset _taskItemAsset;
 
-    public ToDoListBindableElementsWrapper(VisualTreeAsset taskItemAsset)
+    public ToDoListBindableElementsFactory(VisualTreeAsset taskItemAsset)
     {
         _taskItemAsset = taskItemAsset;
     }
 
-    public override IBindableElement Wrap(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
+    public override IBindableElement Create(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
     {
         return bindableUiElement switch
         {
@@ -22,7 +22,7 @@ public class ToDoListBindableElementsWrapper : BindableElementsWrapper
             BindablePageBlocker pageBlocker => new BindableBinaryStateButtonWrapper(pageBlocker, objectProvider),
             BindableAddTaskButton addTaskButton => new BindableBinaryStateButtonWrapper(addTaskButton, objectProvider),
 
-            _ => base.Wrap(bindableUiElement, objectProvider)
+            _ => base.Create(bindableUiElement, objectProvider)
         };
     }
 }

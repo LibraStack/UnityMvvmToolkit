@@ -17,7 +17,7 @@ namespace UnityMvvmToolkit.Common
 
         private void Awake()
         {
-            _view = CreateView(GetBindingContext(), GetBindableElementsWrapper());
+            _view = CreateView(GetBindingContext(), GetBindableElementsFactory());
 
             OnInit();
             BindElements();
@@ -39,7 +39,7 @@ namespace UnityMvvmToolkit.Common
         }
 
         protected abstract void OnInit();
-        protected abstract IBindableElementsWrapper GetBindableElementsWrapper();
+        protected abstract IBindableElementsFactory GetBindableElementsFactory();
         protected abstract IEnumerable<IBindableUIElement> GetBindableUIElements();
 
         protected virtual TBindingContext GetBindingContext()
@@ -64,11 +64,11 @@ namespace UnityMvvmToolkit.Common
         }
 
         private View<TBindingContext> CreateView(TBindingContext bindingContext,
-            IBindableElementsWrapper bindableElementsWrapper)
+            IBindableElementsFactory bindableElementsFactory)
         {
             return new View<TBindingContext>()
                 .Configure(bindingContext, GetObjectProvider(bindingContext, GetValueConverters()),
-                    bindableElementsWrapper);
+                    bindableElementsFactory);
         }
 
         private void BindElements()

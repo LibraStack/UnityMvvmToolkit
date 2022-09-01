@@ -29,9 +29,9 @@ namespace Views
             return _appContext.Resolve<IValueConverter[]>();
         }
 
-        protected override IBindableElementsWrapper GetBindableElementsWrapper()
+        protected override IBindableElementsFactory GetBindableElementsFactory()
         {
-            return _appContext.Resolve<IBindableElementsWrapper>();
+            return _appContext.Resolve<IBindableElementsFactory>();
         }
     }
 }

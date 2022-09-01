@@ -3,9 +3,9 @@ using BindableUIElementWrappers;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.UITK;
 
-public class CounterBindableElementsWrapper : BindableElementsWrapper
+public class CounterBindableElementsFactory : BindableElementsFactory
 {
-    public override IBindableElement Wrap(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
+    public override IBindableElement Create(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
     {
         return bindableUiElement switch
         {
@@ -14,7 +14,7 @@ public class CounterBindableElementsWrapper : BindableElementsWrapper
             BindableThemeSwitcher themeSwitcher => new BindableThemeSwitcherWrapper(themeSwitcher, objectProvider),
             BindableAnimationLabel animationLabel => new BindableAnimationLabelWrapper(animationLabel, objectProvider),
 
-            _ => base.Wrap(bindableUiElement, objectProvider)
+            _ => base.Create(bindableUiElement, objectProvider)
         };
     }
 }

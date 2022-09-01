@@ -16,9 +16,9 @@ namespace UnityMvvmToolkit.UGUI
             RootElement = gameObject;
         }
 
-        protected override IBindableElementsWrapper GetBindableElementsWrapper()
+        protected override IBindableElementsFactory GetBindableElementsFactory()
         {
-            return new BindableElementsWrapper();
+            return new BindableElementsFactory();
         }
 
         protected override IEnumerable<IBindableUIElement> GetBindableUIElements()

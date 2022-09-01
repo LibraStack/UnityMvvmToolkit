@@ -21,9 +21,9 @@ namespace UnityMvvmToolkit.UITK
             _uiDocument = GetComponent<UIDocument>();
         }
 
-        protected override IBindableElementsWrapper GetBindableElementsWrapper()
+        protected override IBindableElementsFactory GetBindableElementsFactory()
         {
-            return new BindableElementsWrapper();
+            return new BindableElementsFactory();
         }
 
         protected override IEnumerable<IBindableUIElement> GetBindableUIElements()

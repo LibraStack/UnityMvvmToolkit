@@ -31,7 +31,7 @@ public class AppContext : MonoBehaviour, IAppContext, IDisposable
         RegisterInstance(new AddTaskDialogViewModel(this));
         
         RegisterInstance<IDataStoreService>(new DataStoreService(this));
-        RegisterInstance<IBindableElementsWrapper>(new ToDoListBindableElementsWrapper(_taskItemAsset));
+        RegisterInstance<IBindableElementsFactory>(new ToDoListBindableElementsFactory(_taskItemAsset));
         RegisterInstance(GetValueConverters());
     }
 
