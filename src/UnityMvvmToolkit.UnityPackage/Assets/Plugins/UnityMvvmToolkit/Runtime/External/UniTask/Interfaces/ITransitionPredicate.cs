@@ -7,7 +7,6 @@ namespace UnityMvvmToolkit.UniTask.Interfaces
     public interface ITransitionPredicate
     {
         bool TransitionEnd(TransitionEndEvent e);
-        bool TransitionCancel(TransitionCancelEvent e);
     }
 }
 

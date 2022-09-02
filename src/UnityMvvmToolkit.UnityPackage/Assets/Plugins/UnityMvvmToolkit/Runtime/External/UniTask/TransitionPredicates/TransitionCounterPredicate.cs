@@ -15,7 +15,6 @@ namespace UnityMvvmToolkit.UniTask.TransitionPredicates
         }
 
         public bool TransitionEnd(TransitionEndEvent e) => --_transitionsCount == 0;
-        public bool TransitionCancel(TransitionCancelEvent e) => true;
     }
 }
 

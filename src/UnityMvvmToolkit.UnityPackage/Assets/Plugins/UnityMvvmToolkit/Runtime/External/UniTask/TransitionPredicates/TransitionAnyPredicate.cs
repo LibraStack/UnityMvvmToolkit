@@ -8,7 +8,6 @@ namespace UnityMvvmToolkit.UniTask.TransitionPredicates
     public readonly struct TransitionAnyPredicate : ITransitionPredicate
     {
         public bool TransitionEnd(TransitionEndEvent e) => true;
-        public bool TransitionCancel(TransitionCancelEvent e) => true;
     }
 }
 

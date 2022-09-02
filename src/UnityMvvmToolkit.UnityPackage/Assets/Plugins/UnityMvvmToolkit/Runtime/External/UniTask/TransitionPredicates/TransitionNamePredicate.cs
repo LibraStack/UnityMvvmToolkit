@@ -15,7 +15,6 @@ namespace UnityMvvmToolkit.UniTask.TransitionPredicates
         }
 
         public bool TransitionEnd(TransitionEndEvent e) => e.AffectsProperty(_stylePropertyName);
-        public bool TransitionCancel(TransitionCancelEvent e) => true;
     }
 }
 
