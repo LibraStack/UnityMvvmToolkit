@@ -3,55 +3,72 @@
 namespace UnityMvvmToolkit.UniTask
 {
     using System;
+    using Interfaces;
     using System.Threading;
     using Cysharp.Threading.Tasks;
 
-    public class AsyncLazyCommand : AsyncCommand
+    public class AsyncLazyCommand : BaseAsyncLazyCommand, IAsyncCommand
     {
-        public AsyncLazyCommand(Func<CancellationToken, UniTask> action, Func<bool> canExecute = null)
-            : base(action, canExecute)
+        private readonly Func<CancellationToken, UniTask> _action;
+
+        public AsyncLazyCommand(Func<CancellationToken, UniTask> action, Func<bool> canExecute = null) 
+            : base(canExecute)
         {
+            _action = action;
         }
 
-        public override async UniTask ExecuteAsync(CancellationToken cancellationToken = default)
+        public void Execute()
+        {
+            ExecuteAsync().Forget();
+        }
+
+        public async UniTask ExecuteAsync(CancellationToken cancellationToken = default)
         {
             try
             {
-                if (ExecuteTask?.Task.Status.IsCompleted() ?? true)
+                if (IsRunning == false)
                 {
-                    ExecuteTask = Action.Invoke(cancellationToken).ToAsyncLazy();
+                    ExecutionTask = _action.Invoke(cancellationToken).ToAsyncLazy();
                 }
 
-                await ExecuteTask;
+                await ExecutionTask;
             }
             finally
             {
-                ExecuteTask = null;
+                ExecutionTask = null;
             }
         }
     }
 
-    public class AsyncLazyCommand<T> : AsyncCommand<T>
+    public class AsyncLazyCommand<T> : BaseAsyncLazyCommand, IAsyncCommand<T>
     {
-        public AsyncLazyCommand(Func<T, CancellationToken, UniTask> action, Func<bool> canExecute = null)
-            : base(action, canExecute)
+        private readonly Func<T, CancellationToken, UniTask> _action;
+
+        public AsyncLazyCommand(Func<T, CancellationToken, UniTask> action, Func<bool> canExecute = null) 
+            : base(canExecute)
         {
+            _action = action;
         }
 
-        public override async UniTask ExecuteAsync(T parameter, CancellationToken cancellationToken = default)
+        public void Execute(T parameter)
+        {
+            ExecuteAsync(parameter).Forget();
+        }
+
+        public async UniTask ExecuteAsync(T parameter, CancellationToken cancellationToken = default)
         {
             try
             {
-                if (ExecuteTask?.Task.Status.IsCompleted() ?? true)
+                if (IsRunning == false)
                 {
-                    ExecuteTask = Action.Invoke(parameter, cancellationToken).ToAsyncLazy();
+                    ExecutionTask = _action.Invoke(parameter, cancellationToken).ToAsyncLazy();
                 }
 
-                await ExecuteTask;
+                await ExecutionTask;
             }
             finally
             {
-                ExecuteTask = null;
+                ExecutionTask = null;
             }
         }
     }

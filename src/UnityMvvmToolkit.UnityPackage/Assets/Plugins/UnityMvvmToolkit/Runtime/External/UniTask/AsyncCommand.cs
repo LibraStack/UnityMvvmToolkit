@@ -9,56 +9,56 @@ namespace UnityMvvmToolkit.UniTask
 
     public class AsyncCommand : BaseAsyncCommand, IAsyncCommand
     {
+        private readonly Func<CancellationToken, UniTask> _action;
+
         public AsyncCommand(Func<CancellationToken, UniTask> action, Func<bool> canExecute = null) : base(canExecute)
         {
-            Action = action;
+            _action = action;
         }
-
-        protected Func<CancellationToken, UniTask> Action { get; }
 
         public void Execute()
         {
             ExecuteAsync().Forget();
         }
 
-        public virtual async UniTask ExecuteAsync(CancellationToken cancellationToken = default)
+        public async UniTask ExecuteAsync(CancellationToken cancellationToken = default)
         {
             try
             {
-                ExecuteTask = Action.Invoke(cancellationToken).ToAsyncLazy();
-                await ExecuteTask;
+                IsRunning = true;
+                await _action.Invoke(cancellationToken).ToAsyncLazy();
             }
             finally
             {
-                ExecuteTask = null;
+                IsRunning = false;
             }
         }
     }
 
     public class AsyncCommand<T> : BaseAsyncCommand, IAsyncCommand<T>
     {
+        private readonly Func<T, CancellationToken, UniTask> _action;
+
         public AsyncCommand(Func<T, CancellationToken, UniTask> action, Func<bool> canExecute = null) : base(canExecute)
         {
-            Action = action;
+            _action = action;
         }
-
-        protected Func<T, CancellationToken, UniTask> Action { get; }
 
         public void Execute(T parameter)
         {
             ExecuteAsync(parameter).Forget();
         }
 
-        public virtual async UniTask ExecuteAsync(T parameter, CancellationToken cancellationToken = default)
+        public async UniTask ExecuteAsync(T parameter, CancellationToken cancellationToken = default)
         {
             try
             {
-                ExecuteTask = Action.Invoke(parameter, cancellationToken).ToAsyncLazy();
-                await ExecuteTask;
+                IsRunning = true;
+                await _action.Invoke(parameter, cancellationToken);
             }
             finally
             {
-                ExecuteTask = null;
+                IsRunning = false;
             }
         }
     }

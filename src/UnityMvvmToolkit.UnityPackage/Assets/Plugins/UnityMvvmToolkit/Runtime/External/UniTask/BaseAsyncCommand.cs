@@ -5,12 +5,11 @@ namespace UnityMvvmToolkit.UniTask
     using Core;
     using System;
     using Interfaces;
-    using Cysharp.Threading.Tasks;
     using System.Runtime.CompilerServices;
 
     public abstract class BaseAsyncCommand : BaseCommand, IBaseAsyncCommand
     {
-        private AsyncLazy _executeTask;
+        private bool _isRunning;
 
         protected BaseAsyncCommand(Func<bool> canExecute) : base(canExecute)
         {
@@ -18,12 +17,12 @@ namespace UnityMvvmToolkit.UniTask
 
         public bool DisableOnExecution { get; set; }
 
-        protected AsyncLazy ExecuteTask
+        public virtual bool IsRunning
         {
-            get => _executeTask;
-            set
+            get => _isRunning;
+            protected set
             {
-                _executeTask = value;
+                _isRunning = value;
                 RaiseCanExecuteChanged();
             }
         }
@@ -36,7 +35,7 @@ namespace UnityMvvmToolkit.UniTask
                 return base.CanExecute();
             }
 
-            return base.CanExecute() && (ExecuteTask?.Task.Status.IsCompleted() ?? true);
+            return IsRunning == false && base.CanExecute();
         }
     }
 }
