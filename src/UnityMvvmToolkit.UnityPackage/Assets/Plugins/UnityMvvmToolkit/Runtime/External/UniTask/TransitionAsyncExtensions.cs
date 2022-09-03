@@ -5,6 +5,7 @@ namespace UnityMvvmToolkit.UniTask
     using System;
     using System.Linq;
     using System.Threading;
+    using Enums;
     using Interfaces;
     using TransitionPredicates;
     using UnityEngine.UIElements;
@@ -27,20 +28,21 @@ namespace UnityMvvmToolkit.UniTask
                 : UniTask.CompletedTask;
         }
 
-        public static UniTask WaitForTransitionEnd(this VisualElement element, int transitionIndex,
+        public static UniTask<TransitionResult> WaitForTransitionEnd(this VisualElement element, int transitionIndex,
             int timeoutMs = DefaultTimeoutMs, CancellationToken cancellationToken = default)
         {
             return GetTransitionDuration(element, transitionIndex, out var stylePropertyName) > float.Epsilon
                 ? WaitForTransition(element, stylePropertyName, timeoutMs, cancellationToken)
-                : UniTask.CompletedTask;
+                : UniTask.FromResult(TransitionResult.Missed);
         }
 
-        public static UniTask WaitForTransitionEnd(this VisualElement element, StylePropertyName stylePropertyName,
-            int timeoutMs = DefaultTimeoutMs, CancellationToken cancellationToken = default)
+        public static UniTask<TransitionResult> WaitForTransitionEnd(this VisualElement element,
+            StylePropertyName stylePropertyName, int timeoutMs = DefaultTimeoutMs,
+            CancellationToken cancellationToken = default)
         {
             return GetTransitionDuration(element, stylePropertyName) > float.Epsilon
                 ? WaitForTransition(element, stylePropertyName, timeoutMs, cancellationToken)
-                : UniTask.CompletedTask;
+                : UniTask.FromResult(TransitionResult.Missed);
         }
 
         /// <summary>
@@ -51,47 +53,48 @@ namespace UnityMvvmToolkit.UniTask
         /// <param name="timeoutMs"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static UniTask WaitForTransitionEnd(this VisualElement element, string propertyName,
+        public static UniTask<TransitionResult> WaitForTransitionEnd(this VisualElement element, string propertyName,
             int timeoutMs = DefaultTimeoutMs, CancellationToken cancellationToken = default)
         {
             var transitionData = GetTransitionData(element, propertyName);
 
             return transitionData is { Duration: { value: > float.Epsilon } }
                 ? WaitForTransition(element, transitionData.Value.StylePropertyName, timeoutMs, cancellationToken)
-                : UniTask.CompletedTask;
+                : UniTask.FromResult(TransitionResult.Missed);
         }
 
-        public static UniTask WaitForAnyTransitionEnd(this VisualElement element, int timeoutMs = DefaultTimeoutMs,
-            CancellationToken cancellationToken = default)
+        public static UniTask<TransitionResult> WaitForAnyTransitionEnd(this VisualElement element,
+            int timeoutMs = DefaultTimeoutMs, CancellationToken cancellationToken = default)
         {
             return AnyTransitionHasDuration(element)
                 ? WaitForTransitionEnd(element, new TransitionAnyPredicate(), timeoutMs, cancellationToken)
-                : UniTask.CompletedTask;
+                : UniTask.FromResult(TransitionResult.Missed);
         }
 
-        public static UniTask WaitForAllTransitionsEnd(this VisualElement element, int timeoutMs = DefaultTimeoutMs,
-            CancellationToken cancellationToken = default)
+        public static UniTask<TransitionResult> WaitForAllTransitionsEnd(this VisualElement element,
+            int timeoutMs = DefaultTimeoutMs, CancellationToken cancellationToken = default)
         {
             var transitionsCount = GetTransitionsWithDurationCount(element);
 
             return transitionsCount == 0
-                ? UniTask.CompletedTask
+                ? UniTask.FromResult(TransitionResult.Missed)
                 : WaitForTransitionEnd(element, new TransitionCounterPredicate(transitionsCount), timeoutMs,
                     cancellationToken);
         }
 
-        public static UniTask WaitForTransitionEnd<T>(this VisualElement element, T transitionPredicate,
-            int timeoutMs = DefaultTimeoutMs, CancellationToken cancellationToken = default)
+        public static UniTask<TransitionResult> WaitForTransitionEnd<T>(this VisualElement element,
+            T transitionPredicate, int timeoutMs = DefaultTimeoutMs, CancellationToken cancellationToken = default)
             where T : ITransitionPredicate
         {
-            return new UniTask(
+            return new UniTask<TransitionResult>(
                 TransitionPromise<T>.Create(element, transitionPredicate, timeoutMs, PlayerLoopTiming.Update,
                     cancellationToken, out var token), token);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static UniTask WaitForTransition(this VisualElement element, StylePropertyName stylePropertyName,
-            int timeoutMs = DefaultTimeoutMs, CancellationToken cancellationToken = default)
+        private static UniTask<TransitionResult> WaitForTransition(this VisualElement element,
+            StylePropertyName stylePropertyName, int timeoutMs = DefaultTimeoutMs,
+            CancellationToken cancellationToken = default)
         {
             return WaitForTransitionEnd(element, new TransitionNamePredicate(stylePropertyName), timeoutMs,
                 cancellationToken);

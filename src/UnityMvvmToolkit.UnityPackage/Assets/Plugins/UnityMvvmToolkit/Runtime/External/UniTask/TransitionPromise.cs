@@ -3,19 +3,20 @@
 namespace UnityMvvmToolkit.UniTask
 {
     using System;
+    using Enums;
     using Interfaces;
     using System.Threading;
     using Cysharp.Threading.Tasks;
     using UnityEngine;
     using UnityEngine.UIElements;
 
-    internal sealed class TransitionPromise<T> : IUniTaskSource, IPlayerLoopItem, ITaskPoolNode<TransitionPromise<T>>
-        where T : ITransitionPredicate
+    internal sealed class TransitionPromise<T> : IUniTaskSource<TransitionResult>, IPlayerLoopItem,
+        ITaskPoolNode<TransitionPromise<T>> where T : ITransitionPredicate
     {
         private static TaskPool<TransitionPromise<T>> _pool;
 
         private TransitionPromise<T> _nextNode;
-        private UniTaskCompletionSourceCore<AsyncUnit> _core;
+        private UniTaskCompletionSourceCore<TransitionResult> _core;
 
         private int _initFrame;
         private float _elapsed;
@@ -42,12 +43,12 @@ namespace UnityMvvmToolkit.UniTask
             TaskPool.RegisterSizeGetter(typeof(TransitionPromise<T>), () => _pool.Size);
         }
 
-        public static IUniTaskSource Create(VisualElement visualElement, T predicate, int timeoutMs,
+        public static IUniTaskSource<TransitionResult> Create(VisualElement visualElement, T predicate, int timeoutMs,
             PlayerLoopTiming timing, CancellationToken cancellationToken, out short token)
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                return AutoResetUniTaskCompletionSource.CreateFromCanceled(cancellationToken, out token);
+                return AutoResetUniTaskCompletionSource<TransitionResult>.CreateFromCanceled(cancellationToken, out token);
             }
 
             if (_pool.TryPop(out var transitionPromise) == false)
@@ -93,7 +94,7 @@ namespace UnityMvvmToolkit.UniTask
             }
             else if (_predicate.TransitionEnd(e))
             {
-                _core.TrySetResult(AsyncUnit.Default);
+                _core.TrySetResult(TransitionResult.Succeeded);
             }
         }
 
@@ -108,7 +109,15 @@ namespace UnityMvvmToolkit.UniTask
             }
 
             _completed = true;
-            _core.TrySetCanceled(_cancellationToken.IsCancellationRequested ? _cancellationToken : default);
+
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                _core.TrySetCanceled(_cancellationToken);
+            }
+            else
+            {
+                _core.TrySetResult(TransitionResult.Canceled);
+            }
         }
 
         private void UnregisterCallbacks()
@@ -117,9 +126,14 @@ namespace UnityMvvmToolkit.UniTask
             _visualElement.UnregisterCallback(_endCallback);
         }
 
-        public void GetResult(short token)
+        public TransitionResult GetResult(short token)
         {
-            _core.GetResult(token);
+            return _core.GetResult(token);
+        }
+
+        void IUniTaskSource.GetResult(short token)
+        {
+            GetResult(token);
         }
 
         public UniTaskStatus GetStatus(short token)
@@ -165,7 +179,8 @@ namespace UnityMvvmToolkit.UniTask
                 return true;
             }
 
-            _core.TrySetResult(AsyncUnit.Default);
+            _completed = true;
+            _core.TrySetResult(TransitionResult.Timeout);
 
             return false;
         }
