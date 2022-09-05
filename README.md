@@ -209,7 +209,6 @@ The included types are:
 - [ParameterValueConverter\<TTargetType\>](#parametervalueconverterttargettype)
 - [ICommand & ICommand\<T\>](#command--commandt)
 - [IAsyncCommand & IAsyncCommand\<T\>](#asynccommand--asynccommandt)
-- [ICommandWrapper](#commandwrapper)
 - [IPropertyValueConverter\<TSourceType, TTargetType\>](#propertyvalueconvertertsourcetype-ttargettype)
 - [IParameterValueConverter\<TTargetType\>](#parametervalueconverterttargettype)
 
@@ -218,10 +217,10 @@ The included types are:
 The `ViewModel` is a base class for objects that are observable by implementing the `INotifyPropertyChanged` interface. It can be used as a starting point for all kinds of objects that need to support property change notification.
 
 Key functionality:
-- Provides a base implementation for `INotifyPropertyChanged`, exposing the `PropertyChanged` events
+- Provides a base implementation for `INotifyPropertyChanged`, exposing the `PropertyChanged` event
 - Provides a series of `Set` methods that can be used to easily set property values from types inheriting from `ViewModel`, and to automatically raise the appropriate events
 
-> **Note:** In case your viewmodel doesn't have a parameterless constructor, you need to override the `GetBindingContext` method on the view.
+> **Note:** In case your viewmodel doesn't have a parameterless constructor, you need to override the `GetBindingContext` method in the view.
 
 #### Simple property
 
@@ -279,7 +278,7 @@ Key functionality:
 public class CounterView : CanvasView<CounterViewModel>
 {
     // Override the base viewmodel instance creation.
-    // Required in case there is no default constructor for the viewmodel.
+    // Required in case the viewmodel doesn't have a parameterless constructor.
     protected override CounterViewModel GetBindingContext()
     {
         return _appContext.Resolve<CounterViewModel>();
@@ -314,7 +313,7 @@ Key functionality:
 public class CounterView : DocumentView<CounterViewModel>
 {
     // Override the base viewmodel instance creation.
-    // Required in case there is no default constructor for the viewmodel.
+    // Required in case the viewmodel doesn't have a parameterless constructor.
     protected override CounterViewModel GetBindingContext()
     {
         return _appContext.Resolve<CounterViewModel>();
@@ -370,7 +369,7 @@ public class CounterViewModel : ViewModel
 }
 ```
 
-And the relative UI could then be (using UXML).
+And the relative UI could then be.
 
 ```xml
 <ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
@@ -432,6 +431,8 @@ With the related UI code.
 </ui:UXML>
 ```
 
+> **Note:** The `BindableImage` is a custom control from the [create custom control](#create-custom-control) section.
+
 To disable the `BindableButton` while an async operation is running, simply set the `DisableOnExecution` property of the `AsyncCommand` to `true`.
 
 ```csharp
@@ -480,13 +481,9 @@ Let's imagine a scenario similar to the one described in the `AsyncCommand` samp
 
 > **Note:** You need to import the [UniTask](https://github.com/Cysharp/UniTask) package in order to use async commands.
 
-### CommandWrapper
-
-...
-
 ### PropertyValueConverter\<TSourceType, TTargetType\>
 
-Property value converters provide a way to apply custom logic to a property binding.
+Property value converter provides a way to apply custom logic to a property binding.
 
 Built-in property value converters:
 - IntToStrConverter
@@ -532,15 +529,18 @@ Then you can use the `ThemeModeToBoolConverter` as in the following example.
 
 ```xml
 <UXML>
+    <!--Full expression-->
     <MyBindableElement binding-value-path="ThemeMode, Converter={ThemeModeToBoolConverter}" />
-    <!--or-->
+    <!--Short expression-->
     <MyBindableElement binding-value-path="ThemeMode, ThemeModeToBoolConverter" />
+    <!--Minimal expression - the first appropriate converter will be used-->
+    <MyBindableElement binding-value-path="ThemeMode" />
 </UXML>
 ```
 
 ### ParameterValueConverter\<TTargetType\>
 
-Parameter value converters allow to convert a command parameter.
+Parameter value converter allows to convert a command parameter.
 
 Built-in parameter value converters:
 - ParameterToStrConverter
@@ -619,15 +619,18 @@ public class MyViewModel : ViewModel
 
 ```xml
 <UXML>
+    <!--Full expression-->
     <BindableButton command="PrintIntParameterCommand, Parameter={5}, Converter={ParameterToIntConverter}" />
-    <!--or-->
+    <!--Short expression-->
     <BindableButton command="PrintIntParameterCommand, 5, ParameterToIntConverter" />
+    <!--Minimal expression - the first appropriate converter will be used-->
+    <BindableButton command="PrintIntParameterCommand, 5" />
 </UXML>
 ```
 
 ## :watch: Quick start
 
-Once the `UnityMVVMToolkit` is installed, create a class `MyFirstViewModel` and inherit from the `ViewModel`.
+Once the `UnityMVVMToolkit` is installed, create a class `MyFirstViewModel` that inherits the `ViewModel` class.
 
 ```csharp
 using UnityMvvmToolkit.Core;
@@ -651,7 +654,7 @@ public class MyFirstViewModel : ViewModel
 
 #### UI Toolkit
 
-Create a class `MyFirstDocumentView` and inherit from the `DocumentView<TBindingContext>`.
+The next step is to create a class `MyFirstDocumentView` that inherits the `DocumentView<TBindingContext>` class.
 
 ```csharp
 using UnityMvvmToolkit.UITK;
@@ -661,7 +664,7 @@ public class MyFirstDocumentView : DocumentView<MyFirstViewModel>
 }
 ```
 
-Create a file `MyFirstView.uxml`, add a `BindableLabel` control and set the `binding-text-path` to `Text`.
+Then create a file `MyFirstView.uxml`, add a `BindableLabel` control and set the `binding-text-path` to `Text`.
 
 ```xml
 <ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
@@ -669,7 +672,7 @@ Create a file `MyFirstView.uxml`, add a `BindableLabel` control and set the `bin
 </ui:UXML>
 ```
 
-Add `UI Document` to the scene, set the `MyFirstView.uxml` as a `Source Asset` and add the `MyFirstDocumentView` component to it.
+Finally, add `UI Document` to the scene, set the `MyFirstView.uxml` as a `Source Asset` and add the `MyFirstDocumentView` component to it.
 
 <details><summary>UI Document Inspector</summary>
 <br />
@@ -680,7 +683,7 @@ Add `UI Document` to the scene, set the `MyFirstView.uxml` as a `Source Asset` a
 
 #### Unity UI (uGUI)
 
-Create a class `MyFirstCanvasView` and inherit from the `CanvasView<TBindingContext>`.
+For the `uGUI` do the following. Create a class `MyFirstCanvasView` that inherits the `CanvasView<TBindingContext>` class.
 
 ```csharp
 using UnityMvvmToolkit.UGUI;
@@ -690,7 +693,7 @@ public class MyFirstCanvasView : CanvasView<MyFirstViewModel>
 }
 ```
 
-Add `Canvas` to the scene, and add the `MyFirstCanvasView` component to it.
+Then add a `Canvas` to the scene, and add the `MyFirstCanvasView` component to it.
 
 <details><summary>Canvas Inspector</summary>
 <br />
@@ -699,7 +702,7 @@ Add `Canvas` to the scene, and add the `MyFirstCanvasView` component to it.
 
 </details>
 
-Add a `Text - TextMeshPro` UI element to the canvas, add the `BindableLabel` component to it and set the `BindingTextPath` to `Text`.
+Finally, add a `Text - TextMeshPro` UI element to the canvas, add the `BindableLabel` component to it and set the `BindingTextPath` to `Text`.
 
 <details><summary>Canvas Text Inspector</summary>
 <br />
@@ -715,35 +718,232 @@ Add a `Text - TextMeshPro` UI element to the canvas, add the `BindableLabel` com
 The package contains a set of standard bindable UI elements out of the box.
 
 The included UI elements are:
-- [BindableLabel](bindablelabel)
-- [BindableTextField](bindabletextfield)
-- [BindableButton](bindablebutton)
-- [BindableListView](bindablelistview)
-- [BindableScrollView](bindablescrollview)
+- [BindableLabel](#bindablelabel)
+- [BindableTextField](#bindabletextfield)
+- [BindableButton](#bindablebutton)
+- [BindableListView](#bindablelistview)
+- [BindableScrollView](#bindablescrollview)
 
 > **Note:** The `ListView` & `ScrollView` are provided for `UI Toolkit` only.
 
 #### BindableLabel
 
-`OneWay` binding
+The `BindableLabel` element uses the `OneWay` binding by default.
+
+```csharp
+public class LabelViewModel : ViewModel
+{
+    private int _intValue;
+    private string _strValue;
+
+    public int IntValue
+    {
+        get => _intValue;
+        set => Set(ref _intValue, value);
+    }
+
+    public string StrValue
+    {
+        get => _strValue;
+        set => Set(ref _strValue, value);
+    }
+}
+
+public class LabelView : DocumentView<LabelViewModel>
+{
+    protected override IValueConverter[] GetValueConverters()
+    {
+        return new IValueConverter[] { new IntToStrConverter() };
+    }
+}
+```
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableLabel binding-text-path="StrValue" />
+    <uitk:BindableLabel binding-text-path="IntValue" />
+</ui:UXML>
+```
 
 #### BindableTextField
 
-`TwoWay` binding
+The `BindableTextField` element uses the `TwoWay` binding by default.
+
+```csharp
+public class TextFieldViewModel : ViewModel
+{
+    private string _textValue;
+
+    public string TextValue
+    {
+        get => _textValue;
+        set => Set(ref _textValue, value);
+    }
+}
+```
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableTextField binding-text-path="TextValue" />
+</ui:UXML>
+```
 
 #### BindableButton
 
-...
+The `BindableButton` can be bound to the following commands:
+- [Command & Command\<T\>](#command--commandt)
+- [AsyncCommand & AsyncCommand\<T\>](#asynccommand--asynccommandt)
+- [AsyncLazyCommand & AsyncLazyCommand\<T\>](#asynclazycommand--asynclazycommandt)
+
+To pass a parameter to the viewmodel, see the [ParameterValueConverter](#parametervalueconverterttargettype) section.
 
 #### BindableListView
 
-...
+The `BindableListView` control is the most efficient way to create lists. Use the `binding-items-source-path` of the `BindableListView` to bind to an `ObservableCollection`.
+
+The following example demonstrates how to bind to a list of users with `BindableListView`.
+
+Create a main `UI Document` named `UsersView.uxml` with the following content.
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableListView binding-items-source-path="Users" />
+</ui:UXML>
+```
+
+Create a `UI Document` named `UserEntry.uxml` for the individual entries in the list.
+
+```xml
+<ui:UXML ...>
+    <ui:Label name="NameLabel" />
+</ui:UXML>
+```
+
+Create a `UserItemData` class to store user data.
+
+```csharp
+public class UserItemData
+{
+    public string Name { get; set; }
+}
+```
+
+Create a `UserItemController` class to display the data of a user instance in the UI of the list entry. It needs to access the label for the user name and set it to display the name of the given user instance.
+
+```csharp
+public class UserItemController
+{
+    private readonly Label _nameLabel;
+
+    public TaskItemController(VisualElement userEntryAsset)
+    {
+        _nameLabel = userEntryAsset.Q<Label>("NameLabel");
+    }
+
+    public void SetData(UserItemData userItemData)
+    {
+        _nameLabel.text = userItemData.Name;
+    }
+}
+```
+
+Create a `UserListViewWrapper` that inherits the `BindableListViewWrapper<TItem, TData>` abstract class and implement the `OnMakeItem` and `OnBindItem` methods.
+
+```csharp
+public class UserListViewWrapper : BindableListViewWrapper<UserItemController, UserItemData>
+{
+    public UserListViewWrapper(BindableListView listView, VisualTreeAsset itemAsset,
+        IObjectProvider objectProvider) : base(listView, itemAsset, objectProvider)
+    {
+    }
+
+    protected override UserItemController OnMakeItem(VisualElement itemAsset)
+    {
+        return new UserItemController(itemAsset);
+    }
+
+    protected override void OnBindItem(UserItemController item, UserItemData data)
+    {
+        item.SetData(data);
+    }
+}
+```
+
+Create a `CustomBindableElementsFactory` and override the `Create` method.
+
+```csharp
+public class CustomBindableElementsFactory : BindableElementsFactory
+{
+    private readonly VisualTreeAsset _userEntryAsset;
+
+    public CustomBindableElementsFactory(VisualTreeAsset userEntryAsset)
+    {
+        _userEntryAsset = userEntryAsset;
+    }
+
+    public override IBindableElement Create(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
+    {
+        return bindableUiElement switch
+        {
+            BindableListView listView => new UserListViewWrapper(listView, _userEntryAsset, objectProvider),
+
+            _ => base.Create(bindableUiElement, objectProvider)
+        };
+    }
+}
+```
+
+Create a `UsersViewModel`.
+
+```csharp
+public class UsersViewModel : ViewModel
+{
+    public UsersViewModel()
+    {
+        Users = new ObservableCollection<UserItemData>
+        {
+            new() { Name = "User 1" },
+            new() { Name = "User 2" },
+            new() { Name = "User 3" },
+        };
+    }
+    
+    public ObservableCollection<UserItemData> Users { get; }
+}
+```
+
+Create a `UsersView` with the following content.
+
+```csharp
+public class UsersView : DocumentView<UsersViewModel>
+{
+    [SerializeField] private VisualTreeAsset _userEntryAsset;
+
+    protected override IBindableElementsFactory GetBindableElementsFactory()
+    {
+        return new CustomBindableElementsFactory(_userEntryAsset);
+    }
+}
+```
 
 #### BindableScrollView
 
-...
+The `BindableScrollView` has the same binding logic as the `BindableListView`, except that the `UserItemData` class must implement the `ICollectionItemData` interface.
+
+```csharp
+public class UserItemData : ICollectionItemData
+{
+    public Guid Id { get; } = Guid.NewGuid();
+
+    public string Name { get; set; }
+}
+```
 
 ### Create custom control
+
+Let's create a bindable image UI element.
+
+First of all, create a base `Image` class.
 
 ```csharp
 public class Image : VisualElement
@@ -760,6 +960,8 @@ public class Image : VisualElement
     public new class UxmlTraits : VisualElement.UxmlTraits {}
 }
 ```
+
+Then create a `BindableImage` and define `BindingImagePath` property.
 
 ```csharp
 public class BindableImage : Image, IBindableUIElement
@@ -782,6 +984,8 @@ public class BindableImage : Image, IBindableUIElement
 }
 ```
 
+The next step is to describe the data binding logic.
+
 ```csharp
 public class BindableImageWrapper : BindablePropertyElement
 {
@@ -801,6 +1005,8 @@ public class BindableImageWrapper : BindablePropertyElement
 }
 ```
 
+Finally, tell the elements factory what to do with the new UI element.
+
 ```csharp
 public class CustomBindableElementsFactory : BindableElementsFactory
 {
@@ -816,6 +1022,20 @@ public class CustomBindableElementsFactory : BindableElementsFactory
 }
 ```
 
+Don't forget to override the `GetBindableElementsFactory` method in the view.
+
+```csharp
+public class ImageViewerView : DocumentView<ImageViewerViewModel>
+{
+    protected override IBindableElementsFactory GetBindableElementsFactory()
+    {
+        return new CustomBindableElementsFactory();
+    }
+}
+```
+
+Now you can use the new UI element as following.
+
 ```csharp
 public class ImageViewerViewModel : ViewModel
 {
@@ -825,16 +1045,6 @@ public class ImageViewerViewModel : ViewModel
     {
         get => _texture;
         private set => Set(ref _texture, value);
-    }
-}
-```
-
-```csharp
-public class ImageViewerView : DocumentView<ImageViewerViewModel>
-{
-    protected override IBindableElementsFactory GetBindableElementsFactory()
-    {
-        return new CustomBindableElementsFactory();
     }
 }
 ```
