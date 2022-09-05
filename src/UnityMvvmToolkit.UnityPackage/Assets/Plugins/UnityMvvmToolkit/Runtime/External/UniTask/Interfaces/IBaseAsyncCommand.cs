@@ -6,6 +6,8 @@ namespace UnityMvvmToolkit.UniTask.Interfaces
     {
         bool IsRunning { get; }
         bool DisableOnExecution { get; set; }
+
+        void Cancel();
     }
 }
 

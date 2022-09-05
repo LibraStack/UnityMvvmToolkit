@@ -14,7 +14,7 @@ namespace UnityMvvmToolkit.Core
             _canExecute = canExecute;
         }
 
-        public event EventHandler<bool> CanExecuteChanged;
+        public virtual event EventHandler<bool> CanExecuteChanged;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RaiseCanExecuteChanged()

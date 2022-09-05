@@ -15,8 +15,6 @@ namespace UnityMvvmToolkit.UniTask
         {
         }
 
-        public bool DisableOnExecution { get; set; }
-
         public virtual bool IsRunning
         {
             get => _isRunning;
@@ -27,6 +25,8 @@ namespace UnityMvvmToolkit.UniTask
             }
         }
 
+        public virtual bool DisableOnExecution { get; set; }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool CanExecute()
         {
@@ -36,6 +36,10 @@ namespace UnityMvvmToolkit.UniTask
             }
 
             return IsRunning == false && base.CanExecute();
+        }
+
+        public virtual void Cancel()
+        {
         }
     }
 }
