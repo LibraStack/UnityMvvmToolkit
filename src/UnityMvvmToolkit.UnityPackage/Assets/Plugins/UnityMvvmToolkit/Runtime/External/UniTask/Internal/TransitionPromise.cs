@@ -1,6 +1,6 @@
 ﻿#if UNITYMVVMTOOLKIT_UNITASK_SUPPORT
 
-namespace UnityMvvmToolkit.UniTask
+namespace UnityMvvmToolkit.UniTask.Internal
 {
     using System;
     using Enums;

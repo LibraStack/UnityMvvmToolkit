@@ -6,6 +6,7 @@ namespace UnityMvvmToolkit.UniTask
     using System.Linq;
     using System.Threading;
     using Enums;
+    using Internal;
     using Interfaces;
     using TransitionPredicates;
     using UnityEngine.UIElements;
