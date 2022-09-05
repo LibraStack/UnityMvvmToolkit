@@ -8,7 +8,7 @@ namespace UnityMvvmToolkit.UniTask.Extensions
 
     public static class AsyncCommandExtensions
     {
-        public static IAsyncCommand CreateCancelCommand(this IAsyncCommand asyncCommand)
+        public static IAsyncCommand WithCancellation(this IAsyncCommand asyncCommand)
         {
             if (asyncCommand == null)
             {
@@ -18,7 +18,7 @@ namespace UnityMvvmToolkit.UniTask.Extensions
             return new AsyncCommandWithCancellation(asyncCommand);
         }
 
-        public static IAsyncCommand<T> CreateCancelCommand<T>(this IAsyncCommand<T> asyncCommand)
+        public static IAsyncCommand<T> WithCancellation<T>(this IAsyncCommand<T> asyncCommand)
         {
             if (asyncCommand == null)
             {
