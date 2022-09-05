@@ -12,6 +12,14 @@ A package that brings data-binding to your Unity project.
 - [Installation](#gear-installation)
   - [IL2CPP restriction](#il2cpp-restriction)
 - [Introduction](#ledger-introduction)
+  - [ViewModel](#viewmodel)
+  - [CanvasView\<TBindingContext\>](#canvasviewtbindingcontext)
+  - [DocumentView\<TBindingContext\>](#documentviewtbindingcontext)
+  - [Command & Command\<T\>](#command--commandt)
+  - [AsyncCommand & AsyncCommand\<T\>](#asynccommand--asynccommandt)
+  - [AsyncLazyCommand & AsyncLazyCommand\<T\>](#asynclazycommand--asynclazycommandt)
+  - [PropertyValueConverter\<TSourceType, TTargetType\>](#propertyvalueconvertertsourcetype-ttargettype)
+  - [ParameterValueConverter\<TTargetType\>](#parametervalueconverterttargettype)
 - [Quick start](#watch-quick-start)
 - [How To Use](#rocket-how-to-use)
   - [Data-binding](#data-binding)
@@ -197,7 +205,6 @@ The included types are:
 - [Command & Command\<T\>](#command--commandt)
 - [AsyncCommand & AsyncCommand\<T\>](#asynccommand--asynccommandt)
 - [AsyncLazyCommand & AsyncLazyCommand\<T\>](#asynclazycommand--asynclazycommandt)
-- [CommandWrapper](#commandwrapper)
 - [PropertyValueConverter\<TSourceType, TTargetType\>](#propertyvalueconvertertsourcetype-ttargettype)
 - [ParameterValueConverter\<TTargetType\>](#parametervalueconverterttargettype)
 - [ICommand & ICommand\<T\>](#command--commandt)
@@ -218,7 +225,7 @@ Key functionality:
 
 #### Simple property
 
-Here's an example of how to implement notification support to a custom property:
+Here's an example of how to implement notification support to a custom property.
 
 ```csharp
 public class CounterViewModel : ViewModel
@@ -237,7 +244,7 @@ The provided `Set<T>(ref T, T, string)` method checks the current value of the p
 
 #### Wrapping a model
 
-To inject notification support to models, that don't implement the `INotifyPropertyChanged` interface, `ViewModel` provides a dedicated `Set<TModel, T>(T, T, TModel, Action<TModel, T>, string)` method for this:
+To inject notification support to models, that don't implement the `INotifyPropertyChanged` interface, `ViewModel` provides a dedicated `Set<TModel, T>(T, T, TModel, Action<TModel, T>, string)` method for this.
 
 ```csharp
 public class UserViewModel : ViewModel
@@ -271,8 +278,6 @@ Key functionality:
 ```csharp
 public class CounterView : CanvasView<CounterViewModel>
 {
-    ...
-    
     // Override the base viewmodel instance creation.
     // Required in case there is no default constructor for the viewmodel.
     protected override CounterViewModel GetBindingContext()
@@ -308,8 +313,6 @@ Key functionality:
 ```csharp
 public class CounterView : DocumentView<CounterViewModel>
 {
-    ...
-    
     // Override the base viewmodel instance creation.
     // Required in case there is no default constructor for the viewmodel.
     protected override CounterViewModel GetBindingContext()
@@ -340,7 +343,7 @@ Key functionality:
 - Implement the `ICommand` & `ICommand<T>` interface, which exposes a `RaiseCanExecuteChanged` method to raise the `CanExecuteChanged` event
 - Expose constructor taking delegates like `Action` and `Action<T>`, which allow the wrapping of standard methods and lambda expressions
 
-The following shows how to set up a simple command:
+The following shows how to set up a simple command.
 
 ```csharp
 using UnityMvvmToolkit.Core;
@@ -367,7 +370,7 @@ public class CounterViewModel : ViewModel
 }
 ```
 
-And the relative UI could then be (using UXML):
+And the relative UI could then be (using UXML).
 
 ```xml
 <ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
@@ -386,10 +389,10 @@ The `AsyncCommand` and `AsyncCommand<T>` are `ICommand` implementations that ext
 
 Key functionality:
 - Extend the functionalities of the synchronous commands included in the package, with support for UniTask-returning delegates
-- Can wrap asynchronous functions with a `CancellationToken` parameter to support cancelation, and they implement a `DisableOnExecution` logic
+- Can wrap asynchronous functions with a `CancellationToken` parameter to support cancelation, and they expose a `DisableOnExecution` property, as well as a `Cancel` method
 - Implement the `IAsyncCommand` & `IAsyncCommand<T>` interfaces, which allows to replace a command with a custom implementation, if needed
 
-Let's say we want to download an image from the web and display it as soon as it downloads:
+Let's say we want to download an image from the web and display it as soon as it downloads.
 
 ```csharp
 public class ImageViewerViewModel : ViewModel
@@ -418,7 +421,7 @@ public class ImageViewerViewModel : ViewModel
 }
 ```
 
-With the related UI code:
+With the related UI code.
 
 ```xml
 <ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
@@ -429,30 +432,51 @@ With the related UI code:
 </ui:UXML>
 ```
 
-To disable the `BindableButton` while an async operation is running, simply set the `DisableOnExecution` property of the `AsyncCommand` to `true`:
+To disable the `BindableButton` while an async operation is running, simply set the `DisableOnExecution` property of the `AsyncCommand` to `true`.
 
 ```csharp
 public class ImageViewerViewModel : ViewModel
 {
-    ...
-
     public ImageViewerViewModel(IImageDownloader imageDownloader)
     {
-        _imageDownloader = imageDownloader;
-        DownloadImageCommand = new AsyncLazyCommand(DownloadImageAsync) { DisableOnExecution = true };
+        ...
+        DownloadImageCommand = new AsyncCommand(DownloadImageAsync) { DisableOnExecution = true };
     }
-
-    ...
 }
 ```
+
+If you want to create an async command that supports cancellation, use the `WithCancellation` extension method.
+
+```csharp
+public class MyViewModel : ViewModel
+{
+    public MyViewModel()
+    {
+        MyAsyncCommand = new AsyncCommand(DoSomethingAsync).WithCancellation();
+        CancelCommand = new Command(Cancel);
+    }
+
+    public IAsyncCommand MyAsyncCommand { get; }
+    public ICommand CancelCommand { get; }
+    
+    private void Cancel()
+    {
+        // If the underlying command is not running, or
+        // if it does not support cancellation, this method will perform no action.
+        MyAsyncCommand.Cancel();
+    }
+}
+```
+
+If the command supports cancellation, previous invocations will automatically be canceled if a new one is started.
 
 > **Note:** You need to import the [UniTask](https://github.com/Cysharp/UniTask) package in order to use async commands.
 
 ### AsyncLazyCommand & AsyncLazyCommand\<T\>
 
-The `AsyncLazyCommand` and `AsyncLazyCommand<T>` are have the same functionality as the `AsyncCommand`'s, except they prevent the async operation from being run multiple times.
+The `AsyncLazyCommand` and `AsyncLazyCommand<T>` are have the same functionality as the `AsyncCommand`'s, except they prevent the same async command from being invoked concurrently multiple times.
 
-Let's imagine a scenario similar to the one described in the `AsyncCommand` sample, but a user clicks the `Download Image` button several times during the async operation is running. In this case, `AsyncLazyCommand` will ignore all clicks until previous async operation has completed.
+Let's imagine a scenario similar to the one described in the `AsyncCommand` sample, but a user clicks the `Download Image` button several times while the async operation is running. In this case, `AsyncLazyCommand` will ignore all clicks until previous async operation has completed.
 
 > **Note:** You need to import the [UniTask](https://github.com/Cysharp/UniTask) package in order to use async commands.
 
@@ -462,11 +486,144 @@ Let's imagine a scenario similar to the one described in the `AsyncCommand` samp
 
 ### PropertyValueConverter\<TSourceType, TTargetType\>
 
-...
+Property value converters provide a way to apply custom logic to a property binding.
+
+Built-in property value converters:
+- IntToStrConverter
+- FloatToStrConverter
+
+If you want to create your own property value converter, create a class that inherits the `PropertyValueConverter<TSourceType, TTargetType>` abstract class and then implement the `Convert` and `ConvertBack` methods.
+
+```csharp
+public enum ThemeMode
+{
+    Light = 0,
+    Dark = 1
+}
+
+public class ThemeModeToBoolConverter : PropertyValueConverter<ThemeMode, bool>
+{
+    // From source to target. 
+    public override bool Convert(ThemeMode value)
+    {
+        return (int) value == 1;
+    }
+
+    // From target to source.
+    public override ThemeMode ConvertBack(bool value)
+    {
+        return (ThemeMode) (value ? 1 : 0);
+    }
+}
+```
+Don't forget to register the `ThemeModeToBoolConverter` in the view.
+
+```csharp
+public class MyView : DocumentView<MyViewModel>
+{
+    protected override IValueConverter[] GetValueConverters()
+    {
+        return new IValueConverter[] { new ThemeModeToBoolConverter() };
+    }
+}
+```
+
+Then you can use the `ThemeModeToBoolConverter` as in the following example.
+
+```xml
+<UXML>
+    <MyBindableElement binding-value-path="ThemeMode, Converter={ThemeModeToBoolConverter}" />
+    <!--or-->
+    <MyBindableElement binding-value-path="ThemeMode, ThemeModeToBoolConverter" />
+</UXML>
+```
 
 ### ParameterValueConverter\<TTargetType\>
 
-...
+Parameter value converters allow to convert a command parameter.
+
+Built-in parameter value converters:
+- ParameterToStrConverter
+- ParameterToIntConverter
+- ParameterToFloatConverter
+
+By default, the converter is not needed if your command has a `ReadOnlyMemory<char>` parameter type.
+
+```csharp
+public class MyViewModel : ViewModel
+{
+    public MyViewModel()
+    {
+        PrintParameterCommand = new Command<ReadOnlyMemory<char>>(PrintParameter);
+    }
+
+    public ICommand<ReadOnlyMemory<char>> PrintParameterCommand { get; }
+
+    private void PrintParameter(ReadOnlyMemory<char> parameter)
+    {
+        Debug.Log(parameter);
+    }
+}
+```
+
+```xml
+<UXML>
+    <BindableButton command="PrintParameterCommand, Parameter={MyParameter}" />
+    <!--or-->
+    <BindableButton command="PrintParameterCommand, MyParameter" />
+</UXML>
+```
+
+If you want to create your own parameter value converter, create a class that inherits the `ParameterValueConverter<TTargetType>` abstract class and then implement the `Convert` method.
+
+```csharp
+public class ParameterToIntConverter : ParameterValueConverter<int>
+{
+    public override int Convert(ReadOnlyMemory<char> parameter)
+    {
+        return int.Parse(parameter.Span);
+    }
+}
+```
+
+Don't forget to register the `ParameterToIntConverter` in the view.
+
+```csharp
+public class MyView : DocumentView<MyViewModel>
+{
+    protected override IValueConverter[] GetValueConverters()
+    {
+        return new IValueConverter[] { new ParameterToIntConverter() };
+    }
+}
+```
+
+Then you can use the `ParameterToIntConverter` as in the following example.
+
+```csharp
+public class MyViewModel : ViewModel
+{
+    public MyViewModel()
+    {
+        PrintParameterCommand = new Command<int>(PrintParameter);
+    }
+
+    public ICommand<int> PrintParameterCommand { get; }
+
+    private void PrintParameter(int parameter)
+    {
+        Debug.Log(parameter);
+    }
+}
+```
+
+```xml
+<UXML>
+    <BindableButton command="PrintIntParameterCommand, Parameter={5}, Converter={ParameterToIntConverter}" />
+    <!--or-->
+    <BindableButton command="PrintIntParameterCommand, 5, ParameterToIntConverter" />
+</UXML>
+```
 
 ## :watch: Quick start
 
@@ -662,23 +819,19 @@ public class CustomBindableElementsFactory : BindableElementsFactory
 ```csharp
 public class ImageViewerViewModel : ViewModel
 {
-    ...
+    private Texture2D _texture;
 
     public Texture2D Image
     {
         get => _texture;
         private set => Set(ref _texture, value);
     }
-
-    ...
 }
 ```
 
 ```csharp
 public class ImageViewerView : DocumentView<ImageViewerViewModel>
 {
-    ...
-
     protected override IBindableElementsFactory GetBindableElementsFactory()
     {
         return new CustomBindableElementsFactory();
@@ -688,9 +841,7 @@ public class ImageViewerView : DocumentView<ImageViewerViewModel>
 
 ```xml
 <UXML>
-    ...
     <BindableImage binding-image-path="Image" />
-    ...
 </UXML>
 ```
 
@@ -702,7 +853,7 @@ To enable [async commands](#asynccommand--asynccommandt) support, you need to ad
 
 In addition to async commands **UnityMvvmToolkit** provides extensions to make [USS transition's](https://docs.unity3d.com/Manual/UIE-Transitions.html) awaitable.
 
-For example, your `VisualElement` has the following transitions:
+For example, your `VisualElement` has the following transitions.
 ```css
 .panel--animation {
     transition-property: opacity, padding-bottom;
@@ -710,7 +861,7 @@ For example, your `VisualElement` has the following transitions:
 }
 ```
 
-You can `await` these transitions using several methods:
+You can `await` these transitions using several methods.
 ```csharp
 public async UniTask DeactivatePanel()
 {
