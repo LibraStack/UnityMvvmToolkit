@@ -26,7 +26,7 @@ namespace UnityMvvmToolkit.UniTask
             try
             {
                 IsRunning = true;
-                await _action.Invoke(cancellationToken).ToAsyncLazy();
+                await _action.Invoke(cancellationToken);
             }
             finally
             {
