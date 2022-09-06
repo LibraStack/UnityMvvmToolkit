@@ -13,13 +13,13 @@ A package that brings data-binding to your Unity project.
   - [IL2CPP restriction](#il2cpp-restriction)
 - [Introduction](#ledger-introduction)
   - [ViewModel](#viewmodel)
-  - [CanvasView\<TBindingContext\>](#canvasviewtbindingcontext)
-  - [DocumentView\<TBindingContext\>](#documentviewtbindingcontext)
-  - [Command & Command\<T\>](#command--commandt)
-  - [AsyncCommand & AsyncCommand\<T\>](#asynccommand--asynccommandt)
-  - [AsyncLazyCommand & AsyncLazyCommand\<T\>](#asynclazycommand--asynclazycommandt)
-  - [PropertyValueConverter\<TSourceType, TTargetType\>](#propertyvalueconvertertsourcetype-ttargettype)
-  - [ParameterValueConverter\<TTargetType\>](#parametervalueconverterttargettype)
+  - [CanvasView](#canvasviewtbindingcontext)
+  - [DocumentView](#documentviewtbindingcontext)
+  - [Command](#command--commandt)
+  - [AsyncCommand](#asynccommand--asynccommandt)
+  - [AsyncLazyCommand](#asynclazycommand--asynclazycommandt)
+  - [PropertyValueConverter](#propertyvalueconvertertsourcetype-ttargettype)
+  - [ParameterValueConverter](#parametervalueconverterttargettype)
 - [Quick start](#watch-quick-start)
 - [How To Use](#rocket-how-to-use)
   - [Data-binding](#data-binding)
@@ -36,7 +36,7 @@ A package that brings data-binding to your Unity project.
 
 ## :pencil: About
 
-The **UnityMvvmToolkit** is a package that allows you to bind UI elements in your `UI Document` or `Canvas` to data sources in your app. Use the samples as a starting point for understanding how to utilize the package.
+The **UnityMvvmToolkit** allows you to use data binding to establish a connection between the app UI and the data it displays. This is a simple and consistent way to achieve clean separation of business logic from UI. Use the samples as a starting point for understanding how to utilize the package.
 
 Key features:
 - Runtime data-binding
@@ -271,8 +271,8 @@ Key functionality:
 - Provides a base implementation for `Canvas` based view
 - Automatically searches for bindable UI elements on the `Canvas`
 - Allows to override the base viewmodel instance creation
-- Allows to define 'property' & 'parameter' value converters
-- Allows to define custom UI elements
+- Allows to define [property](#propertyvalueconvertertsourcetype-ttargettype) & [parameter](#parametervalueconverterttargettype) value converters
+- Allows to provide a custom bindable elements factory
 
 ```csharp
 public class CounterView : CanvasView<CounterViewModel>
@@ -290,7 +290,7 @@ public class CounterView : CanvasView<CounterViewModel>
         return _appContext.Resolve<IValueConverter[]>();
     }
 
-    // Define custom UI elements.
+    // Provide a custom bindable elements factory.
     protected override IBindableElementsFactory GetBindableElementsFactory()
     {
         return _appContext.Resolve<IBindableElementsFactory>();
@@ -306,8 +306,8 @@ Key functionality:
 - Provides a base implementation for `UI Document` based view
 - Automatically searches for bindable UI elements on the `UI Document`
 - Allows to override the base viewmodel instance creation
-- Allows to define 'property' & 'parameter' value converters
-- Allows to define custom UI elements
+- Allows to define [property](#propertyvalueconvertertsourcetype-ttargettype) & [parameter](#parametervalueconverterttargettype) value converters
+- Allows to provide a custom bindable elements factory
 
 ```csharp
 public class CounterView : DocumentView<CounterViewModel>
@@ -325,10 +325,10 @@ public class CounterView : DocumentView<CounterViewModel>
         return _appContext.Resolve<IValueConverter[]>();
     }
 
-    // Define custom UI elements.
+    // Provide a custom bindable elements factory.
     protected override IBindableElementsFactory GetBindableElementsFactory()
     {
-        return _appContext.Resolve<IBindableElementFactory>();
+        return _appContext.Resolve<IBindableElementsFactory>();
     }
 }
 ```
@@ -380,7 +380,7 @@ And the relative UI could then be.
 
 The `BindableButton` binds to the `ICommand` in the viewmodel, which wraps the private `IncrementCount` method. The `BindableLabel` displays the value of the `Count` property and is updated every time the property value changes.
 
-> **Note:** You need to define `IntToStrConverter` to convert int to string.
+> **Note:** You need to define `IntToStrConverter` to convert int to string. See the [PropertyValueConverter](#propertyvalueconvertertsourcetype-ttargettype) section for more information.
 
 ### AsyncCommand & AsyncCommand\<T\>
 
@@ -413,7 +413,7 @@ public class ImageViewerViewModel : ViewModel
 
     public IAsyncCommand DownloadImageCommand { get; }
 
-    private async UniTask DownloadImageAsync(CancellationToken cancellationToken = default)
+    private async UniTask DownloadImageAsync(CancellationToken cancellationToken)
     {
         Image = await _imageDownloader.DownloadRandomImageAsync(cancellationToken);
     }
@@ -459,6 +459,11 @@ public class MyViewModel : ViewModel
 
     public IAsyncCommand MyAsyncCommand { get; }
     public ICommand CancelCommand { get; }
+    
+    private async UniTask DoSomethingAsync(CancellationToken cancellationToken)
+    {
+        ...
+    }
     
     private void Cancel()
     {
@@ -724,7 +729,7 @@ The included UI elements are:
 - [BindableListView](#bindablelistview)
 - [BindableScrollView](#bindablescrollview)
 
-> **Note:** The `ListView` & `ScrollView` are provided for `UI Toolkit` only.
+> **Note:** The `BindableListView` & `BindableScrollView` are provided for `UI Toolkit` only.
 
 #### BindableLabel
 
@@ -801,7 +806,7 @@ To pass a parameter to the viewmodel, see the [ParameterValueConverter](#paramet
 
 The `BindableListView` control is the most efficient way to create lists. Use the `binding-items-source-path` of the `BindableListView` to bind to an `ObservableCollection`.
 
-The following example demonstrates how to bind to a list of users with `BindableListView`.
+The following example demonstrates how to bind to a collection of users with `BindableListView`.
 
 Create a main `UI Document` named `UsersView.uxml` with the following content.
 
@@ -941,7 +946,7 @@ public class UserItemData : ICollectionItemData
 
 ### Create custom control
 
-Let's create a bindable image UI element.
+Let's create a `BindableImage` UI element.
 
 First of all, create a base `Image` class.
 
@@ -984,7 +989,7 @@ public class BindableImage : Image, IBindableUIElement
 }
 ```
 
-The next step is to describe the data binding logic.
+The next step is to describe the data binding logic. To do that, create a `BindableImageWrapper` that inherits the `BindablePropertyElement` abstract class.
 
 ```csharp
 public class BindableImageWrapper : BindablePropertyElement
@@ -1004,6 +1009,8 @@ public class BindableImageWrapper : BindablePropertyElement
     }
 }
 ```
+
+The **UnityMvvmToolkit** contains two abstract classes `BindableCommandElement` and `BindablePropertyElement` that provide a methods for getting properties from the `BindingContext`.
 
 Finally, tell the elements factory what to do with the new UI element.
 
@@ -1061,7 +1068,7 @@ public class ImageViewerViewModel : ViewModel
 
 To enable [async commands](#asynccommand--asynccommandt) support, you need to add the [UniTask](https://github.com/Cysharp/UniTask) package to your project.
 
-In addition to async commands **UnityMvvmToolkit** provides extensions to make [USS transition's](https://docs.unity3d.com/Manual/UIE-Transitions.html) awaitable.
+In addition to async commands **UnityMvvmToolkit** provides extensions to make [USS transition](https://docs.unity3d.com/Manual/UIE-Transitions.html)'s awaitable.
 
 For example, your `VisualElement` has the following transitions.
 ```css
