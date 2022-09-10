@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
-using System.Xml.Serialization;
 using Cysharp.Threading.Tasks;
 using Interfaces;
 using Interfaces.Services;
+using Newtonsoft.Json;
 using Unity.VisualScripting;
 using UnityEngine;
 using ViewModels;
@@ -14,20 +13,18 @@ namespace Services
 {
     public class DataStoreService : IDataStoreService
     {
-        private const string DataFileName = "todolist.xml";
+        private const string DataFileName = "todolist.json";
 
         private readonly MainViewModel _mainViewModel;
-        private readonly XmlSerializer _serializer;
         private readonly string _dataFilePath;
 
         private AsyncLazy _saveDataTask;
-        private AsyncLazy<TaskItemData[]> _loadDataTask;
+        private AsyncLazy<IEnumerable<TaskItemData>> _loadDataTask;
 
         public DataStoreService(IAppContext appContext)
         {
             _mainViewModel = appContext.Resolve<MainViewModel>();
             _dataFilePath = Path.Combine(Application.persistentDataPath, DataFileName);
-            _serializer = new XmlSerializer(typeof(TaskItemData[]));
         }
 
         public async void Enable()
@@ -68,7 +65,7 @@ namespace Services
             await _saveDataTask;
         }
 
-        private async UniTask<TaskItemData[]> LoadDataAsync()
+        private async UniTask<IEnumerable<TaskItemData>> LoadDataAsync()
         {
             if (_loadDataTask?.Task.Status.IsCompleted() ?? true)
             {
@@ -80,19 +77,14 @@ namespace Services
 
         private async UniTask SaveDataAsync(string filePath, IEnumerable<TaskItemData> taskItems)
         {
-            await using var writeStream = File.Create(filePath);
-            _serializer.Serialize(writeStream, taskItems.ToArray());
+            await File.WriteAllTextAsync(filePath, JsonConvert.SerializeObject(taskItems));
         }
 
-        private async UniTask<TaskItemData[]> LoadDataAsync(string filePath)
+        private async UniTask<IEnumerable<TaskItemData>> LoadDataAsync(string filePath)
         {
-            if (File.Exists(filePath) == false)
-            {
-                return GetDefaultDataSet();
-            }
-
-            await using var readStream = File.OpenRead(filePath);
-            return (TaskItemData[]) _serializer.Deserialize(readStream);
+            return File.Exists(filePath)
+                ? JsonConvert.DeserializeObject<IEnumerable<TaskItemData>>(await File.ReadAllTextAsync(filePath))
+                : GetDefaultDataSet();
         }
 
         private TaskItemData[] GetDefaultDataSet()
