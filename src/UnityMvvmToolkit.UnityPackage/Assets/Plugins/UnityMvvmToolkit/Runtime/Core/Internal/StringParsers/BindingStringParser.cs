@@ -45,7 +45,7 @@ namespace UnityMvvmToolkit.Core.Internal.StringParsers
         {
             if (lineData.IsEmptyOrWhiteSpace())
             {
-                throw new NullReferenceException();
+                throw new NullReferenceException(nameof(lineData));
             }
         }
     }

@@ -25,4 +25,20 @@ public class PropertyStringParserTests
         result.PropertyName.ToString().Should().Be(propertyName);
         result.ConverterName.ToString().Should().Be(converterName);
     }
+
+    [Theory]
+    [InlineData("Count,, IntToStrConverter")]
+    [InlineData("Count, IntToStrConverter,,")]
+    public void GetPropertyData_EnsureExceptionThrown(string propertyStringData)
+    {
+        // Arrange
+        var propertyParser = new PropertyStringParser();
+
+        // Assert
+        propertyParser
+            .Invoking(parser => parser.GetPropertyData(propertyStringData.AsMemory()))
+            .Should()
+            .Throw<NullReferenceException>()
+            .WithMessage("lineData");
+    }
 }
