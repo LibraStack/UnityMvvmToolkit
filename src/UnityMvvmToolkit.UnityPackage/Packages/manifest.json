@@ -1,10 +1,10 @@
 {
   "dependencies": {
-    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
-    "com.unity.collab-proxy": "1.17.2",
+    "com.cysharp.unitask": "2.3.3",
+    "com.unity.collab-proxy": "2.0.1",
     "com.unity.feature.2d": "1.0.0",
-    "com.unity.ide.rider": "3.0.15",
-    "com.unity.ide.visualstudio": "2.0.16",
+    "com.unity.ide.rider": "3.0.18",
+    "com.unity.ide.visualstudio": "2.0.17",
     "com.unity.ide.vscode": "1.2.5",
     "com.unity.test-framework": "1.1.33",
     "com.unity.textmeshpro": "3.0.6",
@@ -42,5 +42,14 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.cysharp.unitask"
+      ]
+    }
+  ]
 }
