@@ -1,60 +1,93 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWrappers;
+using UnityMvvmToolkit.Core.Internal.Helpers;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 {
-    internal class CommandProvider<TBindingContext> : ObjectProvider<TBindingContext>
+    internal class CommandProvider
     {
+        /// <summary>
+        /// Stores a PropertyInfo.
+        /// Key is a combination of the IBindingContext and the Property name hash codes.
+        /// </summary>
+        private readonly Dictionary<int, PropertyInfo> _properties;
+
+        /// <summary>
+        /// Stores an array of PropertyInfo for each IBindingContext.
+        /// Key is the IBindingContext type.
+        /// </summary>
+        private readonly Dictionary<Type, PropertyInfo[]> _bindingContextProperties;
+
+        /// <summary>
+        /// Stores a queue of ICommandWrapper instances.
+        /// Key is the ICommandWrapper hash code.
+        /// </summary>
+        private readonly Dictionary<int, Queue<ICommandWrapper>> _commandWrappers;
+
         private readonly HashSet<IParameterValueConverter> _parameterConverters;
 
-        internal CommandProvider(TBindingContext bindingContext, IEnumerable<IValueConverter> converters)
-            : base(bindingContext)
+        internal CommandProvider()
         {
-            _parameterConverters = GetValueConverters<IParameterValueConverter>(converters);
+            _properties = new Dictionary<int, PropertyInfo>();
+            _commandWrappers = new Dictionary<int, Queue<ICommandWrapper>>();
+            _bindingContextProperties = new Dictionary<Type, PropertyInfo[]>();
+
+            _parameterConverters = new HashSet<IParameterValueConverter>();
+        }
+
+        public void RegisterValueConverter(IParameterValueConverter converter)
+        {
+            _parameterConverters.Add(converter);
+        }
+
+        public void WarmupBindingContext(Type bindingContextType, PropertyInfo[] properties)
+        {
+            var propertiesSpan = properties.AsSpan();
+
+            for (var i = 0; i < propertiesSpan.Length; i++)
+            {
+                var propertyInfo = propertiesSpan[i];
+
+                if (propertyInfo.PropertyType.GetInterface(nameof(IBaseCommand)) == null)
+                {
+                    continue;
+                }
+
+                // TODO: Test.
+                var bindingContextTypeHash = bindingContextType.GetHashCode();
+                var propertyNameHash = propertyInfo.Name.GetHashCode();
+
+                _properties.Add(HashCodeHelper.CombineHashCode(bindingContextTypeHash, propertyNameHash),
+                    propertyInfo);
+            }
+
+            _bindingContextProperties.Add(bindingContextType, properties);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TCommand GetCommand<TCommand>(string propertyName) where TCommand : IBaseCommand
+        public TCommand GetCommand<TCommand>(IBindingContext context, string propertyName) where TCommand : IBaseCommand
         {
-            if (string.IsNullOrWhiteSpace(propertyName))
-            {
-                return default;
-            }
+            var propertyInfo = GetPropertyInfo(context, propertyName);
 
-            if (TryGetInstanceFromCache<TCommand>(propertyName, out var command))
-            {
-                return command;
-            }
-
-            AssurePropertyExist(propertyName, out var propertyInfo);
-
-            if (typeof(TCommand) != propertyInfo.PropertyType)
+            if (propertyInfo.PropertyType != typeof(TCommand))
             {
                 throw new InvalidCastException(
                     $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(TCommand)} command.");
             }
 
-            return AddInstanceToCache<TCommand>(propertyName, propertyInfo.GetValue(BindingContext));
+            return (TCommand) propertyInfo.GetValue(context);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ICommandWrapper GetCommandWrapper(string propertyName, ReadOnlyMemory<char> parameterConverterName)
+        public ICommandWrapper GetCommandWrapper(IBindingContext context, CommandBindingData bindingData)
         {
-            if (string.IsNullOrWhiteSpace(propertyName))
-            {
-                return default;
-            }
-
-            if (TryGetInstanceFromCache<ICommandWrapper>(propertyName, out var commandWrapper))
-            {
-                return commandWrapper;
-            }
-
-            AssurePropertyExist(propertyName, out var propertyInfo);
+            var propertyName = bindingData.PropertyName;
+            var propertyInfo = GetPropertyInfo(context, propertyName);
 
             var propertyType = propertyInfo.PropertyType;
             if (propertyType.GetInterface(nameof(IBaseCommand)) == null)
@@ -63,36 +96,89 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
                     $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(IBaseCommand)} command."); // TODO: Conditional?
             }
 
-            if (propertyType == typeof(ICommand) || propertyType.GetInterface(nameof(ICommand)) != null)
+            return default;
+            // if (propertyType == typeof(ICommand) || propertyType.GetInterface(nameof(ICommand)) != null)
+            // {
+            //     return AddInstanceToCache<ICommandWrapper>(propertyName,
+            //         new CommandWrapper((ICommand) propertyInfo.GetValue(null)));
+            // }
+            //
+            // if (propertyType.IsGenericType == false)
+            // {
+            //     throw new InvalidCastException(
+            //         $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(ICommand<>)} command.");
+            // }
+            //
+            // var commandValueType = propertyType.GenericTypeArguments[0];
+            // if (commandValueType == typeof(string))
+            // {
+            //     return AddInstanceToCache<ICommandWrapper>(propertyName,
+            //         new CommandWrapperWithoutConverter(
+            //             (ICommand<string>) propertyInfo.GetValue(null)));
+            // }
+            //
+            // var args = new[]
+            // {
+            //     propertyInfo.GetValue(null),
+            //     GetParameterConverter(commandValueType, parameterConverterName.Span)
+            // };
+            //
+            // var genericCommandWrapperType = typeof(CommandWrapperWithConverter<>).MakeGenericType(commandValueType);
+            //
+            // return AddInstanceToCache<ICommandWrapper>(propertyName,
+            //     Activator.CreateInstance(genericCommandWrapperType, args));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private PropertyInfo GetPropertyInfo(IBindingContext context, string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName))
             {
-                return AddInstanceToCache<ICommandWrapper>(propertyName,
-                    new CommandWrapper((ICommand) propertyInfo.GetValue(BindingContext)));
+                throw new NullReferenceException(propertyName);
             }
 
-            if (propertyType.IsGenericType == false)
+            var bindingContextType = context.GetType();
+
+            var bindingContextTypeHash = bindingContextType.GetHashCode();
+            var propertyNameHash = propertyName.GetHashCode();
+
+            var propertyKey = HashCodeHelper.CombineHashCode(bindingContextTypeHash, propertyNameHash);
+
+            if (_properties.TryGetValue(propertyKey, out var propertyInfo))
             {
-                throw new InvalidCastException(
-                    $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(ICommand<>)} command.");
+                return propertyInfo;
             }
 
-            var commandValueType = propertyType.GenericTypeArguments[0];
-            if (commandValueType == typeof(ReadOnlyMemory<char>))
+            propertyInfo = GetPropertyInfo(bindingContextType, propertyName);
+            _properties.Add(propertyKey, propertyInfo);
+
+            return propertyInfo;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private PropertyInfo GetPropertyInfo(Type bindingContextType, string propertyName)
+        {
+            if (_bindingContextProperties.TryGetValue(bindingContextType, out var bindingContextProperties) == false)
             {
-                return AddInstanceToCache<ICommandWrapper>(propertyName,
-                    new CommandWrapperWithoutConverter(
-                        (ICommand<ReadOnlyMemory<char>>) propertyInfo.GetValue(BindingContext)));
+                bindingContextProperties = bindingContextType
+                    .GetProperties(BindingFlags.Instance | BindingFlags.Public);
+
+                _bindingContextProperties.Add(bindingContextType, bindingContextProperties);
             }
 
-            var args = new[]
+            var propertiesSpan = bindingContextProperties.AsSpan();
+
+            for (var i = 0; i < propertiesSpan.Length; i++)
             {
-                propertyInfo.GetValue(BindingContext),
-                GetParameterConverter(commandValueType, parameterConverterName.Span)
-            };
+                var propertyInfo = propertiesSpan[i];
 
-            var genericCommandWrapperType = typeof(CommandWrapperWithConverter<>).MakeGenericType(commandValueType);
+                if (propertyInfo.Name == propertyName)
+                {
+                    return propertyInfo;
+                }
+            }
 
-            return AddInstanceToCache<ICommandWrapper>(propertyName,
-                Activator.CreateInstance(genericCommandWrapperType, args));
+            return null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

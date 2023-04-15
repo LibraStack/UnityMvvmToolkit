@@ -5,7 +5,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
 {
     [RequireComponent(typeof(TMP_Text))]
-    public class BindableLabel : MonoBehaviour, IBindableUIElement
+    public class BindableLabel : MonoBehaviour//, IBindableUIElement
     {
         [SerializeField] private TMP_Text _label;
         [SerializeField] private string _bindingTextPath;

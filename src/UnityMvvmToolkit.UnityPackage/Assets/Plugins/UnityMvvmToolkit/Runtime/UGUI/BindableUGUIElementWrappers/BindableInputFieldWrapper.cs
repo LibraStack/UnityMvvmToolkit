@@ -6,16 +6,16 @@ using UnityMvvmToolkit.UGUI.BindableUGUIElements;
 
 namespace UnityMvvmToolkit.UGUI.BindableUGUIElementWrappers
 {
-    public class BindableInputFieldWrapper : BindablePropertyElement, IInitializable, IDisposable
+    public class BindableInputFieldWrapper// : BindablePropertyElement, IInitializable, IDisposable
     {
         private readonly TMP_InputField _inputField;
         private readonly IProperty<string> _textProperty;
 
         public BindableInputFieldWrapper(BindableInputField inputField, IObjectProvider objectProvider) 
-            : base(objectProvider)
+            //: base(objectProvider)
         {
             _inputField = inputField.InputField;
-            _textProperty = GetProperty<string>(inputField.BindingTextPath);
+            //_textProperty = GetProperty<string>(inputField.BindingTextPath);
         }
 
         public bool CanInitialize => _textProperty != null;
@@ -25,14 +25,14 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElementWrappers
             _inputField.onValueChanged.AddListener(OnInputFieldTextChanged);
         }
 
-        public override void UpdateValues()
-        {
-            var value = _textProperty.Value;
-            if (_inputField.text != value)
-            {
-                _inputField.SetTextWithoutNotify(value);
-            }
-        }
+        // public override void UpdateValues()
+        // {
+        //     var value = _textProperty.Value;
+        //     if (_inputField.text != value)
+        //     {
+        //         _inputField.SetTextWithoutNotify(value);
+        //     }
+        // }
 
         public void Dispose()
         {

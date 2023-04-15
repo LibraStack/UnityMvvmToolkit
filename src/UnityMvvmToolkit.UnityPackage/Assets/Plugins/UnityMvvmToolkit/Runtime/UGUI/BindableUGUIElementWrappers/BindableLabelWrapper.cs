@@ -5,20 +5,20 @@ using UnityMvvmToolkit.UGUI.BindableUGUIElements;
 
 namespace UnityMvvmToolkit.UGUI.BindableUGUIElementWrappers
 {
-    public class BindableLabelWrapper : BindablePropertyElement
+    public class BindableLabelWrapper //: BindablePropertyElement
     {
         private readonly TMP_Text _label;
         private readonly IReadOnlyProperty<string> _textProperty;
 
-        public BindableLabelWrapper(BindableLabel label, IObjectProvider objectProvider) : base(objectProvider)
+        public BindableLabelWrapper(BindableLabel label, IObjectProvider objectProvider)// : base(objectProvider)
         {
             _label = label.Label;
-            _textProperty = GetReadOnlyProperty<string>(label.BindingTextPath);
+            //_textProperty = GetReadOnlyProperty<string>(label.BindingTextPath);
         }
 
-        public override void UpdateValues()
-        {
-            _label.text = _textProperty.Value;
-        }
+        // public override void UpdateValues()
+        // {
+        //     _label.text = _textProperty.Value;
+        // }
     }
 }

@@ -1,7 +1,11 @@
-﻿namespace UnityMvvmToolkit.Core.Interfaces
+﻿using System;
+
+namespace UnityMvvmToolkit.Core.Interfaces
 {
-    public interface IReadOnlyProperty<out TValueType>
+    public interface IReadOnlyProperty<TType> : IBaseProperty
     {
-        TValueType Value { get; }
+        TType Value { get; }
+
+        event EventHandler<TType> ValueChanged;
     }
 }

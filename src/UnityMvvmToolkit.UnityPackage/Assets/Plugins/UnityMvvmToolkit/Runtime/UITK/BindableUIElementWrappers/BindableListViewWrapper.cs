@@ -8,7 +8,7 @@ using UnityMvvmToolkit.UITK.BindableUIElements;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
 {
-    public abstract class BindableListViewWrapper<TItem, TData> : IBindableElement, IInitializable, IDisposable
+    public abstract class BindableListViewWrapper<TItem, TData>// : IBindableElement, IInitializable, IDisposable
     {
         private readonly BindableListView _listView;
         private readonly VisualTreeAsset _itemAsset;
@@ -21,9 +21,9 @@ namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
         {
             _listView = listView;
             _itemAsset = itemAsset;
-            _itemsCollectionProperty =
-                objectProvider.GetReadOnlyProperty<ObservableCollection<TData>>(listView.BindingItemsSourcePath,
-                    ReadOnlyMemory<char>.Empty);
+            // _itemsCollectionProperty =
+            //     objectProvider.GetReadOnlyProperty<ObservableCollection<TData>>(listView.BindingItemsSourcePath,
+            //         ReadOnlyMemory<char>.Empty);
         }
 
         public bool CanInitialize => _itemsCollectionProperty != null;

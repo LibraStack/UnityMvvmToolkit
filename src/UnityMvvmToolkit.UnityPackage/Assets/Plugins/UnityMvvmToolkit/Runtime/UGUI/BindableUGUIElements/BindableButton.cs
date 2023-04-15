@@ -6,7 +6,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
 {
     [RequireComponent(typeof(Button))]
-    public class BindableButton : MonoBehaviour, IBindableUIElement
+    public class BindableButton : MonoBehaviour//, IBindableUIElement
     {
         [SerializeField] private Button _button;
         [SerializeField] private string _command;

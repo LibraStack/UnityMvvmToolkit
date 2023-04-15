@@ -1,29 +1,26 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UGUI
 {
     public abstract class CanvasView<TBindingContext> : MonoBehaviourView<TBindingContext>
-        where TBindingContext : class, INotifyPropertyChanged
+        where TBindingContext : class, IBindingContext
     {
+        private IBindableElement[] _bindableElements;
+
         public GameObject RootElement { get; private set; }
 
         protected override void OnInit()
         {
             RootElement = gameObject;
+
+            _bindableElements = RootElement.GetComponentsInChildren<IBindableElement>(true);
         }
 
-        protected override IBindableElementsFactory GetBindableElementsFactory()
+        protected override IBindableElement[] GetBindableElements()
         {
-            return new BindableElementsFactory();
-        }
-
-        protected override IEnumerable<IBindableUIElement> GetBindableUIElements()
-        {
-            return RootElement.GetComponentsInChildren<IBindableUIElement>(true);
+            return _bindableElements;
         }
     }
 }

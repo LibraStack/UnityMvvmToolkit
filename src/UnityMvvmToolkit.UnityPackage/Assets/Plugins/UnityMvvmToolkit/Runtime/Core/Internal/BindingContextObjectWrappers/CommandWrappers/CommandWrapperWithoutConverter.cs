@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
@@ -8,16 +7,16 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWra
 {
     internal class CommandWrapperWithoutConverter : BaseCommandWrapper, ICommandWrapperWithParameter
     {
-        private readonly ICommand<ReadOnlyMemory<char>> _command;
-        private readonly Dictionary<int, ReadOnlyMemory<char>> _parameters;
+        private readonly ICommand<string> _command;
+        private readonly Dictionary<int, string> _parameters;
 
-        public CommandWrapperWithoutConverter(ICommand<ReadOnlyMemory<char>> command) : base(command)
+        public CommandWrapperWithoutConverter(ICommand<string> command) : base(command)
         {
             _command = command;
-            _parameters = new Dictionary<int, ReadOnlyMemory<char>>();
+            _parameters = new Dictionary<int, string>();
         }
 
-        public void SetParameter(int elementId, ReadOnlyMemory<char> parameter)
+        public void SetParameter(int elementId, string parameter)
         {
             _parameters.Add(elementId, parameter);
         }

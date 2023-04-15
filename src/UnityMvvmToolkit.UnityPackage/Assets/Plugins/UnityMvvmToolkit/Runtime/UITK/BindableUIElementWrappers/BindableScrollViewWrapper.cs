@@ -11,7 +11,7 @@ using UnityMvvmToolkit.UITK.BindableUIElements;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
 {
-    public abstract class BindableScrollViewWrapper<TItem, TData> : IBindableElement, IInitializable, IDisposable
+    public abstract class BindableScrollViewWrapper<TItem, TData>// : IBindableElement, IInitializable, IDisposable
         where TData : ICollectionItemData
     {
         private readonly BindableScrollView _scrollView;
@@ -28,9 +28,9 @@ namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
             _scrollView = scrollView;
             _itemAsset = itemAsset;
 
-            _itemsCollectionProperty =
-                objectProvider.GetReadOnlyProperty<ObservableCollection<TData>>(scrollView.BindingItemsSourcePath,
-                    ReadOnlyMemory<char>.Empty);
+            // _itemsCollectionProperty =
+            //     objectProvider.GetReadOnlyProperty<ObservableCollection<TData>>(scrollView.BindingItemsSourcePath,
+            //         ReadOnlyMemory<char>.Empty);
         }
 
         public bool CanInitialize => _itemsCollectionProperty != null;

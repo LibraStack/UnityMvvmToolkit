@@ -5,17 +5,17 @@ using UnityMvvmToolkit.UITK.BindableUIElements;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
 {
-    public abstract class BaseBindableButton : BindableCommandElement, IInitializable, IDisposable
+    public abstract class BaseBindableButton// : BindableCommandElement, IInitializable, IDisposable
     {
         private readonly int _buttonId;
         private readonly BindableButton _button;
         private readonly ICommandWrapper _commandWrapper;
 
-        protected BaseBindableButton(BindableButton button, IObjectProvider objectProvider) : base(objectProvider)
+        protected BaseBindableButton(BindableButton button, IObjectProvider objectProvider)// : base(objectProvider)
         {
             _button = button;
             _buttonId = button.GetHashCode();
-            _commandWrapper = GetCommandWrapper(_buttonId, button.Command);
+            //_commandWrapper = GetCommandWrapper(_buttonId, button.Command);
         }
 
         public bool CanInitialize => _commandWrapper != null;

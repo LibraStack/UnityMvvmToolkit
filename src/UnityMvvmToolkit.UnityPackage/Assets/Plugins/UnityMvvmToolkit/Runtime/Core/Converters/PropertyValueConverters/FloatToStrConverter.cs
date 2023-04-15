@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Extensions;
 
@@ -16,7 +15,7 @@ namespace UnityMvvmToolkit.Core.Converters.PropertyValueConverters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override float ConvertBack(string value)
         {
-            value.AsSpan().TryParse(out var result);
+            value.TryParse(out var result);
             return result;
         }
     }

@@ -3,7 +3,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public class BindableListView : ListView, IBindableUIElement
+    public class BindableListView : ListView//, IBindableUIElement
     {
         public string BindingItemsSourcePath { get; set; }
 

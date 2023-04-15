@@ -3,7 +3,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public class BindableScrollView : ScrollView, IBindableUIElement
+    public class BindableScrollView : ScrollView//, IBindableUIElement
     {
         public string BindingItemsSourcePath { get; set; }
 

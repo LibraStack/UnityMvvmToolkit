@@ -5,17 +5,17 @@ using UnityMvvmToolkit.UGUI.BindableUGUIElements;
 
 namespace UnityMvvmToolkit.UGUI.BindableUGUIElementWrappers
 {
-    public class BindableButtonWrapper : BindableCommandElement, IInitializable, IDisposable
+    public class BindableButtonWrapper// : BindableCommandElement, IInitializable, IDisposable
     {
         private readonly int _buttonId;
         private readonly BindableButton _button;
         private readonly ICommandWrapper _commandWrapper;
 
-        public BindableButtonWrapper(BindableButton button, IObjectProvider objectProvider) : base(objectProvider)
+        public BindableButtonWrapper(BindableButton button, IObjectProvider objectProvider)// : base(objectProvider)
         {
             _button = button;
             _buttonId = button.GetInstanceID();
-            _commandWrapper = GetCommandWrapper(_buttonId, button.Command);
+            //_commandWrapper = GetCommandWrapper(_buttonId, button.Command);
         }
 
         public bool CanInitialize => _commandWrapper != null;

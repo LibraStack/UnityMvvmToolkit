@@ -1,27 +1,57 @@
-﻿using UnityEngine.UIElements;
+﻿using System.Runtime.CompilerServices;
+using UnityEngine.UIElements;
+using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public class BindableTextField : TextField, IBindableUIElement
+    public partial class BindableTextField : TextField, IBindableElement
     {
-        public string BindingValuePath { get; set; }
-        
-        public new class UxmlFactory : UxmlFactory<BindableTextField, UxmlTraits>
+        private IProperty<string> _valueProperty;
+        private PropertyBindingData _propertyBindingData;
+
+        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
+            _propertyBindingData ??= BindingValuePath.ToPropertyBindingData();
+
+            _valueProperty = objectProvider.RentProperty<string>(context, _propertyBindingData);
+            _valueProperty.ValueChanged += OnPropertyValueChanged;
+
+            UpdateControlValue(_valueProperty.Value);
+            this.RegisterValueChangedCallback(OnControlValueChanged);
         }
 
-        public new class UxmlTraits : TextField.UxmlTraits
+        public void ResetBindingContext(IObjectProvider objectProvider)
         {
-            private readonly UxmlStringAttributeDescription _bindingValueAttribute = new()
-                { name = "binding-value-path", defaultValue = "" };
-
-            public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
+            if (_valueProperty == null)
             {
-                base.Init(visualElement, bag, context);
-                ((BindableTextField) visualElement).BindingValuePath =
-                    _bindingValueAttribute.GetValueFromBag(bag, context);
+                return;
             }
+
+            objectProvider.ReturnProperty(_valueProperty);
+
+            _valueProperty.ValueChanged -= OnPropertyValueChanged;
+            _valueProperty = null;
+
+            UpdateControlValue(default);
+            this.UnregisterValueChangedCallback(OnControlValueChanged);
+        }
+
+        protected virtual void OnControlValueChanged(ChangeEvent<string> e)
+        {
+            _valueProperty.Value = e.newValue;
+        }
+
+        private void OnPropertyValueChanged(object sender, string newValue)
+        {
+            UpdateControlValue(newValue);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual void UpdateControlValue(string newValue)
+        {
+            SetValueWithoutNotify(newValue);
         }
     }
 }

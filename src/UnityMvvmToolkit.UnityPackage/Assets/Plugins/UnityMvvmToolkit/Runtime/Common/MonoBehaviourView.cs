@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
@@ -8,39 +6,54 @@ using UnityMvvmToolkit.Core.Interfaces;
 namespace UnityMvvmToolkit.Common
 {
     [DefaultExecutionOrder(1)]
-    public abstract class MonoBehaviourView<TBindingContext> : MonoBehaviour
-        where TBindingContext : class, INotifyPropertyChanged
+    public abstract class MonoBehaviourView<TBindingContext> : MonoBehaviour, IBindableElement
+        where TBindingContext : class, IBindingContext
     {
-        private View<TBindingContext> _view;
+        private TBindingContext _bindingContext;
+        private IObjectProvider _objectProvider;
 
-        public TBindingContext BindingContext => _view.BindingContext;
+        public TBindingContext BindingContext => _bindingContext;
 
         private void Awake()
         {
-            _view = CreateView(GetBindingContext(), GetBindableElementsFactory());
-
             OnInit();
-            BindElements();
-        }
-
-        private void OnEnable()
-        {
-            _view.EnableBinding();
-        }
-
-        private void OnDisable()
-        {
-            _view.DisableBinding();
+            SetBindingContext(GetBindingContext(), GetObjectProvider());
         }
 
         private void OnDestroy()
         {
-            _view.Dispose();
+            if (_objectProvider != null)
+            {
+                ResetBindingContext(_objectProvider);
+            }
+        }
+
+        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
+        {
+            _bindingContext = (TBindingContext) context;
+            _objectProvider = objectProvider;
+
+            var bindableElements = GetBindableElements().AsSpan();
+            for (var i = 0; i < bindableElements.Length; i++)
+            {
+                bindableElements[i].SetBindingContext(context, objectProvider);
+            }
+        }
+
+        public void ResetBindingContext(IObjectProvider objectProvider)
+        {
+            var bindableElements = GetBindableElements().AsSpan();
+            for (var i = 0; i < bindableElements.Length; i++)
+            {
+                bindableElements[i].ResetBindingContext(objectProvider);
+            }
+
+            _bindingContext = null;
+            _objectProvider = null;
         }
 
         protected abstract void OnInit();
-        protected abstract IBindableElementsFactory GetBindableElementsFactory();
-        protected abstract IEnumerable<IBindableUIElement> GetBindableUIElements();
+        protected abstract IBindableElement[] GetBindableElements();
 
         protected virtual TBindingContext GetBindingContext()
         {
@@ -58,25 +71,9 @@ namespace UnityMvvmToolkit.Common
             return Array.Empty<IValueConverter>();
         }
 
-        protected virtual IObjectProvider GetObjectProvider(TBindingContext bindingContext, IValueConverter[] converters)
+        protected virtual IObjectProvider GetObjectProvider()
         {
-            return new BindingContextObjectProvider<TBindingContext>(bindingContext, converters);
-        }
-
-        private View<TBindingContext> CreateView(TBindingContext bindingContext,
-            IBindableElementsFactory bindableElementsFactory)
-        {
-            return new View<TBindingContext>()
-                .Configure(bindingContext, GetObjectProvider(bindingContext, GetValueConverters()),
-                    bindableElementsFactory);
-        }
-
-        private void BindElements()
-        {
-            foreach (var bindableUIElement in GetBindableUIElements())
-            {
-                _view.RegisterBindableElement(bindableUIElement, true);
-            }
+            return new BindingContextObjectProvider(GetValueConverters());
         }
     }
 }

@@ -3,7 +3,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public class BindableButton : Button, IBindableUIElement
+    public class BindableButton : Button//, IBindableUIElement
     {
         public bool Enabled
         {
