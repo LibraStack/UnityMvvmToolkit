@@ -1,25 +1,37 @@
-﻿using Interfaces;
+﻿using Cysharp.Threading.Tasks;
+using Interfaces;
 using LabelAnimations;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityMvvmToolkit.UITK.BindableUIElements;
 
 namespace BindableUIElements
 {
-    public class BindableCountLabel : BindableAnimationLabel
+    public partial class BindableCountLabel : BindableLabel
     {
         private ILabelAnimation _scaleAnimation;
 
-        protected override ILabelAnimation Animation
+        public BindableCountLabel()
         {
-            get { return _scaleAnimation ??= new LabelScaleAnimation(this, Vector3.zero, Vector3.one); }
+            RegisterCallback<GeometryChangedEvent>(OnLayoutCalculated);
         }
 
-        public new class UxmlFactory : UxmlFactory<BindableCountLabel, UxmlTraits>
+        protected override void UpdateControlText(string newText)
         {
+            base.UpdateControlText(newText);
+            _scaleAnimation?.PlayAsync().Forget();
         }
 
-        public new class UxmlTraits : BindableAnimationLabel.UxmlTraits
+        private void OnLayoutCalculated(GeometryChangedEvent e)
         {
+            try
+            {
+                _scaleAnimation ??= new LabelScaleAnimation(this, Vector3.zero, Vector3.one);
+            }
+            finally
+            {
+                UnregisterCallback<GeometryChangedEvent>(OnLayoutCalculated);
+            }
         }
     }
 }

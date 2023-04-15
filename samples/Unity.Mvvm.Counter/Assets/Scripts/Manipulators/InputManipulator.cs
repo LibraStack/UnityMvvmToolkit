@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace UIElements
+namespace Manipulators
 {
     public abstract class InputManipulator : PointerManipulator
     {

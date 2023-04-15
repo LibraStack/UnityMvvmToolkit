@@ -20,12 +20,12 @@ namespace Services
         {
             LoadData();
 
-            _counterViewModel.PropertyChanged += OnCounterViewModelPropertyChanged;
+            // _counterViewModel.PropertyChanged += OnCounterViewModelPropertyChanged;
         }
 
         public void Disable()
         {
-            _counterViewModel.PropertyChanged -= OnCounterViewModelPropertyChanged;
+            // _counterViewModel.PropertyChanged -= OnCounterViewModelPropertyChanged;
         }
 
         private void OnCounterViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Interfaces.Services;
+﻿using Interfaces.Services;
 using UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -9,7 +8,7 @@ using UnityMvvmToolkit.UITK;
 namespace Views
 {
     public abstract class BaseView<TBindingContext> : DocumentView<TBindingContext>
-        where TBindingContext : class, INotifyPropertyChanged
+        where TBindingContext : class, IBindingContext
     {
         [SerializeField] private AppContext _appContext;
 
@@ -27,11 +26,6 @@ namespace Views
         protected override IValueConverter[] GetValueConverters()
         {
             return _appContext.Resolve<IValueConverter[]>();
-        }
-
-        protected override IBindableElementsFactory GetBindableElementsFactory()
-        {
-            return _appContext.Resolve<IBindableElementsFactory>();
         }
     }
 }

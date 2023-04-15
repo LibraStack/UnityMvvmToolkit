@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace UIElements
+namespace Manipulators
 {
     public class SliderManipulator : InputManipulator
     {

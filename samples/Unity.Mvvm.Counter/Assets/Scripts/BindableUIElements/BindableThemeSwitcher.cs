@@ -1,28 +1,51 @@
 ﻿using UIElements;
-using UnityEngine.UIElements;
+using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace BindableUIElements
 {
-    public class BindableThemeSwitcher : ThemeSwitcher, IBindableUIElement
+    public partial class BindableThemeSwitcher : ThemeSwitcher, IBindableElement
     {
-        public string BindingValuePath { get; set; }
-        
-        public new class UxmlFactory : UxmlFactory<BindableThemeSwitcher, UxmlTraits>
+        private IProperty<bool> _valueProperty;
+        private PropertyBindingData _propertyBindingData;
+
+        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
+            _propertyBindingData ??= BindingValuePath.ToPropertyBindingData();
+
+            _valueProperty = objectProvider.RentProperty<bool>(context, _propertyBindingData);
+            _valueProperty.ValueChanged += OnPropertyValueChanged;
+
+            UpdateControlValue(_valueProperty.Value);
         }
 
-        public new class UxmlTraits : ThemeSwitcher.UxmlTraits
+        public void ResetBindingContext(IObjectProvider objectProvider)
         {
-            private readonly UxmlStringAttributeDescription _bindingValueAttribute = new()
-                { name = "binding-value-path", defaultValue = "" };
-
-            public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
+            if (_valueProperty == null)
             {
-                base.Init(visualElement, bag, context);
-                ((BindableThemeSwitcher) visualElement).BindingValuePath =
-                    _bindingValueAttribute.GetValueFromBag(bag, context);
+                return;
             }
+
+            objectProvider.ReturnProperty(_valueProperty);
+
+            _valueProperty.ValueChanged -= OnPropertyValueChanged;
+            _valueProperty = null;
+        }
+
+        protected override void OnControlValueChanged(bool value)
+        {
+            _valueProperty.Value = value;
+        }
+
+        private void OnPropertyValueChanged(object sender, bool newValue)
+        {
+            UpdateControlValue(newValue);
+        }
+
+        private void UpdateControlValue(bool newValue)
+        {
+            SetValueWithoutNotify(newValue);
         }
     }
 }

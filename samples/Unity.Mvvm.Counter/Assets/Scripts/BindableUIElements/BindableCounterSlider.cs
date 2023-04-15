@@ -1,34 +1,40 @@
-﻿using UIElements;
-using UnityEngine.UIElements;
+﻿using System;
+using UIElements;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace BindableUIElements
 {
-    public class BindableCounterSlider : CounterSlider, IBindableUIElement
+    public partial class BindableCounterSlider : CounterSlider, IBindableElement
     {
-        public string IncrementCommand { get; set; }
-        public string DecrementCommand { get; set; }
+        private ICommand _incrementCommand;
+        private ICommand _decrementCommand;
 
-        public new class UxmlFactory : UxmlFactory<BindableCounterSlider, UxmlTraits>
+        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
+            _incrementCommand = objectProvider.GetCommand<ICommand>(context, IncrementCommand);
+            _decrementCommand = objectProvider.GetCommand<ICommand>(context, DecrementCommand);
+
+            Increment += OnIncrement;
+            Decrement += OnDecrement;
         }
 
-        public new class UxmlTraits : CounterSlider.UxmlTraits
+        public void ResetBindingContext(IObjectProvider objectProvider)
         {
-            private readonly UxmlStringAttributeDescription _incrementCommandAttribute = new()
-                { name = "increment-command", defaultValue = "" };
+            _incrementCommand = null;
+            _decrementCommand = null;
 
-            private readonly UxmlStringAttributeDescription _decrementCommandAttribute = new()
-                { name = "decrement-command", defaultValue = "" };
+            Increment -= OnIncrement;
+            Decrement -= OnDecrement;
+        }
 
-            public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
-            {
-                base.Init(visualElement, bag, context);
+        private void OnIncrement(object sender, EventArgs e)
+        {
+            _incrementCommand.Execute();
+        }
 
-                var bindableCounterSlider = (BindableCounterSlider) visualElement;
-                bindableCounterSlider.IncrementCommand = _incrementCommandAttribute.GetValueFromBag(bag, context);
-                bindableCounterSlider.DecrementCommand = _decrementCommandAttribute.GetValueFromBag(bag, context);
-            }
+        private void OnDecrement(object sender, EventArgs e)
+        {
+            _decrementCommand.Execute();
         }
     }
 }

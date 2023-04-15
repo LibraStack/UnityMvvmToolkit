@@ -38,11 +38,14 @@ namespace UIElements
             set => SetValue(value);
         }
 
-        public event EventHandler<bool> Switch;
-
         public void SetValueWithoutNotify(bool value)
         {
             SetValue(value, false);
+        }
+
+        protected virtual void OnControlValueChanged(bool value)
+        {
+            throw new NotImplementedException();
         }
 
         private void CreateLabelContainer(string containerName, string labelText, string labelClassNameModifier)
@@ -105,7 +108,7 @@ namespace UIElements
 
             if (notify)
             {
-                Switch?.Invoke(this, value);
+                OnControlValueChanged(value);
             }
         }
 

@@ -4,10 +4,10 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace ViewModels
 {
-    public class CounterViewModel : ViewModel
+    public class CounterViewModel : IBindingContext
     {
-        private int _count;
-        private ThemeMode _themeMode;
+        private readonly IProperty<int> _count = new ObservableProperty<int>();
+        private readonly IProperty<ThemeMode> _themeMode = new ObservableProperty<ThemeMode>();
 
         public CounterViewModel()
         {
@@ -17,14 +17,14 @@ namespace ViewModels
 
         public int Count
         {
-            get => _count;
-            set => Set(ref _count, value);
+            get => _count.Value;
+            set => _count.Value = value;
         }
 
         public ThemeMode ThemeMode
         {
-            get => _themeMode;
-            set => Set(ref _themeMode, value);
+            get => _themeMode.Value;
+            set => _themeMode.Value = value;
         }
 
         public ICommand IncrementCommand { get; }

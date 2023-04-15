@@ -13,7 +13,7 @@ namespace UIElements
             _themeService = themeService;
         }
 
-        public void SetThemeMode(ThemeMode themeMode)
+        protected void SetThemeMode(ThemeMode themeMode)
         {
             _themeService?.SetThemeMode(themeMode);
         }
