@@ -1,21 +1,21 @@
 ﻿using System;
 
-namespace UnityMvvmToolkit.Core.Internal.Structs
+namespace UnityMvvmToolkit.Core
 {
-    internal ref struct PropertyData
+    public class PropertyBindingData
     {
-        public ReadOnlyMemory<char> PropertyName { get; set; }
-        public ReadOnlyMemory<char> ConverterName { get; set; }
+        public string PropertyName { get; set; }
+        public string ConverterName { get; set; }
 
         public void SetValueByIndex(int index, ReadOnlyMemory<char> value)
         {
             switch (index)
             {
                 case 0:
-                    PropertyName = value;
+                    PropertyName = value.ToString();
                     break;
                 case 1:
-                    ConverterName = value;
+                    ConverterName = value.ToString();
                     break;
                 default: throw new IndexOutOfRangeException(nameof(index));
             }

@@ -6,7 +6,7 @@ namespace UnityMvvmToolkit.UnitTests;
 public class PropertyStringParserTests
 {
     [Theory]
-    [InlineData("Count", "Count", "")]
+    [InlineData("Count", "Count", null)]
     [InlineData("Count, IntToStrConverter", "Count", "IntToStrConverter")]
     [InlineData("Count, Converter={IntToStrConverter}", "Count", "IntToStrConverter")]
     public void GetPropertyData_ShouldParseString_WhenParametersAreValid(string propertyStringData, string propertyName,
@@ -14,16 +14,16 @@ public class PropertyStringParserTests
     {
         // Arrange
         var propertyParser = new PropertyStringParser();
-        
+
         // Act
         var result = propertyParser.GetPropertyData(propertyStringData.AsMemory());
 
         // Assert
-        result.PropertyName.IsEmpty.Should().Be(string.IsNullOrEmpty(propertyName));
-        result.ConverterName.IsEmpty.Should().Be(string.IsNullOrEmpty(converterName));
-        
-        result.PropertyName.ToString().Should().Be(propertyName);
-        result.ConverterName.ToString().Should().Be(converterName);
+        string.IsNullOrEmpty(result.PropertyName).Should().Be(string.IsNullOrEmpty(propertyName));
+        string.IsNullOrEmpty(result.ConverterName).Should().Be(string.IsNullOrEmpty(converterName));
+
+        result.PropertyName.Should().Be(propertyName);
+        result.ConverterName.Should().Be(converterName);
     }
 
     [Theory]

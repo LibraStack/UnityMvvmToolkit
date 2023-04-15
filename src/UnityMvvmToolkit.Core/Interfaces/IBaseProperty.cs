@@ -1,6 +1,6 @@
 ﻿namespace UnityMvvmToolkit.Core.Interfaces
 {
-    public interface IBindableUIElement
+    public interface IBaseProperty
     {
     }
 }

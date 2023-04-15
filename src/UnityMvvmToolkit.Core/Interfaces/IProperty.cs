@@ -1,7 +1,14 @@
-﻿namespace UnityMvvmToolkit.Core.Interfaces
+﻿using System.Runtime.CompilerServices;
+
+namespace UnityMvvmToolkit.Core.Interfaces
 {
-    public interface IProperty<TValueType>
+    public interface IProperty<TType> : IReadOnlyProperty<TType>
     {
-        TValueType Value { get; set; }
+        new TType Value { get; set; }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        bool TrySetValue(TType value);
+
+        internal void ForceSetValue(TType value);
     }
 }

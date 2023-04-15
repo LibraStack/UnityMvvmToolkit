@@ -6,8 +6,8 @@ namespace UnityMvvmToolkit.UnitTests;
 public class CommandStringParserTests
 {
     [Theory]
-    [InlineData("ClickCommand", "ClickCommand", "", "")]
-    [InlineData("ClickCommand, 55", "ClickCommand", "55", "")]
+    [InlineData("ClickCommand", "ClickCommand", null, null)]
+    [InlineData("ClickCommand, 55", "ClickCommand", "55", null)]
     [InlineData("ClickCommand, 55, ParameterToIntConverter", "ClickCommand", "55", "ParameterToIntConverter")]
     [InlineData("ClickCommand, Parameter={55}, Converter={ParameterConverter}", "ClickCommand", "55", "ParameterConverter")]
     [InlineData("ClickCommand, Converter={ParameterConverter}, Parameter={55}", "ClickCommand", "55", "ParameterConverter")]
@@ -18,15 +18,15 @@ public class CommandStringParserTests
         var commandParser = new CommandStringParser();
 
         // Act
-        var result = commandParser.GetCommandData(propertyStringData.AsMemory());
+        var result = commandParser.GetCommandData(0, propertyStringData.AsMemory());
 
         // Assert
-        result.PropertyName.IsEmpty.Should().Be(string.IsNullOrEmpty(propertyName));
-        result.ParameterValue.IsEmpty.Should().Be(string.IsNullOrEmpty(parameterValue));
-        result.ParameterConverterName.IsEmpty.Should().Be(string.IsNullOrEmpty(parameterConverterName));
-        
-        result.PropertyName.ToString().Should().Be(propertyName);
-        result.ParameterValue.ToString().Should().Be(parameterValue);
-        result.ParameterConverterName.ToString().Should().Be(parameterConverterName);
+        string.IsNullOrEmpty(result.PropertyName).Should().Be(string.IsNullOrEmpty(propertyName));
+        string.IsNullOrEmpty(result.ParameterValue).Should().Be(string.IsNullOrEmpty(parameterValue));
+        string.IsNullOrEmpty(result.ParameterConverterName).Should().Be(string.IsNullOrEmpty(parameterConverterName));
+
+        result.PropertyName.Should().Be(propertyName);
+        result.ParameterValue.Should().Be(parameterValue);
+        result.ParameterConverterName.Should().Be(parameterConverterName);
     }
 }

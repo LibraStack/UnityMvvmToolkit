@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityMvvmToolkit.Core.Internal.Structs;
 
 namespace UnityMvvmToolkit.Core.Internal.StringParsers
 {
@@ -8,34 +7,34 @@ namespace UnityMvvmToolkit.Core.Internal.StringParsers
         private const string ParameterOpen = "Parameter={";
         private const string ConverterOpen = "Converter={";
 
-        public CommandData GetCommandData(ReadOnlyMemory<char> commandStringData)
+        public CommandBindingData GetCommandData(int elementId, ReadOnlyMemory<char> commandBindingPath)
         {
-            var commandData = new CommandData();
-            var isShortFormat = IsShortFormat(commandStringData);
+            var commandData = new CommandBindingData(elementId);
+            var isShortFormat = IsShortFormat(commandBindingPath);
 
-            foreach (var line in Split(commandStringData))
+            foreach (var line in Split(commandBindingPath))
             {
                 AssureLineIsNotEmpty(line.Data);
 
                 if (isShortFormat)
                 {
-                    commandData.SetValueByIndex(line.Index, commandStringData.Slice(line.Start, line.Length));
+                    commandData.SetValueByIndex(line.Index, commandBindingPath.Slice(line.Start, line.Length));
                     continue;
                 }
 
-                if (IsBindingOption(ParameterOpen, line, commandStringData, out var parameterValue))
+                if (IsBindingOption(ParameterOpen, line, commandBindingPath, out var parameterValue))
                 {
-                    commandData.ParameterValue = parameterValue;
+                    commandData.ParameterValue = parameterValue.ToString();
                     continue;
                 }
 
-                if (IsBindingOption(ConverterOpen, line, commandStringData, out var converterName))
+                if (IsBindingOption(ConverterOpen, line, commandBindingPath, out var converterName))
                 {
-                    commandData.ParameterConverterName = converterName;
+                    commandData.ParameterConverterName = converterName.ToString();
                     continue;
                 }
 
-                commandData.PropertyName = commandStringData.Slice(line.Start, line.Length);
+                commandData.PropertyName = commandBindingPath.Slice(line.Start, line.Length).ToString();
             }
 
             return commandData;

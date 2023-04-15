@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Extensions;
 
 namespace UnityMvvmToolkit.Core.Converters.ParameterValueConverters
@@ -7,9 +6,9 @@ namespace UnityMvvmToolkit.Core.Converters.ParameterValueConverters
     public class ParameterToFloatConverter : ParameterValueConverter<float>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override float Convert(ReadOnlyMemory<char> parameter)
+        public override float Convert(string parameter)
         {
-            parameter.Span.TryParse(out var result);
+            parameter.TryParse(out var result);
             return result;
         }
     }

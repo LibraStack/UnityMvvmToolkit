@@ -12,7 +12,7 @@ public class LineSplitEnumeratorTests
         // Arrange
         var index = 0;
         var lineEnumerator = new LineSplitEnumerator(str, separator, true);
-        
+
         // Act
         foreach (var line in lineEnumerator)
         {

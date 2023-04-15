@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
@@ -20,7 +19,7 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWra
             _parameters = new Dictionary<int, TCommandValueType>();
         }
 
-        public void SetParameter(int elementId, ReadOnlyMemory<char> parameter)
+        public void SetParameter(int elementId, string parameter)
         {
             _parameters.Add(elementId, _parameterConverter.Convert(parameter));
         }

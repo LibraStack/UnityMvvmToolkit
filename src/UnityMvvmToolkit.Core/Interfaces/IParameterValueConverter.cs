@@ -11,6 +11,6 @@ namespace UnityMvvmToolkit.Core.Interfaces
     public interface IParameterValueConverter<out TTargetType> : IParameterValueConverter
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        TTargetType Convert(ReadOnlyMemory<char> parameter);
+        TTargetType Convert(string parameter);
     }
 }
