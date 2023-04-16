@@ -47,6 +47,13 @@ namespace UnityMvvmToolkit.Core
             return this;
         }
 
+        public IObjectProvider WarmupPropertyValueConverter<T>(int capacity) where T : IPropertyValueConverter
+        {
+            _propertyProvider.WarmupPropertyValueConverter<T>(capacity);
+
+            return this;
+        }
+
         public IProperty<TValueType> RentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData)
         {
             return _propertyProvider.GetProperty<TValueType>(context, bindingData);

@@ -8,6 +8,8 @@ namespace UnityMvvmToolkit.Core.Interfaces
         IObjectProvider WarmupViewModel<TBindingContext>() where TBindingContext : IBindingContext;
         IObjectProvider WarmupViewModel(Type bindingContextType);
 
+        IObjectProvider WarmupPropertyValueConverter<T>(int capacity) where T : IPropertyValueConverter;
+
         IProperty<TValueType> RentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData);
         void ReturnProperty<TValueType>(IProperty<TValueType> property);
 

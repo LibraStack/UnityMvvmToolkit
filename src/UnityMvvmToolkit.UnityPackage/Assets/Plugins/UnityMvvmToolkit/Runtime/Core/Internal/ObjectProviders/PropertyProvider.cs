@@ -42,6 +42,42 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
             }
         }
 
+        public void WarmupPropertyValueConverter<T>(int capacity) where T : IPropertyValueConverter
+        {
+            var converter = GetPropertyValueConverterByType(typeof(T));
+
+            if (converter == default)
+            {
+                throw new NullReferenceException($"Converter '{typeof(T)}' not found.");
+            }
+
+            var propertyWrapperHashCode = IPropertyWrapper
+                .GenerateHashCode(converter.TargetType, converter.SourceType);
+
+            if (_propertiesWithConverter.ContainsKey(propertyWrapperHashCode))
+            {
+                throw new InvalidOperationException(
+                    "Warm up the value converters only during the initialization phase.");
+            }
+
+            var itemsQueue = new Queue<IPropertyWrapper>();
+
+            var args = new object[]
+            {
+                GetPropertyValueConverter(converter.TargetType, converter.SourceType, null)
+            };
+
+            var genericPropertyType =
+                typeof(PropertyWithConverter<,>).MakeGenericType(converter.TargetType, converter.SourceType);
+
+            for (var i = 0; i < capacity; i++)
+            {
+                itemsQueue.Enqueue((IPropertyWrapper) Activator.CreateInstance(genericPropertyType, args));
+            }
+
+            _propertiesWithConverter.Add(propertyWrapperHashCode, itemsQueue);
+        }
+
         public IProperty<TValueType> GetProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData)
         {
             return GetProperty<IProperty<TValueType>, TValueType>(context, bindingData);
@@ -130,7 +166,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 
             var args = new object[]
             {
-                GetValueConverter<TValueType>(memberValueType, bindingData.ConverterName)
+                GetPropertyValueConverter(typeof(TValueType), memberValueType, bindingData.ConverterName)
             };
 
             var genericPropertyType =
@@ -171,11 +207,25 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IPropertyValueConverter GetValueConverter<TValueType>(Type sourceType, string converterName)
+        private IPropertyValueConverter GetPropertyValueConverterByType(Type converterType)
+        {
+            foreach (var converter in _propertyValueConverters)
+            {
+                if (converter.GetType() == converterType)
+                {
+                    return converter;
+                }
+            }
+
+            return default;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IPropertyValueConverter GetPropertyValueConverter(Type targetType, Type sourceType, string converterName)
         {
             var valueConverter = string.IsNullOrEmpty(converterName)
-                ? GetConverter(sourceType, typeof(TValueType))
-                : GetConverter(sourceType, typeof(TValueType), converterName);
+                ? GetPropertyConverter(sourceType, targetType)
+                : GetPropertyConverter(sourceType, targetType, converterName);
 
             if (valueConverter != null)
             {
@@ -184,14 +234,14 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 
             if (string.IsNullOrEmpty(converterName))
             {
-                throw new NullReferenceException($"Converter is missing: From {sourceType} To {typeof(TValueType)}");
+                throw new NullReferenceException($"Converter is missing: From {sourceType} To {targetType}");
             }
 
             throw new NullReferenceException($"Converter '{converterName}' not found.");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IPropertyValueConverter GetConverter(Type sourceType, Type targetType)
+        private IPropertyValueConverter GetPropertyConverter(Type sourceType, Type targetType)
         {
             foreach (var converter in _propertyValueConverters)
             {
@@ -205,7 +255,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private IPropertyValueConverter GetConverter(Type sourceType, Type targetType, string converterName)
+        private IPropertyValueConverter GetPropertyConverter(Type sourceType, Type targetType, string converterName)
         {
             foreach (var converter in _propertyValueConverters)
             {
