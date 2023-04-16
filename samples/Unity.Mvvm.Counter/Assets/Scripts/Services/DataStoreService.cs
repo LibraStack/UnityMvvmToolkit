@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Enums;
+﻿using Enums;
 using Interfaces;
 using Interfaces.Services;
 using UnityEngine;
@@ -20,34 +19,32 @@ namespace Services
         {
             LoadData();
 
-            // _counterViewModel.PropertyChanged += OnCounterViewModelPropertyChanged;
+            _counterViewModel.Count.ValueChanged += OnCountValueChanged;
+            _counterViewModel.ThemeMode.ValueChanged += OnThemeModeValueChanged;
         }
 
         public void Disable()
         {
-            // _counterViewModel.PropertyChanged -= OnCounterViewModelPropertyChanged;
+            _counterViewModel.Count.ValueChanged += OnCountValueChanged;
+            _counterViewModel.ThemeMode.ValueChanged += OnThemeModeValueChanged;
         }
 
-        private void OnCounterViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnCountValueChanged(object sender, int newValue)
         {
-            switch (e.PropertyName)
-            {
-                case nameof(_counterViewModel.Count):
-                    PlayerPrefs.SetInt(e.PropertyName, _counterViewModel.Count);
-                    break;
+            PlayerPrefs.SetInt(nameof(_counterViewModel.Count), newValue);
+            PlayerPrefs.Save();
+        }
 
-                case nameof(_counterViewModel.ThemeMode):
-                    PlayerPrefs.SetInt(e.PropertyName, (int) _counterViewModel.ThemeMode);
-                    break;
-            }
-
+        private void OnThemeModeValueChanged(object sender, ThemeMode newValue)
+        {
+            PlayerPrefs.SetInt(nameof(_counterViewModel.ThemeMode), (int) newValue);
             PlayerPrefs.Save();
         }
 
         private void LoadData()
         {
-            _counterViewModel.Count = PlayerPrefs.GetInt(nameof(_counterViewModel.Count));
-            _counterViewModel.ThemeMode = (ThemeMode) PlayerPrefs.GetInt(nameof(_counterViewModel.ThemeMode));
+            _counterViewModel.Count.Value = PlayerPrefs.GetInt(nameof(_counterViewModel.Count));
+            _counterViewModel.ThemeMode.Value = (ThemeMode) PlayerPrefs.GetInt(nameof(_counterViewModel.ThemeMode));
         }
     }
 }

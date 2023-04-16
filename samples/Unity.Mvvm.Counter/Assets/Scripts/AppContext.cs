@@ -4,6 +4,7 @@ using Interfaces;
 using Interfaces.Services;
 using Services;
 using UnityEngine;
+using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
 using UnityMvvmToolkit.Core.Interfaces;
 using ValueConverters;
@@ -22,7 +23,7 @@ public class AppContext : MonoBehaviour, IAppContext
         RegisterInstance<IThemeService>(_themeService);
         RegisterInstance(new CounterViewModel());
         RegisterInstance<IDataStoreService>(new DataStoreService(this));
-        RegisterInstance(GetValueConverters());
+        RegisterInstance(GetObjectProvider());
     }
 
     public T Resolve<T>()
@@ -33,6 +34,11 @@ public class AppContext : MonoBehaviour, IAppContext
     private void RegisterInstance<T>(T instance)
     {
         _registeredTypes.Add(typeof(T), instance);
+    }
+
+    private IObjectProvider GetObjectProvider()
+    {
+        return new BindingContextObjectProvider(GetValueConverters()).WarmupViewModel<CounterViewModel>();
     }
 
     private IValueConverter[] GetValueConverters()

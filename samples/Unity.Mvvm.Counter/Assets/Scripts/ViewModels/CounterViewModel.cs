@@ -6,31 +6,22 @@ namespace ViewModels
 {
     public class CounterViewModel : IBindingContext
     {
-        private readonly IProperty<int> _count = new ObservableProperty<int>();
-        private readonly IProperty<ThemeMode> _themeMode = new ObservableProperty<ThemeMode>();
-
         public CounterViewModel()
         {
+            Count = new ObservableProperty<int>();
+            ThemeMode = new ObservableProperty<ThemeMode>();
+
             IncrementCommand = new Command(IncrementCount);
             DecrementCommand = new Command(DecrementCount);
         }
 
-        public int Count
-        {
-            get => _count.Value;
-            set => _count.Value = value;
-        }
-
-        public ThemeMode ThemeMode
-        {
-            get => _themeMode.Value;
-            set => _themeMode.Value = value;
-        }
+        public IProperty<int> Count { get; }
+        public IProperty<ThemeMode> ThemeMode { get; }
 
         public ICommand IncrementCommand { get; }
         public ICommand DecrementCommand { get; }
 
-        private void IncrementCount() => Count++;
-        private void DecrementCount() => Count--;
+        private void IncrementCount() => Count.Value++;
+        private void DecrementCount() => Count.Value--;
     }
 }
