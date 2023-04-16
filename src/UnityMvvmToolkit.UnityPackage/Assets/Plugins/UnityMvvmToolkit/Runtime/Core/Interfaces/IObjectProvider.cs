@@ -4,9 +4,9 @@ namespace UnityMvvmToolkit.Core.Interfaces
 {
     public interface IObjectProvider
     {
-        void WarmupAssemblyViewModels();
-        void WarmupViewModel<TBindingContext>() where TBindingContext : IBindingContext;
-        void WarmupViewModel(Type bindingContextType);
+        IObjectProvider WarmupAssemblyViewModels();
+        IObjectProvider WarmupViewModel<TBindingContext>() where TBindingContext : IBindingContext;
+        IObjectProvider WarmupViewModel(Type bindingContextType);
 
         IProperty<TValueType> RentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData);
         void ReturnProperty<TValueType>(IProperty<TValueType> property);

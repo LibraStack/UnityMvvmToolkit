@@ -9,6 +9,7 @@ using UnityMvvmToolkit.Core.Internal.Helpers;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 {
+    [Obsolete]
     internal class CommandProvider
     {
         /// <summary>

@@ -10,18 +10,16 @@ namespace UnityMvvmToolkit.Core
 {
     public class BindingContextObjectProvider : IObjectProvider
     {
-        private readonly CommandProvider _commandProvider;
         private readonly PropertyProvider _propertyProvider;
 
         public BindingContextObjectProvider(IValueConverter[] converters)
         {
-            _commandProvider = new CommandProvider();
-            _propertyProvider = new PropertyProvider();
+            _propertyProvider = new PropertyProvider(new BindingContextMembersProvider());
 
             RegisterValueConverters(converters);
         }
 
-        public void WarmupAssemblyViewModels()
+        public IObjectProvider WarmupAssemblyViewModels()
         {
             var assemblyTypes = Assembly
                 .GetExecutingAssembly()
@@ -33,25 +31,25 @@ namespace UnityMvvmToolkit.Core
             {
                 WarmupViewModel(type);
             }
+
+            return this;
         }
 
-        public void WarmupViewModel<TBindingContext>() where TBindingContext : IBindingContext
+        public IObjectProvider WarmupViewModel<TBindingContext>() where TBindingContext : IBindingContext
         {
-            WarmupViewModel(typeof(TBindingContext));
+            return WarmupViewModel(typeof(TBindingContext));
         }
 
-        public void WarmupViewModel(Type bindingContextType)
+        public IObjectProvider WarmupViewModel(Type bindingContextType)
         {
-            var properties = bindingContextType
-                .GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            _propertyProvider.WarmupBindingContext(bindingContextType);
 
-            _commandProvider.WarmupBindingContext(bindingContextType, properties);
-            _propertyProvider.WarmupBindingContext(bindingContextType, properties);
+            return this;
         }
 
         public IProperty<TValueType> RentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData)
         {
-            return _propertyProvider.GetProperty<TValueType>(bindingData, context);
+            return _propertyProvider.GetProperty<TValueType>(context, bindingData);
         }
 
         public void ReturnProperty<TValueType>(IProperty<TValueType> property)
@@ -65,7 +63,7 @@ namespace UnityMvvmToolkit.Core
         public IReadOnlyProperty<TValueType> RentReadOnlyProperty<TValueType>(IBindingContext context,
             PropertyBindingData bindingData)
         {
-            return _propertyProvider.GetReadOnlyProperty<TValueType>(bindingData, context);
+            return _propertyProvider.GetReadOnlyProperty<TValueType>(context, bindingData);
         }
 
         public void ReturnReadOnlyProperty<TValueType>(IReadOnlyProperty<TValueType> property)
@@ -79,19 +77,19 @@ namespace UnityMvvmToolkit.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TCommand GetCommand<TCommand>(IBindingContext context, string propertyName) where TCommand : IBaseCommand
         {
-            return _commandProvider.GetCommand<TCommand>(context, propertyName);
+            return _propertyProvider.GetCommand<TCommand>(context, propertyName);
         }
 
         public ICommandWrapper GetCommandWrapper(IBindingContext context, CommandBindingData bindingData)
         {
-            var commandWrapper = _commandProvider.GetCommandWrapper(context, bindingData);
+            // var commandWrapper = _commandProvider.GetCommandWrapper(context, bindingData);
+            //
+            // if (commandWrapper is ICommandWrapperWithParameter commandWrapperWithParameter)
+            // {
+            //     commandWrapperWithParameter.SetParameter(bindingData.ElementId, bindingData.ParameterValue);
+            // }
 
-            if (commandWrapper is ICommandWrapperWithParameter commandWrapperWithParameter)
-            {
-                commandWrapperWithParameter.SetParameter(bindingData.ElementId, bindingData.ParameterValue);
-            }
-
-            return commandWrapper;
+            return default;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -104,9 +102,9 @@ namespace UnityMvvmToolkit.Core
                     case IPropertyValueConverter propertyValueConverter:
                         _propertyProvider.RegisterValueConverter(propertyValueConverter);
                         continue;
-                    case IParameterValueConverter parameterValueConverter:
-                        _commandProvider.RegisterValueConverter(parameterValueConverter);
-                        break;
+                    // case IParameterValueConverter parameterValueConverter:
+                    //     _commandProvider.RegisterValueConverter(parameterValueConverter);
+                    //     break;
                 }
             }
         }

@@ -1,9 +1,19 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace UnityMvvmToolkit.Core.Internal.Helpers
 {
     internal static class HashCodeHelper
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int GetMemberHashCode(Type contextType, string memberName)
+        {
+            var contextTypeHash = contextType.GetHashCode();
+            var memberNameHash = StringComparer.OrdinalIgnoreCase.GetHashCode(memberName);
+
+            return CombineHashCode(contextTypeHash, memberNameHash);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int CombineHashCode(int hash1, int hash2)
         {
