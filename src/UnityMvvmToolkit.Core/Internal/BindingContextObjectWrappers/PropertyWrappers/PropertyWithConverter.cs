@@ -8,7 +8,6 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.PropertyWr
 {
     internal class PropertyWithConverter<TValueType, TSourceType> : IProperty<TValueType>, IPropertyWrapper
     {
-        private readonly int _hashCode;
         private readonly IPropertyValueConverter<TSourceType, TValueType> _valueConverter;
 
         private TValueType _value;
@@ -17,8 +16,15 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.PropertyWr
 
         public PropertyWithConverter(IPropertyValueConverter<TSourceType, TValueType> valueConverter)
         {
-            _hashCode = IPropertyWrapper.GenerateHashCode(typeof(TValueType), typeof(TSourceType));
             _valueConverter = valueConverter;
+        }
+
+        public int ConverterId { get; private set; }
+
+        public IPropertyWrapper SetConverterId(int converterId)
+        {
+            ConverterId = converterId;
+            return this;
         }
 
         public IPropertyWrapper SetProperty(object property)
@@ -69,11 +75,6 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.PropertyWr
             _property.ForceSetValue(_sourceValue);
 
             return true;
-        }
-
-        public override int GetHashCode()
-        {
-            return _hashCode;
         }
 
         private void OnPropertyValueChanged(object sender, TSourceType sourceValue)

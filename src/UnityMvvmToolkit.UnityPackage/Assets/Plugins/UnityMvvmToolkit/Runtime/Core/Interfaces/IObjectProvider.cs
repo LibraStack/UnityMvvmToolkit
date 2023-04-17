@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityMvvmToolkit.Core.Enums;
 
 namespace UnityMvvmToolkit.Core.Interfaces
 {
@@ -8,13 +9,15 @@ namespace UnityMvvmToolkit.Core.Interfaces
         IObjectProvider WarmupViewModel<TBindingContext>() where TBindingContext : IBindingContext;
         IObjectProvider WarmupViewModel(Type bindingContextType);
 
-        IObjectProvider WarmupPropertyValueConverter<T>(int capacity) where T : IPropertyValueConverter;
+        IObjectProvider WarmupValueConverter<T>(int capacity, WarmupType warmupType = WarmupType.OnlyByType)
+            where T : IValueConverter;
 
         IProperty<TValueType> RentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData);
         void ReturnProperty<TValueType>(IProperty<TValueType> property);
 
         IReadOnlyProperty<TValueType> RentReadOnlyProperty<TValueType>(IBindingContext context,
             PropertyBindingData bindingData);
+
         void ReturnReadOnlyProperty<TValueType>(IReadOnlyProperty<TValueType> property);
 
         TCommand GetCommand<TCommand>(IBindingContext context, string propertyName) where TCommand : IBaseCommand;

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using UnityMvvmToolkit.Core.Enums;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
 using UnityMvvmToolkit.Core.Internal.ObjectProviders;
@@ -14,9 +15,7 @@ namespace UnityMvvmToolkit.Core
 
         public BindingContextObjectProvider(IValueConverter[] converters)
         {
-            _propertyProvider = new PropertyProvider(new BindingContextMembersProvider());
-
-            RegisterValueConverters(converters);
+            _propertyProvider = new PropertyProvider(new BindingContextMembersProvider(), converters);
         }
 
         public IObjectProvider WarmupAssemblyViewModels()
@@ -47,9 +46,10 @@ namespace UnityMvvmToolkit.Core
             return this;
         }
 
-        public IObjectProvider WarmupPropertyValueConverter<T>(int capacity) where T : IPropertyValueConverter
+        public IObjectProvider WarmupValueConverter<T>(int capacity, WarmupType warmupType = WarmupType.OnlyByType)
+            where T : IValueConverter
         {
-            _propertyProvider.WarmupPropertyValueConverter<T>(capacity);
+            _propertyProvider.WarmupValueConverter<T>(capacity, warmupType);
 
             return this;
         }
@@ -97,23 +97,6 @@ namespace UnityMvvmToolkit.Core
             // }
 
             return default;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void RegisterValueConverters(IValueConverter[] converters)
-        {
-            foreach (var converter in converters)
-            {
-                switch (converter)
-                {
-                    case IPropertyValueConverter propertyValueConverter:
-                        _propertyProvider.RegisterValueConverter(propertyValueConverter);
-                        continue;
-                    // case IParameterValueConverter parameterValueConverter:
-                    //     _commandProvider.RegisterValueConverter(parameterValueConverter);
-                    //     break;
-                }
-            }
         }
     }
 }

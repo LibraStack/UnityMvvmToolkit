@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.Helpers
 {
@@ -12,6 +13,72 @@ namespace UnityMvvmToolkit.Core.Internal.Helpers
             var memberNameHash = StringComparer.OrdinalIgnoreCase.GetHashCode(memberName);
 
             return CombineHashCode(contextTypeHash, memberNameHash);
+        }
+
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // public static int GetValueConverterHashCode(IValueConverter converter, string converterName = null)
+        // {
+        //     return converter switch
+        //     {
+        //         IPropertyValueConverter propertyConverter =>
+        //             GetPropertyConverterHashCode(propertyConverter, converterName),
+        //         IParameterValueConverter parameterConverter =>
+        //             GetParameterConverterHashCode(parameterConverter, converterName),
+        //         _ => throw new ArgumentOutOfRangeException()
+        //     };
+        // }
+
+        /// <summary>
+        /// <para><c>If name is null:</c></para>
+        /// <b>TargetTypeHash + SourceTypeHash</b>
+        /// <para><c>Else:</c></para>
+        /// <b>NameHash + TargetTypeHash + SourceTypeHash</b>
+        /// </summary>
+        /// <param name="converter">Converter.</param>
+        /// <param name="converterName">Converter name.</param>
+        /// <returns>Hash code.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int GetPropertyConverterHashCode(IPropertyValueConverter converter, string converterName = null)
+        {
+            var targetTypeHash = converter.TargetType.GetHashCode();
+            var sourceTypeHash = converter.SourceType.GetHashCode();
+
+            return string.IsNullOrEmpty(converterName)
+                ? CombineHashCode(targetTypeHash, sourceTypeHash)
+                : CombineHashCode(converterName.GetHashCode(), targetTypeHash, sourceTypeHash);
+        }
+
+        /// <summary>
+        /// <para><c>If name is null:</c></para>
+        /// <b>TargetTypeHash</b>
+        /// <para><c>Else:</c></para>
+        /// <b>NameHash + TargetTypeHash</b>
+        /// </summary>
+        /// <param name="converter">Converter.</param>
+        /// <param name="converterName">Converter name.</param>
+        /// <returns>Hash code.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int GetParameterConverterHashCode(IParameterValueConverter converter, string converterName = null)
+        {
+            var targetTypeHash = converter.TargetType.GetHashCode();
+
+            return string.IsNullOrEmpty(converterName)
+                ? targetTypeHash
+                : CombineHashCode(converterName.GetHashCode(), targetTypeHash);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int GetPropertyWrapperConverterId(IPropertyValueConverter converter, string converterName = null)
+        {
+            return GetPropertyConverterHashCode(converter, converterName);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int GetPropertyWrapperConverterId(Type targetType, Type sourceType, string converterName = null)
+        {
+            return string.IsNullOrEmpty(converterName)
+                ? CombineHashCode(targetType.GetHashCode(), sourceType.GetHashCode())
+                : CombineHashCode(converterName.GetHashCode(), targetType.GetHashCode(), sourceType.GetHashCode());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
