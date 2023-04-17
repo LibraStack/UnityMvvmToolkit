@@ -7,12 +7,12 @@ namespace UnityMvvmToolkit.UniTask.Internal
     using System.Threading;
     using Cysharp.Threading.Tasks;
 
-    internal class AsyncCommandWithCancellation : BaseAsyncCommand, IAsyncCommand
+    internal class AsyncCommandWithCancellation<T> : BaseAsyncCommand, IAsyncCommand<T>
     {
-        private readonly IAsyncCommand _asyncCommand;
+        private readonly IAsyncCommand<T> _asyncCommand;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public AsyncCommandWithCancellation(IAsyncCommand asyncCommand) : base(null)
+        public AsyncCommandWithCancellation(IAsyncCommand<T> asyncCommand) : base(null)
         {
             _asyncCommand = asyncCommand;
         }
@@ -29,19 +29,19 @@ namespace UnityMvvmToolkit.UniTask.Internal
             remove => _asyncCommand.CanExecuteChanged -= value;
         }
 
-        public void Execute()
+        public void Execute(T parameter)
         {
-            ExecuteAsync().Forget();
+            ExecuteAsync(parameter).Forget();
         }
 
-        public async UniTask ExecuteAsync(CancellationToken cancellationToken = default)
+        public async UniTask ExecuteAsync(T parameter, CancellationToken cancellationToken = default)
         {
             _cancellationTokenSource?.Cancel();
             _cancellationTokenSource = new CancellationTokenSource();
 
             try
             {
-                await _asyncCommand.ExecuteAsync(_cancellationTokenSource.Token);
+                await _asyncCommand.ExecuteAsync(parameter, _cancellationTokenSource.Token);
             }
             finally
             {

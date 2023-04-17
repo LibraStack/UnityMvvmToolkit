@@ -7,28 +7,28 @@ namespace UnityMvvmToolkit.UniTask
     using System.Threading;
     using Cysharp.Threading.Tasks;
 
-    public class AsyncLazyCommand : BaseAsyncLazyCommand, IAsyncCommand
+    public class AsyncLazyCommand<T> : BaseAsyncLazyCommand, IAsyncCommand<T>
     {
-        private readonly Func<CancellationToken, UniTask> _action;
+        private readonly Func<T, CancellationToken, UniTask> _action;
 
-        public AsyncLazyCommand(Func<CancellationToken, UniTask> action, Func<bool> canExecute = null)
+        public AsyncLazyCommand(Func<T, CancellationToken, UniTask> action, Func<bool> canExecute = null)
             : base(canExecute)
         {
             _action = action;
         }
 
-        public void Execute()
+        public void Execute(T parameter)
         {
-            ExecuteAsync().Forget();
+            ExecuteAsync(parameter).Forget();
         }
 
-        public async UniTask ExecuteAsync(CancellationToken cancellationToken = default)
+        public async UniTask ExecuteAsync(T parameter, CancellationToken cancellationToken = default)
         {
             try
             {
                 if (IsRunning == false)
                 {
-                    ExecutionTask = _action.Invoke(cancellationToken).ToAsyncLazy();
+                    ExecutionTask = _action.Invoke(parameter, cancellationToken).ToAsyncLazy();
                 }
 
                 await ExecutionTask;

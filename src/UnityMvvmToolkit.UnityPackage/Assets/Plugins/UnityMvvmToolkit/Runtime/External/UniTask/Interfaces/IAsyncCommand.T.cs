@@ -6,9 +6,9 @@ namespace UnityMvvmToolkit.UniTask.Interfaces
     using Cysharp.Threading.Tasks;
     using UnityMvvmToolkit.Core.Interfaces;
 
-    public interface IAsyncCommand : IBaseAsyncCommand, ICommand
+    public interface IAsyncCommand<in T> : IBaseAsyncCommand, ICommand<T>
     {
-        UniTask ExecuteAsync(CancellationToken cancellationToken = default);
+        UniTask ExecuteAsync(T parameter, CancellationToken cancellationToken = default);
     }
 }
 

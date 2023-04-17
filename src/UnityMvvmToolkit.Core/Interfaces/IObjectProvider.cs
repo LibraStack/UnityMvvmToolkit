@@ -22,7 +22,7 @@ namespace UnityMvvmToolkit.Core.Interfaces
 
         TCommand GetCommand<TCommand>(IBindingContext context, string propertyName) where TCommand : IBaseCommand;
 
-        // TODO: Rent?
-        ICommandWrapper GetCommandWrapper(IBindingContext context, CommandBindingData bindingData);
+        ICommandWrapper RentCommandWrapper(IBindingContext context, CommandBindingData bindingData);
+        void ReturnCommandWrapper(ICommandWrapper commandWrapper, CommandBindingData bindingData);
     }
 }

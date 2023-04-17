@@ -15,23 +15,27 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         private readonly BindingContextMembersProvider _membersProvider;
 
         private readonly Dictionary<int, MemberInfo> _memberInfos;
-        private readonly Dictionary<int, Queue<IPropertyWrapper>> _propertyWrapperByConverter;
 
         private readonly HashSet<int> _initializedBindingContexts;
 
         private readonly IValueConverter[] _valueConverters;
         private readonly Dictionary<int, IValueConverter> _valueConvertersByHash;
+        
+        private readonly Dictionary<int, Queue<ICommandWrapper>> _commandWrapperByConverter;
+        private readonly Dictionary<int, Queue<IPropertyWrapper>> _propertyWrapperByConverter;
 
         internal PropertyProvider(BindingContextMembersProvider membersProvider, IValueConverter[] valueConverters)
         {
             _membersProvider = membersProvider;
             _memberInfos = new Dictionary<int, MemberInfo>();
-            _propertyWrapperByConverter = new Dictionary<int, Queue<IPropertyWrapper>>();
 
             _initializedBindingContexts = new HashSet<int>();
 
             _valueConverters = valueConverters;
             _valueConvertersByHash = new Dictionary<int, IValueConverter>();
+
+            _commandWrapperByConverter = new Dictionary<int, Queue<ICommandWrapper>>();
+            _propertyWrapperByConverter = new Dictionary<int, Queue<IPropertyWrapper>>();
 
             RegisterValueConverters(valueConverters);
         }
@@ -135,6 +139,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
             return GetProperty<IReadOnlyProperty<TValueType>, TValueType>(context, bindingData);
         }
 
+        public void ReturnProperty(IPropertyWrapper propertyWrapper)
+        {
+            propertyWrapper.Reset();
+            _propertyWrapperByConverter[propertyWrapper.ConverterId].Enqueue(propertyWrapper);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TCommand GetCommand<TCommand>(IBindingContext context, string propertyName) where TCommand : IBaseCommand
         {
@@ -164,10 +174,14 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
             return (TCommand) propertyInfo.GetValue(context);
         }
 
-        public void ReturnProperty(IPropertyWrapper propertyWrapper)
+        public ICommandWrapperWithParameter GetCommandWrapper(IBindingContext context, CommandBindingData bindingData)
         {
-            propertyWrapper.Reset();
-            _propertyWrapperByConverter[propertyWrapper.ConverterId].Enqueue(propertyWrapper);
+            throw new NotImplementedException();
+        }
+
+        public void ReturnCommandWrapper(ICommandWrapper commandWrapper)
+        {
+            throw new NotImplementedException();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

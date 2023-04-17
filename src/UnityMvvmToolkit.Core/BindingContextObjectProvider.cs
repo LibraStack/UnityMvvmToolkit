@@ -61,10 +61,7 @@ namespace UnityMvvmToolkit.Core
 
         public void ReturnProperty<TValueType>(IProperty<TValueType> property)
         {
-            if (property is IPropertyWrapper propertyWrapper)
-            {
-                _propertyProvider.ReturnProperty(propertyWrapper);
-            }
+            ReturnBaseProperty(property);
         }
 
         public IReadOnlyProperty<TValueType> RentReadOnlyProperty<TValueType>(IBindingContext context,
@@ -75,10 +72,7 @@ namespace UnityMvvmToolkit.Core
 
         public void ReturnReadOnlyProperty<TValueType>(IReadOnlyProperty<TValueType> property)
         {
-            if (property is IPropertyWrapper propertyWrapper)
-            {
-                _propertyProvider.ReturnProperty(propertyWrapper);
-            }
+            ReturnBaseProperty(property);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -87,16 +81,32 @@ namespace UnityMvvmToolkit.Core
             return _propertyProvider.GetCommand<TCommand>(context, propertyName);
         }
 
-        public ICommandWrapper GetCommandWrapper(IBindingContext context, CommandBindingData bindingData)
+        public ICommandWrapper RentCommandWrapper(IBindingContext context, CommandBindingData bindingData)
         {
-            // var commandWrapper = _commandProvider.GetCommandWrapper(context, bindingData);
-            //
-            // if (commandWrapper is ICommandWrapperWithParameter commandWrapperWithParameter)
-            // {
-            //     commandWrapperWithParameter.SetParameter(bindingData.ElementId, bindingData.ParameterValue);
-            // }
+            if (string.IsNullOrEmpty(bindingData.ParameterValue))
+            {
+                throw new InvalidOperationException(
+                    $"Command '{bindingData.PropertyName}' has no parameter. Use {nameof(GetCommand)} instead.");
+            }
 
-            return default;
+            return _propertyProvider
+                .GetCommandWrapper(context, bindingData)
+                .RegisterParameter(bindingData.ElementId, bindingData.ParameterValue);
+        }
+
+        public void ReturnCommandWrapper(ICommandWrapper commandWrapper, CommandBindingData bindingData)
+        {
+            _propertyProvider.ReturnCommandWrapper(
+                ((ICommandWrapperWithParameter) commandWrapper).UnregisterParameter(bindingData.ElementId));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ReturnBaseProperty(IBaseProperty property)
+        {
+            if (property is IPropertyWrapper propertyWrapper)
+            {
+                _propertyProvider.ReturnProperty(propertyWrapper);
+            }
         }
     }
 }

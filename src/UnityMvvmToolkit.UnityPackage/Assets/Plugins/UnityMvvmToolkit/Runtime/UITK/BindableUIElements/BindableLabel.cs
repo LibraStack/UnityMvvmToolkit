@@ -28,12 +28,16 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 return;
             }
 
-            objectProvider.ReturnReadOnlyProperty(_textProperty);
-
-            _textProperty.ValueChanged -= OnPropertyValueChanged;
-            _textProperty = null;
-
-            UpdateControlText(default);
+            try
+            {
+                objectProvider.ReturnReadOnlyProperty(_textProperty);
+                UpdateControlText(default);
+            }
+            finally
+            {
+                _textProperty.ValueChanged -= OnPropertyValueChanged;
+                _textProperty = null;
+            }
         }
 
         private void OnPropertyValueChanged(object sender, string newText)

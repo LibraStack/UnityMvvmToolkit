@@ -4,6 +4,7 @@ namespace UnityMvvmToolkit.Core.Internal.Interfaces
 {
     internal interface ICommandWrapperWithParameter : ICommandWrapper
     {
-        void SetParameter(int elementId, string parameter);
+        ICommandWrapper RegisterParameter(int elementId, string parameter);
+        ICommandWrapper UnregisterParameter(int elementId);
     }
 }

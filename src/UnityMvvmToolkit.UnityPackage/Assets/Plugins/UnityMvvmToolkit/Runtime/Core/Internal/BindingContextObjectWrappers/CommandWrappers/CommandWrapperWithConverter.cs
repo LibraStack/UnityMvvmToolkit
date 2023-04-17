@@ -9,6 +9,7 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWra
     {
         private readonly ICommand<TCommandValueType> _command;
         private readonly IParameterValueConverter<TCommandValueType> _parameterConverter;
+
         private readonly Dictionary<int, TCommandValueType> _parameters;
 
         public CommandWrapperWithConverter(ICommand<TCommandValueType> command,
@@ -16,12 +17,22 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.CommandWra
         {
             _command = command;
             _parameterConverter = parameterConverter;
+
             _parameters = new Dictionary<int, TCommandValueType>();
         }
 
-        public void SetParameter(int elementId, string parameter)
+        public ICommandWrapper RegisterParameter(int elementId, string parameter)
         {
             _parameters.Add(elementId, _parameterConverter.Convert(parameter));
+
+            return this;
+        }
+
+        public ICommandWrapper UnregisterParameter(int elementId)
+        {
+            _parameters.Remove(elementId);
+
+            return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
