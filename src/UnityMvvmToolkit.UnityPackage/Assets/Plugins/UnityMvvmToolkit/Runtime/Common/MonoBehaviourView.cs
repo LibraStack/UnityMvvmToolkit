@@ -30,22 +30,30 @@ namespace UnityMvvmToolkit.Common
 
         public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
+            if (_bindingContext != null)
+            {
+                throw new InvalidOperationException(
+                    $"{GetType().Name} - binding context was not reset. Reset the binding context first.");
+            }
+
             _bindingContext = (TBindingContext) context;
             _objectProvider = objectProvider;
 
-            var bindableElements = GetBindableElements().AsSpan();
-            for (var i = 0; i < bindableElements.Length; i++)
+            var bindableElementsSpan = GetBindableElements().AsSpan();
+
+            for (var i = 0; i < bindableElementsSpan.Length; i++)
             {
-                bindableElements[i].SetBindingContext(context, objectProvider);
+                bindableElementsSpan[i].SetBindingContext(context, objectProvider);
             }
         }
 
         public void ResetBindingContext(IObjectProvider objectProvider)
         {
-            var bindableElements = GetBindableElements().AsSpan();
-            for (var i = 0; i < bindableElements.Length; i++)
+            var bindableElementsSpan = GetBindableElements().AsSpan();
+
+            for (var i = 0; i < bindableElementsSpan.Length; i++)
             {
-                bindableElements[i].ResetBindingContext(objectProvider);
+                bindableElementsSpan[i].ResetBindingContext(objectProvider);
             }
 
             _bindingContext = null;

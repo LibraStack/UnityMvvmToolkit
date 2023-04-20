@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Core.Interfaces;
 
@@ -15,7 +16,10 @@ namespace UnityMvvmToolkit.UGUI
         {
             RootElement = gameObject;
 
-            _bindableElements = RootElement.GetComponentsInChildren<IBindableElement>(true);
+            _bindableElements = RootElement
+                .GetComponentsInChildren<IBindableElement>(true)
+                .Where(element => ((MonoBehaviour) element).gameObject != RootElement)
+                .ToArray();
         }
 
         protected override IBindableElement[] GetBindableElements()
