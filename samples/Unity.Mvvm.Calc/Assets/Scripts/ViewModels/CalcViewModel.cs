@@ -1,12 +1,11 @@
-﻿using System;
-using Interfaces;
+﻿using Interfaces;
 using Models;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace ViewModels
 {
-    public class CalcViewModel : ViewModel
+    public class CalcViewModel : IBindingContext
     {
         private readonly CalcModel _model;
 
@@ -14,56 +13,46 @@ namespace ViewModels
         {
             _model = appContext.Resolve<CalcModel>();
 
-            NumberCommand = new Command<ReadOnlyMemory<char>>(OnEnterNumber);
-            OperationCommand = new Command<ReadOnlyMemory<char>>(OnEnterOperation, IsOperationsEnabled);
+            NumberCommand = new Command<string>(OnEnterNumber);
+            OperationCommand = new Command<string>(OnEnterOperation, IsOperationsEnabled);
             CalculateCommand = new Command(OnCalculate, IsCalculateEnabled);
             ClearCommand = new Command(OnClear, IsClearEnabled);
         }
 
-        public string Result => _model.Result;
-        public string Expression => _model.Expression;
+        public IReadOnlyProperty<string> Result => _model.Result;
+        public IReadOnlyProperty<string> Expression => _model.Expression;
 
-        public ICommand<ReadOnlyMemory<char>> NumberCommand { get; }
-        public ICommand<ReadOnlyMemory<char>> OperationCommand { get; }
+        public ICommand<string> NumberCommand { get; }
+        public ICommand<string> OperationCommand { get; }
         public ICommand CalculateCommand { get; }
         public ICommand ClearCommand { get; }
 
         private bool IsOperationsEnabled() => !_model.HasOperation && _model.HasFirstNumber && !_model.HasSecondNumber;
         private bool IsCalculateEnabled() => _model.HasOperation && _model.HasFirstNumber && _model.HasSecondNumber;
-        private bool IsClearEnabled() => _model.Expression.Length > 0;
+        private bool IsClearEnabled() => _model.Expression.Value.Length > 0;
 
-        private void OnEnterNumber(ReadOnlyMemory<char> number)
+        private void OnEnterNumber(string number)
         {
-            _model.AddNumber(number.Span);
-            RaisePropertiesChanged();
+            _model.AddNumber(number);
             RaiseCanExecuteChanged();
         }
 
-        private void OnEnterOperation(ReadOnlyMemory<char> operation)
+        private void OnEnterOperation(string operation)
         {
-            _model.AddOperation(operation.Span);
-            RaisePropertiesChanged();
+            _model.AddOperation(operation);
             RaiseCanExecuteChanged();
         }
 
         private void OnCalculate()
         {
             _model.Calculate();
-            RaisePropertiesChanged();
             RaiseCanExecuteChanged();
         }
 
         private void OnClear()
         {
             _model.Clear();
-            RaisePropertiesChanged();
             RaiseCanExecuteChanged();
-        }
-
-        private void RaisePropertiesChanged()
-        {
-            OnPropertyChanged(nameof(Result));
-            OnPropertyChanged(nameof(Expression));
         }
 
         private void RaiseCanExecuteChanged()

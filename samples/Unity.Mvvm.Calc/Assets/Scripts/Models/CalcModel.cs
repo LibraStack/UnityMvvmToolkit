@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Interfaces;
+using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
+using UnityMvvmToolkit.Core.Interfaces;
 
 namespace Models
 {
@@ -16,43 +18,43 @@ namespace Models
         private int _number1Length;
         private int _number2Length;
 
-        private string _result;
-        private string _expression;
+        private readonly IProperty<string> _result;
+        private readonly IProperty<string> _expression;
 
         public CalcModel(IAppContext appContext)
         {
-            _result = string.Empty;
-            _expression = string.Empty;
+            _result = new ObservableProperty<string>(string.Empty);
+            _expression = new ObservableProperty<string>(string.Empty);
 
             _converter = appContext.Resolve<FloatToStrConverter>();
             _mathOperations = appContext.Resolve<IReadOnlyDictionary<char, IMathOperation>>();
         }
 
-        public string Result => _result;
-        public string Expression => _expression;
+        public IReadOnlyProperty<string> Result => _result;
+        public IReadOnlyProperty<string> Expression => _expression;
 
         public bool HasOperation => _hasOperation;
         public bool HasFirstNumber => _number1Length > 0;
         public bool HasSecondNumber => _number2Length > 0;
 
-        public void AddNumber(ReadOnlySpan<char> numberSpan)
+        public void AddNumber(string number)
         {
             if (_isResultState)
             {
                 _isResultState = false;
                 _number1Length = 1;
 
-                _expression = numberSpan.ToString();
+                _expression.Value = number;
 
                 return;
             }
 
-            _expression += numberSpan.ToString();
+            _expression.Value += number;
 
             if (_hasOperation)
             {
                 _number2Length++;
-                _result = Calculate(_expression);
+                _result.Value = Calculate(_expression.Value);
             }
             else
             {
@@ -60,32 +62,32 @@ namespace Models
             }
         }
 
-        public void AddOperation(ReadOnlySpan<char> operationSpan)
+        public void AddOperation(string operation)
         {
             if (_hasOperation)
             {
                 return;
             }
 
-            if (operationSpan.Length != 1)
+            if (operation.Length != 1)
             {
-                throw new InvalidOperationException(nameof(operationSpan));
+                throw new InvalidOperationException(nameof(operation));
             }
 
             _hasOperation = true;
             _isResultState = false;
 
-            _expression += operationSpan[0];
+            _expression.Value += operation;
         }
 
         public void Calculate()
         {
-            if (string.IsNullOrWhiteSpace(_expression))
+            if (string.IsNullOrWhiteSpace(_expression.Value))
             {
                 return;
             }
 
-            var result = Calculate(_expression);
+            var result = Calculate(_expression.Value);
 
             _hasOperation = false;
             _isResultState = true;
@@ -93,8 +95,8 @@ namespace Models
             _number1Length = result.Length;
             _number2Length = 0;
 
-            _result = string.Empty;
-            _expression = result;
+            _result.Value = string.Empty;
+            _expression.Value = result;
         }
 
         public void Clear()
@@ -105,8 +107,8 @@ namespace Models
             _number1Length = 0;
             _number2Length = 0;
 
-            _result = string.Empty;
-            _expression = string.Empty;
+            _result.Value = string.Empty;
+            _expression.Value = string.Empty;
         }
 
         private string Calculate(ReadOnlySpan<char> expression)
