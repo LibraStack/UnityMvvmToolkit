@@ -34,18 +34,13 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 return;
             }
 
-            try
-            {
-                objectProvider.ReturnCommandWrapper(_command, _commandBindingData);
-                SetControlEnabled(true);
-            }
-            finally
-            {
-                _command.CanExecuteChanged -= OnCommandCanExecuteChanged;
-                _command = null;
+            objectProvider.ReturnCommandWrapper(_command, _commandBindingData);
 
-                clicked -= OnButtonClicked;
-            }
+            _command.CanExecuteChanged -= OnCommandCanExecuteChanged;
+            _command = null;
+
+            clicked -= OnButtonClicked;
+            SetControlEnabled(true);
         }
 
         private void OnButtonClicked()

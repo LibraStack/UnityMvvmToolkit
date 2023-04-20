@@ -1,22 +1,68 @@
-﻿using UnityEngine;
-using UnityEngine.Events;
+﻿using System.Runtime.CompilerServices;
+using UnityEngine;
 using UnityEngine.UI;
+using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
 {
     [RequireComponent(typeof(Button))]
-    public class BindableButton : MonoBehaviour//, IBindableUIElement
+    public class BindableButton : MonoBehaviour, IBindableElement
     {
         [SerializeField] private Button _button;
-        [SerializeField] private string _command;
+        [SerializeField] private string _commandPath;
 
-        public string Command => _command;
+        private int? _buttonId;
 
-        public event UnityAction Click
+        private IBaseCommand _command;
+        private CommandBindingData _commandBindingData;
+
+        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
-            add => _button.onClick.AddListener(value);
-            remove => _button.onClick.RemoveListener(value);
+            _buttonId ??= GetHashCode();
+            _commandBindingData ??= _commandPath.ToCommandBindingData(_buttonId.Value);
+
+            _command = string.IsNullOrEmpty(_commandBindingData.ParameterValue)
+                ? objectProvider.GetCommand<ICommand>(context, _commandBindingData.PropertyName)
+                : objectProvider.RentCommandWrapper(context, _commandBindingData);
+
+            _command.CanExecuteChanged += OnCommandCanExecuteChanged;
+
+            _button.onClick.AddListener(OnButtonClicked);
+            SetControlEnabled(_command.CanExecute());
+        }
+
+        public void ResetBindingContext(IObjectProvider objectProvider)
+        {
+            if (_command == null)
+            {
+                return;
+            }
+
+            objectProvider.ReturnCommandWrapper(_command, _commandBindingData);
+
+            _command.CanExecuteChanged -= OnCommandCanExecuteChanged;
+            _command = null;
+
+            _button.onClick.RemoveListener(OnButtonClicked);
+            SetControlEnabled(true);
+        }
+
+        private void OnButtonClicked()
+        {
+            _command.Execute(_buttonId!.Value);
+        }
+
+        private void OnCommandCanExecuteChanged(object sender, bool canExecute)
+        {
+            SetControlEnabled(canExecute);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetControlEnabled(bool isEnabled)
+        {
+            _button.enabled = isEnabled;
         }
     }
 }

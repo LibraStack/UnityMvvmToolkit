@@ -29,18 +29,13 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 return;
             }
 
-            try
-            {
-                objectProvider.ReturnProperty(_valueProperty);
-                UpdateControlValue(default);
-            }
-            finally
-            {
-                _valueProperty.ValueChanged -= OnPropertyValueChanged;
-                _valueProperty = null;
+            objectProvider.ReturnProperty(_valueProperty);
 
-                this.UnregisterValueChangedCallback(OnControlValueChanged);
-            }
+            _valueProperty.ValueChanged -= OnPropertyValueChanged;
+            _valueProperty = null;
+
+            this.UnregisterValueChangedCallback(OnControlValueChanged);
+            UpdateControlValue(default);
         }
 
         protected virtual void OnControlValueChanged(ChangeEvent<string> e)
