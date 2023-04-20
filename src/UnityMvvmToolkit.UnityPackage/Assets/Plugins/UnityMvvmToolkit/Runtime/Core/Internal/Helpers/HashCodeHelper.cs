@@ -15,19 +15,6 @@ namespace UnityMvvmToolkit.Core.Internal.Helpers
             return CombineHashCode(contextTypeHash, memberNameHash);
         }
 
-        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        // public static int GetValueConverterHashCode(IValueConverter converter, string converterName = null)
-        // {
-        //     return converter switch
-        //     {
-        //         IPropertyValueConverter propertyConverter =>
-        //             GetPropertyConverterHashCode(propertyConverter, converterName),
-        //         IParameterValueConverter parameterConverter =>
-        //             GetParameterConverterHashCode(parameterConverter, converterName),
-        //         _ => throw new ArgumentOutOfRangeException()
-        //     };
-        // }
-
         /// <summary>
         /// <para><c>If name is null:</c></para>
         /// <b>TargetTypeHash + SourceTypeHash</b>
@@ -79,6 +66,28 @@ namespace UnityMvvmToolkit.Core.Internal.Helpers
             return string.IsNullOrEmpty(converterName)
                 ? CombineHashCode(targetType.GetHashCode(), sourceType.GetHashCode())
                 : CombineHashCode(converterName.GetHashCode(), targetType.GetHashCode(), sourceType.GetHashCode());
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int GetCommandWrapperConverterId(IParameterValueConverter converter, string converterName = null)
+        {
+            return GetParameterConverterHashCode(converter, converterName);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int GetCommandWrapperConverterId(Type targetType, string converterName = null)
+        {
+            return string.IsNullOrEmpty(converterName)
+                ? targetType.GetHashCode()
+                : CombineHashCode(converterName.GetHashCode(), targetType.GetHashCode());
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int GetCommandWrapperId(Type contextType, Type targetType, string converterName = null)
+        {
+            return string.IsNullOrEmpty(converterName)
+                ? CombineHashCode(contextType.GetHashCode(), targetType.GetHashCode())
+                : CombineHashCode(contextType.GetHashCode(), converterName.GetHashCode(), targetType.GetHashCode());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -4,9 +4,9 @@ using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
 
-namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.PropertyWrappers
+namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 {
-    internal class PropertyWithConverter<TValueType, TSourceType> : IProperty<TValueType>, IPropertyWrapper
+    internal class PropertyWrapper<TValueType, TSourceType> : IProperty<TValueType>, IPropertyWrapper
     {
         private readonly IPropertyValueConverter<TSourceType, TValueType> _valueConverter;
 
@@ -14,12 +14,22 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.PropertyWr
         private TSourceType _sourceValue;
         private IProperty<TSourceType> _property;
 
-        public PropertyWithConverter(IPropertyValueConverter<TSourceType, TValueType> valueConverter)
+        public PropertyWrapper(IPropertyValueConverter<TSourceType, TValueType> valueConverter)
         {
             _valueConverter = valueConverter;
         }
 
         public int ConverterId { get; private set; }
+
+        public TValueType Value
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _value;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => TrySetValue(value);
+        }
+
+        public event EventHandler<TValueType> ValueChanged;
 
         public IPropertyWrapper SetConverterId(int converterId)
         {
@@ -31,7 +41,8 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.PropertyWr
         {
             if (_property != null)
             {
-                throw new InvalidOperationException("PropertyWithConverter was not reset.");
+                throw new InvalidOperationException(
+                    $"{nameof(PropertyWrapper<TValueType, TSourceType>)} was not reset.");
             }
 
             _property = (IProperty<TSourceType>) property;
@@ -42,24 +53,6 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.PropertyWr
 
             return this;
         }
-
-        public void Reset()
-        {
-            _property.ValueChanged -= OnPropertyValueChanged;
-            _property = null;
-
-            _value = default;
-        }
-
-        public TValueType Value
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _value;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => TrySetValue(value);
-        }
-
-        public event EventHandler<TValueType> ValueChanged;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TrySetValue(TValueType value)
@@ -75,6 +68,14 @@ namespace UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.PropertyWr
             _property.ForceSetValue(_sourceValue);
 
             return true;
+        }
+
+        public void Reset()
+        {
+            _property.ValueChanged -= OnPropertyValueChanged;
+            _property = null;
+
+            _value = default;
         }
 
         private void OnPropertyValueChanged(object sender, TSourceType sourceValue)

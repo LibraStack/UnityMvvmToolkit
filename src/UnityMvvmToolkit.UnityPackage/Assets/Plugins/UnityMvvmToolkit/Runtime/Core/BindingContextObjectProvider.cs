@@ -9,7 +9,7 @@ using UnityMvvmToolkit.Core.Internal.ObjectProviders;
 
 namespace UnityMvvmToolkit.Core
 {
-    public class BindingContextObjectProvider : IObjectProvider
+    public sealed class BindingContextObjectProvider : IObjectProvider, IDisposable
     {
         private readonly PropertyProvider _propertyProvider;
 
@@ -81,7 +81,7 @@ namespace UnityMvvmToolkit.Core
             return _propertyProvider.GetCommand<TCommand>(context, propertyName);
         }
 
-        public ICommandWrapper RentCommandWrapper(IBindingContext context, CommandBindingData bindingData)
+        public IBaseCommand RentCommandWrapper(IBindingContext context, CommandBindingData bindingData)
         {
             if (string.IsNullOrEmpty(bindingData.ParameterValue))
             {
@@ -89,15 +89,15 @@ namespace UnityMvvmToolkit.Core
                     $"Command '{bindingData.PropertyName}' has no parameter. Use {nameof(GetCommand)} instead.");
             }
 
-            return _propertyProvider
-                .GetCommandWrapper(context, bindingData)
-                .RegisterParameter(bindingData.ElementId, bindingData.ParameterValue);
+            return _propertyProvider.GetCommandWrapper(context, bindingData);
         }
 
-        public void ReturnCommandWrapper(ICommandWrapper commandWrapper, CommandBindingData bindingData)
+        public void ReturnCommandWrapper(IBaseCommand command, CommandBindingData bindingData)
         {
-            _propertyProvider.ReturnCommandWrapper(
-                ((ICommandWrapperWithParameter) commandWrapper).UnregisterParameter(bindingData.ElementId));
+            if (command is ICommandWrapper commandWrapper)
+            {
+                _propertyProvider.ReturnCommandWrapper(commandWrapper, bindingData.ElementId);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -107,6 +107,11 @@ namespace UnityMvvmToolkit.Core
             {
                 _propertyProvider.ReturnProperty(propertyWrapper);
             }
+        }
+
+        public void Dispose()
+        {
+            _propertyProvider?.Dispose();
         }
     }
 }

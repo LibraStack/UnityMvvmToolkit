@@ -1,38 +1,67 @@
-﻿using UnityEngine.UIElements;
+﻿using System.Runtime.CompilerServices;
+using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public class BindableButton : Button//, IBindableUIElement
+    public partial class BindableButton : ButtonUITK, IBindableElement
     {
-        public bool Enabled
+        private int? _buttonId;
+
+        private IBaseCommand _command;
+        private CommandBindingData _commandBindingData;
+
+        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
-            get => enabledSelf;
-            set => SetEnabled(value);
+            _buttonId ??= GetHashCode();
+            _commandBindingData ??= Command.ToCommandBindingData(_buttonId.Value);
+
+            _command = string.IsNullOrEmpty(_commandBindingData.ParameterValue)
+                ? objectProvider.GetCommand<ICommand>(context, _commandBindingData.PropertyName)
+                : objectProvider.RentCommandWrapper(context, _commandBindingData);
+
+            _command.CanExecuteChanged += OnCommandCanExecuteChanged;
+
+            clicked += OnButtonClicked;
+            SetControlEnabled(_command.CanExecute());
         }
 
-        public string Command { get; set; }
-
-        public new class UxmlFactory : UxmlFactory<BindableButton, UxmlTraits>
+        public void ResetBindingContext(IObjectProvider objectProvider)
         {
-        }
-
-        public new class UxmlTraits : Button.UxmlTraits
-        {
-            private readonly UxmlBoolAttributeDescription _enabledAttribute = new()
-                { name = "enabled", defaultValue = true };
-
-            private readonly UxmlStringAttributeDescription _commandAttribute = new()
-                { name = "command", defaultValue = "" };
-
-            public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
+            if (_command == null)
             {
-                base.Init(visualElement, bag, context);
-
-                var bindableButton = (BindableButton) visualElement;
-                bindableButton.Enabled = _enabledAttribute.GetValueFromBag(bag, context);
-                bindableButton.Command = _commandAttribute.GetValueFromBag(bag, context);
+                return;
             }
+
+            try
+            {
+                objectProvider.ReturnCommandWrapper(_command, _commandBindingData);
+                SetControlEnabled(true);
+            }
+            finally
+            {
+                _command.CanExecuteChanged -= OnCommandCanExecuteChanged;
+                _command = null;
+
+                clicked -= OnButtonClicked;
+            }
+        }
+
+        private void OnButtonClicked()
+        {
+            _command.Execute(_buttonId!.Value);
+        }
+
+        private void OnCommandCanExecuteChanged(object sender, bool canExecute)
+        {
+            SetControlEnabled(canExecute);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetControlEnabled(bool isEnabled)
+        {
+            Enabled = isEnabled;
         }
     }
 }

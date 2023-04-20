@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using UnityMvvmToolkit.Core.Converters.ParameterValueConverters;
 using UnityMvvmToolkit.Core.Enums;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.Core.Internal.BindingContextObjectWrappers.PropertyWrappers;
+using UnityMvvmToolkit.Core.Internal.Extensions;
 using UnityMvvmToolkit.Core.Internal.Helpers;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
+using UnityMvvmToolkit.Core.Internal.ObjectWrappers;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 {
-    internal class PropertyProvider
+    internal class PropertyProvider : IDisposable
     {
         private readonly BindingContextMembersProvider _membersProvider;
 
@@ -18,11 +20,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 
         private readonly HashSet<int> _initializedBindingContexts;
 
-        private readonly IValueConverter[] _valueConverters;
         private readonly Dictionary<int, IValueConverter> _valueConvertersByHash;
-        
-        private readonly Dictionary<int, Queue<ICommandWrapper>> _commandWrapperByConverter;
-        private readonly Dictionary<int, Queue<IPropertyWrapper>> _propertyWrapperByConverter;
+
+        private readonly Dictionary<int, ICommandWrapper> _commandWrappers;
+        private readonly Dictionary<int, Queue<IObjectWrapper>> _wrapperByConverter;
+
+        private bool _isDisposed;
 
         internal PropertyProvider(BindingContextMembersProvider membersProvider, IValueConverter[] valueConverters)
         {
@@ -31,11 +34,11 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 
             _initializedBindingContexts = new HashSet<int>();
 
-            _valueConverters = valueConverters;
             _valueConvertersByHash = new Dictionary<int, IValueConverter>();
 
-            _commandWrapperByConverter = new Dictionary<int, Queue<ICommandWrapper>>();
-            _propertyWrapperByConverter = new Dictionary<int, Queue<IPropertyWrapper>>();
+            _commandWrappers = new Dictionary<int, ICommandWrapper>();
+
+            _wrapperByConverter = new Dictionary<int, Queue<IObjectWrapper>>();
 
             RegisterValueConverters(valueConverters);
         }
@@ -63,7 +66,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
                     WarmupPropertyValueConverter(converter, capacity, warmupType);
                     break;
                 case IParameterValueConverter converter:
-                    WarmupParameterValueConverter(converter, capacity);
+                    WarmupParameterValueConverter(converter, capacity, warmupType);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -101,17 +104,16 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WarmupPropertyValueConverter(int converterId, IPropertyValueConverter converter, int capacity)
         {
-            if (_propertyWrapperByConverter.ContainsKey(converterId))
+            if (_wrapperByConverter.ContainsKey(converterId))
             {
-                throw new InvalidOperationException(
-                    "Warm up the value converters only during the initialization phase.");
+                throw new InvalidOperationException("Warm up only during the initialization phase.");
             }
 
-            var itemsQueue = new Queue<IPropertyWrapper>();
+            var itemsQueue = new Queue<IObjectWrapper>();
 
             var args = new object[] { converter };
-            var genericPropertyType = typeof(PropertyWithConverter<,>)
-                .MakeGenericType(converter.TargetType, converter.SourceType);
+            var genericPropertyType =
+                typeof(PropertyWrapper<,>).MakeGenericType(converter.TargetType, converter.SourceType);
 
             for (var i = 0; i < capacity; i++)
             {
@@ -119,13 +121,57 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
                     .Enqueue(CreatePropertyWrapperInstance(genericPropertyType, args, converterId, null));
             }
 
-            _propertyWrapperByConverter.Add(converterId, itemsQueue);
+            _wrapperByConverter.Add(converterId, itemsQueue);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WarmupParameterValueConverter(IParameterValueConverter parameterConverter, int capacity)
+        private void WarmupParameterValueConverter(IParameterValueConverter converter, int capacity,
+            WarmupType warmupType)
         {
-            throw new NotImplementedException();
+            int converterId;
+
+            switch (warmupType)
+            {
+                case WarmupType.OnlyByType:
+                    converterId = HashCodeHelper.GetCommandWrapperConverterId(converter);
+                    WarmupParameterValueConverter(converterId, converter, capacity);
+                    break;
+                case WarmupType.OnlyByName:
+                    converterId = HashCodeHelper.GetCommandWrapperConverterId(converter, converter.Name);
+                    WarmupParameterValueConverter(converterId, converter, capacity);
+                    break;
+                case WarmupType.ByTypeAndName:
+                    converterId = HashCodeHelper.GetCommandWrapperConverterId(converter);
+                    WarmupParameterValueConverter(converterId, converter, capacity);
+
+                    converterId = HashCodeHelper.GetCommandWrapperConverterId(converter, converter.Name);
+                    WarmupParameterValueConverter(converterId, converter, capacity);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(warmupType), warmupType, null);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void WarmupParameterValueConverter(int converterId, IParameterValueConverter converter, int capacity)
+        {
+            if (_wrapperByConverter.ContainsKey(converterId))
+            {
+                throw new InvalidOperationException("Warm up only during the initialization phase.");
+            }
+
+            var itemsQueue = new Queue<IObjectWrapper>();
+
+            var args = new object[] { converter };
+            var genericPropertyType = typeof(CommandWrapper<>).MakeGenericType(converter.TargetType);
+
+            for (var i = 0; i < capacity; i++)
+            {
+                itemsQueue
+                    .Enqueue(CreateCommandWrapperInstance(genericPropertyType, args, converterId, -1, null));
+            }
+
+            _wrapperByConverter.Add(converterId, itemsQueue);
         }
 
         public IProperty<TValueType> GetProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData)
@@ -141,26 +187,25 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 
         public void ReturnProperty(IPropertyWrapper propertyWrapper)
         {
-            propertyWrapper.Reset();
-            _propertyWrapperByConverter[propertyWrapper.ConverterId].Enqueue(propertyWrapper);
+            AssureIsNotDisposed();
+
+            try
+            {
+                _wrapperByConverter[propertyWrapper.ConverterId].Enqueue(propertyWrapper);
+            }
+            finally
+            {
+                propertyWrapper.Reset();
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TCommand GetCommand<TCommand>(IBindingContext context, string propertyName) where TCommand : IBaseCommand
         {
-            var contextType = context.GetType();
-
-            if (IsBindingContextInitialized(contextType) == false)
-            {
-                WarmupBindingContext(contextType);
-            }
-
-            var memberHash = HashCodeHelper.GetMemberHashCode(contextType, propertyName);
-
-            if (_memberInfos.TryGetValue(memberHash, out var memberInfo) == false ||
+            if (TryGetContextMemberInfo(context.GetType(), propertyName, out var memberInfo) == false ||
                 memberInfo.MemberType != MemberTypes.Property)
             {
-                throw new InvalidOperationException($"Property '{propertyName}' not found.");
+                throw new InvalidOperationException($"Command '{propertyName}' not found.");
             }
 
             var propertyInfo = (PropertyInfo) memberInfo;
@@ -174,29 +219,104 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
             return (TCommand) propertyInfo.GetValue(context);
         }
 
-        public ICommandWrapperWithParameter GetCommandWrapper(IBindingContext context, CommandBindingData bindingData)
+        public ICommandWrapper GetCommandWrapper(IBindingContext context, CommandBindingData bindingData)
         {
-            throw new NotImplementedException();
+            var contextType = context.GetType();
+
+            if (TryGetContextMemberInfo(contextType, bindingData.PropertyName, out var memberInfo) == false ||
+                memberInfo.MemberType != MemberTypes.Property)
+            {
+                throw new InvalidOperationException($"Command '{bindingData.PropertyName}' not found.");
+            }
+
+            var propertyInfo = (PropertyInfo) memberInfo;
+            var propertyType = propertyInfo.PropertyType;
+
+            if (propertyType.IsGenericType == false ||
+                propertyType.GetInterface(nameof(IBaseCommand)) == null)
+            {
+                throw new InvalidCastException(
+                    $"Can not cast the {propertyType} command to the {typeof(ICommand<>)} command.");
+            }
+
+            var commandValueType = propertyType.GenericTypeArguments[0];
+
+            var commandId =
+                HashCodeHelper.GetCommandWrapperId(contextType, commandValueType, bindingData.PropertyName);
+
+            if (_commandWrappers.TryGetValue(commandId, out var commandWrapper))
+            {
+                return commandWrapper
+                    .RegisterParameter(bindingData.ElementId, bindingData.ParameterValue);
+            }
+
+            var converterId =
+                HashCodeHelper.GetCommandWrapperConverterId(commandValueType, bindingData.ParameterConverterName);
+
+            if (_wrapperByConverter.TryGetValue(converterId, out var commandWrappers))
+            {
+                if (commandWrappers.Count > 0)
+                {
+                    return commandWrappers
+                        .Dequeue()
+                        .AsCommandWrapper()
+                        .SetCommand(commandId, propertyInfo.GetValue(context))
+                        .RegisterParameter(bindingData.ElementId, bindingData.ParameterValue);
+                }
+            }
+            else
+            {
+                _wrapperByConverter.Add(converterId, new Queue<IObjectWrapper>());
+            }
+
+            var args = new object[] { _valueConvertersByHash[converterId] };
+            var commandWrapperType = typeof(CommandWrapper<>).MakeGenericType(commandValueType);
+            var command = propertyInfo.GetValue(context);
+
+            commandWrapper = CreateCommandWrapperInstance(commandWrapperType, args, converterId, commandId, command)
+                .RegisterParameter(bindingData.ElementId, bindingData.ParameterValue);
+
+            _commandWrappers.Add(commandId, commandWrapper);
+
+            return commandWrapper;
         }
 
-        public void ReturnCommandWrapper(ICommandWrapper commandWrapper)
+        public void ReturnCommandWrapper(ICommandWrapper commandWrapper, int elementId)
         {
-            throw new NotImplementedException();
+            AssureIsNotDisposed();
+
+            if (commandWrapper.UnregisterParameter(elementId) != 0)
+            {
+                return;
+            }
+
+            try
+            {
+                _commandWrappers.Remove(commandWrapper.CommandId);
+                _wrapperByConverter[commandWrapper.ConverterId].Enqueue(commandWrapper);
+            }
+            finally
+            {
+                commandWrapper.Reset();
+            }
+        }
+
+        public void Dispose()
+        {
+            _memberInfos.Clear();
+            _initializedBindingContexts.Clear();
+
+            _valueConvertersByHash.Clear();
+
+            _wrapperByConverter.Clear();
+
+            _isDisposed = true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private TProperty GetProperty<TProperty, TValueType>(IBindingContext context, PropertyBindingData bindingData)
         {
-            var contextType = context.GetType();
-
-            if (IsBindingContextInitialized(contextType) == false)
-            {
-                WarmupBindingContext(contextType);
-            }
-
-            var memberHash = HashCodeHelper.GetMemberHashCode(contextType, bindingData.PropertyName);
-
-            if (_memberInfos.TryGetValue(memberHash, out var memberInfo) == false)
+            if (TryGetContextMemberInfo(context.GetType(), bindingData.PropertyName, out var memberInfo) == false)
             {
                 throw new InvalidOperationException($"Property '{bindingData.PropertyName}' not found.");
             }
@@ -212,33 +332,63 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
             var converterId =
                 HashCodeHelper.GetPropertyWrapperConverterId(targetType, sourceType, bindingData.ConverterName);
 
-            if (_propertyWrapperByConverter.TryGetValue(converterId, out var propertyWrappers))
+            if (_wrapperByConverter.TryGetValue(converterId, out var propertyWrappers))
             {
                 if (propertyWrappers.Count > 0)
                 {
-                    return (TProperty) propertyWrappers.Dequeue().SetProperty(contextProperty);
+                    return (TProperty) propertyWrappers
+                        .Dequeue()
+                        .AsPropertyWrapper()
+                        .SetProperty(contextProperty);
                 }
             }
             else
             {
-                _propertyWrapperByConverter.Add(converterId, new Queue<IPropertyWrapper>());
+                _wrapperByConverter.Add(converterId, new Queue<IObjectWrapper>());
             }
 
             var args = new object[] { _valueConvertersByHash[converterId] };
-            var genericPropertyType = typeof(PropertyWithConverter<,>).MakeGenericType(targetType, sourceType);
+            var propertyWrapperType = typeof(PropertyWrapper<,>).MakeGenericType(targetType, sourceType);
 
-            return (TProperty) CreatePropertyWrapperInstance(genericPropertyType, args, converterId, contextProperty);
+            return (TProperty) CreatePropertyWrapperInstance(propertyWrapperType, args, converterId, contextProperty);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static IPropertyWrapper CreatePropertyWrapperInstance(Type genericPropertyType, object[] args,
+        private bool TryGetContextMemberInfo(Type contextType, string memberName, out MemberInfo memberInfo)
+        {
+            if (string.IsNullOrEmpty(memberName))
+            {
+                throw new NullReferenceException(nameof(memberInfo)); // TODO: Move to up.
+            }
+
+            if (IsBindingContextInitialized(contextType) == false)
+            {
+                WarmupBindingContext(contextType);
+            }
+
+            return _memberInfos.TryGetValue(HashCodeHelper.GetMemberHashCode(contextType, memberName), out memberInfo);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static IPropertyWrapper CreatePropertyWrapperInstance(Type propertyWrapperType, object[] args,
             int converterId, object property)
         {
-            var propertyWrapper = (IPropertyWrapper) Activator.CreateInstance(genericPropertyType, args);
+            var propertyWrapper = (IPropertyWrapper) Activator.CreateInstance(propertyWrapperType, args);
 
             return property is null
                 ? propertyWrapper.SetConverterId(converterId)
                 : propertyWrapper.SetConverterId(converterId).SetProperty(property);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static ICommandWrapper CreateCommandWrapperInstance(Type commandWrapperType, object[] args,
+            int converterId, int commandId, object command)
+        {
+            var commandWrapper = (ICommandWrapper) Activator.CreateInstance(commandWrapperType, args);
+
+            return command is null
+                ? commandWrapper.SetConverterId(converterId)
+                : commandWrapper.SetConverterId(converterId).SetCommand(commandId, command);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -278,46 +428,54 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
 
             for (var i = 0; i < convertersSpan.Length; i++)
             {
-                var valueConverter = convertersSpan[i];
-
-                int converterHashByType;
-                int converterHashByName;
-
-                switch (valueConverter)
-                {
-                    case IPropertyValueConverter converter:
-                        converterHashByType = HashCodeHelper.GetPropertyConverterHashCode(converter);
-                        converterHashByName = HashCodeHelper.GetPropertyConverterHashCode(converter, converter.Name);
-                        break;
-                    case IParameterValueConverter converter:
-                        converterHashByType = HashCodeHelper.GetParameterConverterHashCode(converter);
-                        converterHashByName = HashCodeHelper.GetParameterConverterHashCode(converter, converter.Name);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                _valueConvertersByHash.Add(converterHashByType, valueConverter);
-                _valueConvertersByHash.Add(converterHashByName, valueConverter);
+                RegisterValueConverter(convertersSpan[i]);
             }
+
+            if (_valueConvertersByHash.ContainsKey(typeof(ParameterToStrConverter).GetHashCode()) == false)
+            {
+                RegisterValueConverter(new ParameterToStrConverter());
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void RegisterValueConverter(IValueConverter valueConverter)
+        {
+            int converterHashByType;
+            int converterHashByName;
+            var converterTypeHash = valueConverter.GetType().GetHashCode();
+
+            switch (valueConverter)
+            {
+                case IPropertyValueConverter converter:
+                    converterHashByType = HashCodeHelper.GetPropertyConverterHashCode(converter);
+                    converterHashByName = HashCodeHelper.GetPropertyConverterHashCode(converter, converter.Name);
+                    break;
+                case IParameterValueConverter converter:
+                    converterHashByType = HashCodeHelper.GetParameterConverterHashCode(converter);
+                    converterHashByName = HashCodeHelper.GetParameterConverterHashCode(converter, converter.Name);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            _valueConvertersByHash.Add(converterTypeHash, valueConverter);
+            _valueConvertersByHash.Add(converterHashByType, valueConverter);
+            _valueConvertersByHash.Add(converterHashByName, valueConverter);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private IValueConverter GetValueConverterByType(Type converterType)
         {
-            var convertersSpan = _valueConverters.AsSpan();
+            return _valueConvertersByHash[converterType.GetHashCode()];
+        }
 
-            for (var i = 0; i < convertersSpan.Length; i++)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AssureIsNotDisposed()
+        {
+            if (_isDisposed)
             {
-                var converter = convertersSpan[i];
-
-                if (converter.GetType() == converterType)
-                {
-                    return converter;
-                }
+                throw new ObjectDisposedException(nameof(PropertyProvider));
             }
-
-            return default;
         }
     }
 }

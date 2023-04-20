@@ -8,5 +8,10 @@ namespace UnityMvvmToolkit.Core.Interfaces
 
         bool CanExecute();
         void RaiseCanExecuteChanged();
+
+        internal void Execute(int elementId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

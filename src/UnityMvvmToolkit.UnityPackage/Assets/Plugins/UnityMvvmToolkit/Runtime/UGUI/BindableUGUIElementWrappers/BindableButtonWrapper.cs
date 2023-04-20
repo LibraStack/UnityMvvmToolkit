@@ -9,7 +9,7 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElementWrappers
     {
         private readonly int _buttonId;
         private readonly BindableButton _button;
-        private readonly ICommandWrapper _commandWrapper;
+        // private readonly ICommandWrapper _commandWrapper;
 
         public BindableButtonWrapper(BindableButton button, IObjectProvider objectProvider)// : base(objectProvider)
         {
@@ -18,7 +18,7 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElementWrappers
             //_commandWrapper = GetCommandWrapper(_buttonId, button.Command);
         }
 
-        public bool CanInitialize => _commandWrapper != null;
+        // public bool CanInitialize => _commandWrapper != null;
 
         public void Initialize()
         {
@@ -32,7 +32,7 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElementWrappers
 
         private void OnButtonClicked()
         {
-            _commandWrapper.Execute(_buttonId);
+            // _commandWrapper.Execute(_buttonId);
         }
     }
 }
