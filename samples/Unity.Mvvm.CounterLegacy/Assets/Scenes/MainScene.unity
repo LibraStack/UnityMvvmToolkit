@@ -578,7 +578,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _button: {fileID: 1537193460}
-  _command: IncreaseCommand
+  _commandPath: IncreaseCommand
 --- !u!114 &1537193460
 MonoBehaviour:
   m_ObjectHideFlags: 0

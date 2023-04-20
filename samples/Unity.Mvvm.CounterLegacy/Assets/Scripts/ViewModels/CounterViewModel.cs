@@ -3,9 +3,9 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace ViewModels
 {
-    public class CounterViewModel : ViewModel
+    public class CounterViewModel : IBindingContext
     {
-        private int _count;
+        private readonly IProperty<int> _count = new ObservableProperty<int>();
 
         public CounterViewModel()
         {
@@ -14,8 +14,8 @@ namespace ViewModels
 
         public int Count
         {
-            get => _count;
-            set => Set(ref _count, value);
+            get => _count.Value;
+            set => _count.Value = value;
         }
 
         public ICommand IncreaseCommand { get; }
