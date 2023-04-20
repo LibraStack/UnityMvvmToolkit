@@ -2,10 +2,6 @@
 {
     internal interface IObjectWrapper<out T> : IObjectWrapper
     {
-        int ConverterId { get; }
-
         T SetConverterId(int converterId);
-
-        void Reset();
     }
 }

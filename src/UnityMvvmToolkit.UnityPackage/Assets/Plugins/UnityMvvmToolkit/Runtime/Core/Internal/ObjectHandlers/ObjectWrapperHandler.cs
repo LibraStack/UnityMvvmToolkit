@@ -146,14 +146,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         {
             AssureIsNotDisposed();
 
-            try
-            {
-                _wrappersByConverter[propertyWrapper.ConverterId].Enqueue(propertyWrapper);
-            }
-            finally
-            {
-                propertyWrapper.Reset();
-            }
+            ReturnWrapper(propertyWrapper);
         }
 
         public void ReturnCommandWrapper(ICommandWrapper commandWrapper, int elementId)
@@ -165,15 +158,8 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                 return;
             }
 
-            try
-            {
-                _commandWrappers.Remove(commandWrapper.CommandId);
-                _wrappersByConverter[commandWrapper.ConverterId].Enqueue(commandWrapper);
-            }
-            finally
-            {
-                commandWrapper.Reset();
-            }
+            _commandWrappers.Remove(commandWrapper.CommandId);
+            ReturnWrapper(commandWrapper);
         }
 
         public void Dispose()
@@ -283,6 +269,13 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             }
 
             _wrappersByConverter.Add(converterId, itemsQueue);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ReturnWrapper(IObjectWrapper wrapper)
+        {
+            wrapper.Reset();
+            _wrappersByConverter[wrapper.ConverterId].Enqueue(wrapper);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

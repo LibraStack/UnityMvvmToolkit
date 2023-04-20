@@ -2,5 +2,8 @@
 {
     internal interface IObjectWrapper
     {
+        int ConverterId { get; }
+
+        void Reset();
     }
 }
