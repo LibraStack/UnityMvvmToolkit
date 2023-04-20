@@ -23,10 +23,10 @@ public class CommandStringParserTests
         // Assert
         string.IsNullOrEmpty(result.PropertyName).Should().Be(string.IsNullOrEmpty(propertyName));
         string.IsNullOrEmpty(result.ParameterValue).Should().Be(string.IsNullOrEmpty(parameterValue));
-        string.IsNullOrEmpty(result.ParameterConverterName).Should().Be(string.IsNullOrEmpty(parameterConverterName));
+        string.IsNullOrEmpty(result.ConverterName).Should().Be(string.IsNullOrEmpty(parameterConverterName));
 
         result.PropertyName.Should().Be(propertyName);
         result.ParameterValue.Should().Be(parameterValue);
-        result.ParameterConverterName.Should().Be(parameterConverterName);
+        result.ConverterName.Should().Be(parameterConverterName);
     }
 }

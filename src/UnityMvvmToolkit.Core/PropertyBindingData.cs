@@ -2,12 +2,9 @@
 
 namespace UnityMvvmToolkit.Core
 {
-    public class PropertyBindingData
+    public sealed class PropertyBindingData : BindingData
     {
-        public string PropertyName { get; set; }
-        public string ConverterName { get; set; }
-
-        public void SetValueByIndex(int index, ReadOnlyMemory<char> value)
+        public override void SetValueByIndex(int index, ReadOnlyMemory<char> value)
         {
             switch (index)
             {

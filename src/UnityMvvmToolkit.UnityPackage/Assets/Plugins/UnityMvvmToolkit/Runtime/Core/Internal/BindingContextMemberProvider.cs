@@ -4,12 +4,13 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Helpers;
+using UnityMvvmToolkit.Core.Internal.Interfaces;
 
-namespace UnityMvvmToolkit.Core.Internal.ObjectProviders
+namespace UnityMvvmToolkit.Core.Internal
 {
-    internal class BindingContextMembersProvider
+    internal sealed class BindingContextMemberProvider : IClassMemberProvider
     {
-        public void GetBindingContextMembers(Type bindingContextType, Dictionary<int, MemberInfo> result)
+        public void GetBindingContextMembers(Type bindingContextType, IDictionary<int, MemberInfo> result)
         {
             var memberInfosSpan = bindingContextType
                 .GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)

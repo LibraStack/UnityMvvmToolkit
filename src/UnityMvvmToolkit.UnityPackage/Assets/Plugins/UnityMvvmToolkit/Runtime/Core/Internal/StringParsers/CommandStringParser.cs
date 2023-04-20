@@ -2,7 +2,7 @@
 
 namespace UnityMvvmToolkit.Core.Internal.StringParsers
 {
-    internal class CommandStringParser : BindingStringParser
+    internal sealed class CommandStringParser : BindingStringParser
     {
         private const string ParameterOpen = "Parameter={";
         private const string ConverterOpen = "Converter={";
@@ -30,7 +30,7 @@ namespace UnityMvvmToolkit.Core.Internal.StringParsers
 
                 if (IsBindingOption(ConverterOpen, line, commandBindingPath, out var converterName))
                 {
-                    commandData.ParameterConverterName = converterName.ToString();
+                    commandData.ConverterName = converterName.ToString();
                     continue;
                 }
 

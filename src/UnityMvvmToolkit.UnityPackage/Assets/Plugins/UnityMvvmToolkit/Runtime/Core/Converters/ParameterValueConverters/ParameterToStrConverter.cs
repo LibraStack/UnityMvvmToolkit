@@ -2,7 +2,7 @@
 
 namespace UnityMvvmToolkit.Core.Converters.ParameterValueConverters
 {
-    public class ParameterToStrConverter : ParameterValueConverter<string>
+    public sealed class ParameterToStrConverter : ParameterValueConverter<string>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string Convert(string parameter)

@@ -2,7 +2,7 @@
 
 namespace UnityMvvmToolkit.Core.Internal.StringParsers
 {
-    internal class PropertyStringParser : BindingStringParser
+    internal sealed class PropertyStringParser : BindingStringParser
     {
         private const string ConverterOpen = "Converter={";
 

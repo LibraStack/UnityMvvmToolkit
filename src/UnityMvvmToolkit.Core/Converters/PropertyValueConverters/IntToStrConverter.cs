@@ -2,7 +2,7 @@
 
 namespace UnityMvvmToolkit.Core.Converters.PropertyValueConverters
 {
-    public class IntToStrConverter : PropertyValueConverter<int, string>
+    public sealed class IntToStrConverter : PropertyValueConverter<int, string>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string Convert(int value)

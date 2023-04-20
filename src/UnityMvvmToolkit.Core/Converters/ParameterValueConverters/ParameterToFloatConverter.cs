@@ -3,7 +3,7 @@ using UnityMvvmToolkit.Core.Extensions;
 
 namespace UnityMvvmToolkit.Core.Converters.ParameterValueConverters
 {
-    public class ParameterToFloatConverter : ParameterValueConverter<float>
+    public sealed class ParameterToFloatConverter : ParameterValueConverter<float>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override float Convert(string parameter)

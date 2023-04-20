@@ -2,7 +2,7 @@
 
 namespace UnityMvvmToolkit.Core
 {
-    public class CommandBindingData
+    public sealed class CommandBindingData : BindingData
     {
         public CommandBindingData(int elementId)
         {
@@ -10,11 +10,9 @@ namespace UnityMvvmToolkit.Core
         }
 
         public int ElementId { get; }
-        public string PropertyName { get; set; }
         public string ParameterValue { get; set; }
-        public string ParameterConverterName { get; set; }
 
-        public void SetValueByIndex(int index, ReadOnlyMemory<char> value)
+        public override void SetValueByIndex(int index, ReadOnlyMemory<char> value)
         {
             switch (index)
             {
@@ -25,7 +23,7 @@ namespace UnityMvvmToolkit.Core
                     ParameterValue = value.ToString();
                     break;
                 case 2:
-                    ParameterConverterName = value.ToString();
+                    ConverterName = value.ToString();
                     break;
                 default: throw new IndexOutOfRangeException(nameof(index));
             }

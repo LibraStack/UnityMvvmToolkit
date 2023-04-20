@@ -4,18 +4,23 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Enums;
 using UnityMvvmToolkit.Core.Interfaces;
+using UnityMvvmToolkit.Core.Internal;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
-using UnityMvvmToolkit.Core.Internal.ObjectProviders;
+using UnityMvvmToolkit.Core.Internal.ObjectHandlers;
 
 namespace UnityMvvmToolkit.Core
 {
     public sealed class BindingContextObjectProvider : IObjectProvider, IDisposable
     {
-        private readonly PropertyProvider _propertyProvider;
+        private readonly ObjectWrapperHandler _objectWrapperHandler;
+        private readonly ValueConverterHandler _valueConverterHandler;
+        private readonly BindingContextHandler _bindingContextHandler;
 
         public BindingContextObjectProvider(IValueConverter[] converters)
         {
-            _propertyProvider = new PropertyProvider(new BindingContextMembersProvider(), converters);
+            _valueConverterHandler = new ValueConverterHandler(converters);
+            _objectWrapperHandler = new ObjectWrapperHandler(_valueConverterHandler);
+            _bindingContextHandler = new BindingContextHandler(new BindingContextMemberProvider());
         }
 
         public IObjectProvider WarmupAssemblyViewModels()
@@ -41,7 +46,10 @@ namespace UnityMvvmToolkit.Core
 
         public IObjectProvider WarmupViewModel(Type bindingContextType)
         {
-            _propertyProvider.WarmupBindingContext(bindingContextType);
+            if (_bindingContextHandler.TryRegisterBindingContext(bindingContextType) == false)
+            {
+                throw new InvalidOperationException($"{bindingContextType.Name} already warmed up.");
+            }
 
             return this;
         }
@@ -49,14 +57,16 @@ namespace UnityMvvmToolkit.Core
         public IObjectProvider WarmupValueConverter<T>(int capacity, WarmupType warmupType = WarmupType.OnlyByType)
             where T : IValueConverter
         {
-            _propertyProvider.WarmupValueConverter<T>(capacity, warmupType);
+            _objectWrapperHandler.CreateValueConverterInstances<T>(capacity, warmupType);
 
             return this;
         }
 
         public IProperty<TValueType> RentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData)
         {
-            return _propertyProvider.GetProperty<TValueType>(context, bindingData);
+            EnsureBindingDataValid(bindingData);
+
+            return GetProperty<IProperty<TValueType>, TValueType>(context, bindingData);
         }
 
         public void ReturnProperty<TValueType>(IProperty<TValueType> property)
@@ -67,7 +77,9 @@ namespace UnityMvvmToolkit.Core
         public IReadOnlyProperty<TValueType> RentReadOnlyProperty<TValueType>(IBindingContext context,
             PropertyBindingData bindingData)
         {
-            return _propertyProvider.GetReadOnlyProperty<TValueType>(context, bindingData);
+            EnsureBindingDataValid(bindingData);
+
+            return GetProperty<IReadOnlyProperty<TValueType>, TValueType>(context, bindingData);
         }
 
         public void ReturnReadOnlyProperty<TValueType>(IReadOnlyProperty<TValueType> property)
@@ -78,26 +90,69 @@ namespace UnityMvvmToolkit.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TCommand GetCommand<TCommand>(IBindingContext context, string propertyName) where TCommand : IBaseCommand
         {
-            return _propertyProvider.GetCommand<TCommand>(context, propertyName);
+            EnsureIsNotNullOrWhiteSpace(propertyName, nameof(propertyName));
+
+            if (TryGetContextMemberInfo(context.GetType(), propertyName, out var memberInfo) == false ||
+                memberInfo.MemberType != MemberTypes.Property)
+            {
+                throw new InvalidOperationException($"Command '{propertyName}' not found.");
+            }
+
+            var propertyInfo = (PropertyInfo) memberInfo;
+
+            if (propertyInfo.PropertyType != typeof(TCommand))
+            {
+                throw new InvalidCastException(
+                    $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(TCommand)} command.");
+            }
+
+            return (TCommand) propertyInfo.GetValue(context);
         }
 
         public IBaseCommand RentCommandWrapper(IBindingContext context, CommandBindingData bindingData)
         {
-            if (string.IsNullOrEmpty(bindingData.ParameterValue))
+            EnsureIsNotNullOrWhiteSpace(bindingData.ParameterValue,
+                $"Command '{bindingData.PropertyName}' has no parameter. Use {nameof(GetCommand)} instead.");
+
+            if (TryGetContextMemberInfo(context.GetType(), bindingData.PropertyName, out var memberInfo) == false ||
+                memberInfo.MemberType != MemberTypes.Property)
             {
-                throw new InvalidOperationException(
-                    $"Command '{bindingData.PropertyName}' has no parameter. Use {nameof(GetCommand)} instead.");
+                throw new InvalidOperationException($"Command '{bindingData.PropertyName}' not found.");
             }
 
-            return _propertyProvider.GetCommandWrapper(context, bindingData);
+            return _objectWrapperHandler.GetCommandWrapper(context, bindingData, memberInfo);
         }
 
         public void ReturnCommandWrapper(IBaseCommand command, CommandBindingData bindingData)
         {
             if (command is ICommandWrapper commandWrapper)
             {
-                _propertyProvider.ReturnCommandWrapper(commandWrapper, bindingData.ElementId);
+                _objectWrapperHandler.ReturnCommandWrapper(commandWrapper, bindingData.ElementId);
             }
+        }
+
+        public void Dispose()
+        {
+            _objectWrapperHandler.Dispose();
+            _valueConverterHandler.Dispose();
+            _bindingContextHandler.Dispose();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private TProperty GetProperty<TProperty, TValueType>(IBindingContext context, BindingData bindingData)
+        {
+            if (TryGetContextMemberInfo(context.GetType(), bindingData.PropertyName, out var memberInfo) == false)
+            {
+                throw new InvalidOperationException($"Property '{bindingData.PropertyName}' not found.");
+            }
+
+            return _objectWrapperHandler.GetProperty<TProperty, TValueType>(context, bindingData, memberInfo);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool TryGetContextMemberInfo(Type contextType, string memberName, out MemberInfo memberInfo)
+        {
+            return _bindingContextHandler.TryGetContextMemberInfo(contextType, memberName, out memberInfo);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -105,13 +160,23 @@ namespace UnityMvvmToolkit.Core
         {
             if (property is IPropertyWrapper propertyWrapper)
             {
-                _propertyProvider.ReturnProperty(propertyWrapper);
+                _objectWrapperHandler.ReturnProperty(propertyWrapper);
             }
         }
 
-        public void Dispose()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void EnsureBindingDataValid(BindingData bindingData)
         {
-            _propertyProvider?.Dispose();
+            EnsureIsNotNullOrWhiteSpace(bindingData.PropertyName, nameof(bindingData.PropertyName));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void EnsureIsNotNullOrWhiteSpace(string str, string message)
+        {
+            if (string.IsNullOrWhiteSpace(str))
+            {
+                throw new NullReferenceException(message);
+            }
         }
     }
 }

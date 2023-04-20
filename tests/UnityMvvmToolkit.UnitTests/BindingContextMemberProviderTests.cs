@@ -1,18 +1,18 @@
 ﻿using System.Reflection;
 using FluentAssertions;
+using UnityMvvmToolkit.Core.Internal;
 using UnityMvvmToolkit.Core.Internal.Helpers;
-using UnityMvvmToolkit.Core.Internal.ObjectProviders;
 using UnityMvvmToolkit.UnitTests.TestBindingContext;
 
 namespace UnityMvvmToolkit.UnitTests;
 
-public class BindingContextMembersProviderTests
+public class BindingContextMemberProviderTests
 {
     [Fact]
     public void GetBindingContextMembers_ShouldReturnBindingContextMembers()
     {
         // Arrange
-        var membersProvider = new BindingContextMembersProvider();
+        var membersProvider = new BindingContextMemberProvider();
         var members = new Dictionary<int, MemberInfo>();
 
         var bindingContextType = typeof(MyBindingContext);

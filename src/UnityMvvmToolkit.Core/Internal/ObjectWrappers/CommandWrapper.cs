@@ -5,7 +5,7 @@ using UnityMvvmToolkit.Core.Internal.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 {
-    internal class CommandWrapper<TCommandValueType> : ICommandWrapper
+    internal sealed class CommandWrapper<TCommandValueType> : ICommandWrapper
     {
         private readonly Dictionary<int, TCommandValueType> _parameters;
         private readonly IParameterValueConverter<TCommandValueType> _parameterConverter;

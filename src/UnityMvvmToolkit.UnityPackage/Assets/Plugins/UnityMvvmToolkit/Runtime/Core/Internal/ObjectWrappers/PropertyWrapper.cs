@@ -6,7 +6,7 @@ using UnityMvvmToolkit.Core.Internal.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 {
-    internal class PropertyWrapper<TValueType, TSourceType> : IProperty<TValueType>, IPropertyWrapper
+    internal sealed class PropertyWrapper<TValueType, TSourceType> : IProperty<TValueType>, IPropertyWrapper
     {
         private readonly IPropertyValueConverter<TSourceType, TValueType> _valueConverter;
 

@@ -4,7 +4,7 @@ using UnityMvvmToolkit.Core.Extensions;
 
 namespace UnityMvvmToolkit.Core.Converters.PropertyValueConverters
 {
-    public class FloatToStrConverter : PropertyValueConverter<float, string>
+    public sealed class FloatToStrConverter : PropertyValueConverter<float, string>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string Convert(float value)
