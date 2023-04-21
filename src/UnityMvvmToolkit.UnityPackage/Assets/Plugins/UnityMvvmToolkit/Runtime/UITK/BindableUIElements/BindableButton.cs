@@ -14,6 +14,11 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
+            if (string.IsNullOrWhiteSpace(Command))
+            {
+                return;
+            }
+
             _buttonId ??= GetHashCode();
             _commandBindingData ??= Command.ToCommandBindingData(_buttonId.Value);
 
