@@ -12,7 +12,7 @@ using UnityMvvmToolkit.UITK.BindableUIElements;
 namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
 {
     public abstract class BindableScrollViewWrapper<TItem, TData>// : IBindableElement, IInitializable, IDisposable
-        where TData : ICollectionItemData
+        where TData : ICollectionItem
     {
         private readonly BindableScrollView _scrollView;
         private readonly VisualTreeAsset _itemAsset;
@@ -20,7 +20,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
 
         private ObservableCollection<TData> _itemsCollection;
         private ObjectPool<VisualElement> _itemAssetsPool;
-        private Dictionary<Guid, VisualElement> _itemAssets;
+        private Dictionary<int, VisualElement> _itemAssets;
 
         protected BindableScrollViewWrapper(BindableScrollView scrollView, VisualTreeAsset itemAsset,
             IObjectProvider objectProvider)
@@ -40,7 +40,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
 
         public virtual void Initialize()
         {
-            _itemAssets = new Dictionary<Guid, VisualElement>();
+            _itemAssets = new Dictionary<int, VisualElement>();
             _itemAssetsPool = new ObjectPool<VisualElement>(createFunc: OnAssetsPoolCreateItem,
                 actionOnRelease: OnAssetsPoolReleaseItem, actionOnDestroy: OnAssetsPoolDestroyItem);
 
@@ -114,15 +114,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElementWrappers
             _scrollView.contentContainer.Add(itemAsset);
 
             OnBindItem(item, itemData);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void RemoveItems(IEnumerable<TData> items)
-        {
-            foreach (var itemData in items)
-            {
-                RemoveItem(itemData);
-            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

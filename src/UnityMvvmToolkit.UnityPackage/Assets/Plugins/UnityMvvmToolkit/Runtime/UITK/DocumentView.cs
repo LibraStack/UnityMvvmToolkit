@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.Common;
+using UnityMvvmToolkit.Common.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UITK
@@ -18,12 +18,7 @@ namespace UnityMvvmToolkit.UITK
         protected override void OnInit()
         {
             _uiDocument = GetComponent<UIDocument>();
-            _bindableElements = RootVisualElement
-                .Query<VisualElement>()
-                .Where(element => element is IBindableElement)
-                .Build()
-                .Cast<IBindableElement>()
-                .ToArray();
+            _bindableElements = RootVisualElement.GetBindableElements();
         }
 
         protected override IBindableElement[] GetBindableElements()

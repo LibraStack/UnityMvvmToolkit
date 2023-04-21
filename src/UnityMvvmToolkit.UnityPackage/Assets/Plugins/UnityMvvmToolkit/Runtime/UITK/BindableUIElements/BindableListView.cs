@@ -1,27 +1,93 @@
-﻿using UnityEngine.UIElements;
+﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Runtime.CompilerServices;
+using UnityEngine.UIElements;
+using UnityMvvmToolkit.Common.Extensions;
+using UnityMvvmToolkit.Common.Interfaces;
+using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public class BindableListView : ListView//, IBindableUIElement
+    public partial class BindableListView : ListView, IBindableElement
     {
-        public string BindingItemsSourcePath { get; set; }
+        private PropertyBindingData _itemsSourceBindingData;
+        private PropertyBindingData _itemTemplateBindingData;
 
-        public new class UxmlFactory : UxmlFactory<BindableListView, UxmlTraits>
+        private IReadOnlyProperty<VisualTreeAsset> _itemTemplate;
+        private IReadOnlyProperty<ObservableCollection<ICollectionItem>> _itemsSource;
+
+        private IObjectProvider _objectProvider;
+
+        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
+            _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
+            _itemTemplateBindingData ??= BindingItemTemplatePath.ToPropertyBindingData();
+
+            _objectProvider = objectProvider;
+
+            _itemsSource =
+                objectProvider.RentReadOnlyProperty<ObservableCollection<ICollectionItem>>(context,
+                    _itemsSourceBindingData);
+            _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
+
+            _itemTemplate = objectProvider.RentReadOnlyProperty<VisualTreeAsset>(context, _itemTemplateBindingData);
+
+            itemsSource = _itemsSource.Value;
+            makeItem += MakeItem;
+            bindItem += BindItem;
         }
 
-        public new class UxmlTraits : ListView.UxmlTraits
+        public void ResetBindingContext(IObjectProvider objectProvider)
         {
-            private readonly UxmlStringAttributeDescription _bindingItemsSourceAttribute = new()
-                { name = "binding-items-source-path", defaultValue = "" };
-
-            public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
+            if (_itemsSource == null)
             {
-                base.Init(visualElement, bag, context);
-                ((BindableListView) visualElement).BindingItemsSourcePath =
-                    _bindingItemsSourceAttribute.GetValueFromBag(bag, context);
+                return;
             }
+
+            objectProvider.ReturnReadOnlyProperty(_itemsSource);
+            objectProvider.ReturnReadOnlyProperty(_itemTemplate);
+
+            _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
+            _itemsSource = null;
+
+            _itemTemplate = null;
+            _objectProvider = null;
+
+            makeItem -= MakeItem;
+            bindItem -= BindItem;
+            Clear();
+        }
+
+        protected virtual void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RefreshItems(); // TODO: Do not refresh all items.
+        }
+
+        protected virtual VisualElement MakeItem()
+        {
+            return MakeItem(_itemTemplate.Value); // TODO: Pool.
+        }
+
+        protected virtual void BindItem(VisualElement item, int index)
+        {
+            if (index >= 0 && index < itemsSource.Count)
+            {
+                BindItem(item, _itemsSource.Value[index], _objectProvider);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static VisualElement MakeItem(VisualTreeAsset itemAsset)
+        {
+            return itemAsset.InstantiateBindableElement();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void BindItem(VisualElement item, IBindingContext bindingContext, IObjectProvider objectProvider)
+        {
+            item.SetBindingContext(bindingContext, objectProvider);
         }
     }
 }
