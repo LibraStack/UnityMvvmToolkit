@@ -20,12 +20,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
 
         public IValueConverter GetValueConverterById(int converterId)
         {
-            return _valueConvertersByHash[converterId];
+            return _valueConvertersByHash[converterId]; // TODO: throw clear exception.
         }
 
         public IValueConverter GetValueConverterByType(Type converterType)
         {
-            return _valueConvertersByHash[converterType.GetHashCode()];
+            return _valueConvertersByHash[converterType.GetHashCode()]; // TODO: throw clear exception.
         }
 
         public void Dispose()
