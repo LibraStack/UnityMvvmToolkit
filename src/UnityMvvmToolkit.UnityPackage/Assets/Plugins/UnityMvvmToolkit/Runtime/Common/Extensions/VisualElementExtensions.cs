@@ -33,10 +33,10 @@ namespace UnityMvvmToolkit.Common.Extensions
         public static void SetBindingContext(this VisualElement visualElement, IBindingContext context,
             IObjectProvider objectProvider, bool initialize = false)
         {
-            if (visualElement is IBindableElement bindableElement)
-            {
-                SetBindingContext(bindableElement, context, objectProvider, initialize);
-            }
+            // if (visualElement is IBindableElement bindableElement)
+            // {
+            //     SetBindingContext(bindableElement, context, objectProvider, initialize);
+            // }
 
             var bindableElementsSpan = ((IBindableElement[]) visualElement.userData).AsSpan();
 
@@ -50,10 +50,10 @@ namespace UnityMvvmToolkit.Common.Extensions
         public static void ResetBindingContext(this VisualElement visualElement, IObjectProvider objectProvider,
             bool dispose = false)
         {
-            if (visualElement is IBindableElement bindableElement)
-            {
-                ResetBindingContext(bindableElement, objectProvider, dispose);
-            }
+            // if (visualElement is IBindableElement bindableElement)
+            // {
+            //     ResetBindingContext(bindableElement, objectProvider, dispose);
+            // }
 
             var bindableElementsSpan = ((IBindableElement[]) visualElement.userData).AsSpan();
 

@@ -16,12 +16,12 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="ListContainer" class="content-page__list-container">
-            <UnityMvvmToolkit.UITK.BindableUIElements.BindableScrollView scroll-deceleration-rate="0,135" elasticity="0.05" binding-items-source-path="TaskItems" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" touch-scroll-type="Elastic" />
+            <UnityMvvmToolkit.UITK.BindableUIElements.BindableScrollView scroll-deceleration-rate="0,135" elasticity="0.05" binding-items-source-path="TaskItems" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" touch-scroll-type="Elastic" binding-item-template-path="TaskItemTemplate" />
         </ui:VisualElement>
         <ui:VisualElement name="BottomPanel" class="content-page__bottom-panel" />
     </ui:VisualElement>
-    <BindableUIElements.BindablePageBlocker name="Blocker" command="ChangeAddTaskDialogVisibilityCommand" binding-state-path="IsAddTaskDialogActive" class="main-view__blocker main-view__blocker--animation" />
-    <BindableUIElements.BindableAddTaskButton name="AddTaskButton" command="ChangeAddTaskDialogVisibilityCommand" binding-state-path="IsAddTaskDialogActive" class="add-task-button add-task-button--animation">
+    <BindableUIElements.BindablePageBlocker name="Blocker" binding-state-path="IsAddTaskDialogActive" class="main-view__blocker main-view__blocker--animation" />
+    <BindableUIElements.BindableAddTaskButton name="AddTaskButton" binding-state-path="IsAddTaskDialogActive" class="add-task-button add-task-button--animation">
         <ui:VisualElement name="Icon" picking-mode="Ignore" class="add-task-button__icon" />
     </BindableUIElements.BindableAddTaskButton>
 </ui:UXML>

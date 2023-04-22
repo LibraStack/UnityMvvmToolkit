@@ -1,8 +1,6 @@
-﻿using UnityEngine.UIElements;
-
-namespace BindableUIElements
+﻿namespace BindableUIElements
 {
-    public class BindableAddTaskButton : BindableBinaryStateButton
+    public partial class BindableAddTaskButton : BindableBinaryStateButton
     {
         private const string CancelStateClassName = "add-task-button--cancel";
 
@@ -14,14 +12,6 @@ namespace BindableUIElements
         public override void Deactivate()
         {
             RemoveFromClassList(CancelStateClassName);
-        }
-
-        public new class UxmlFactory : UxmlFactory<BindableAddTaskButton, UxmlTraits>
-        {
-        }
-
-        public new class UxmlTraits : BindableBinaryStateButton.UxmlTraits
-        {
         }
     }
 }

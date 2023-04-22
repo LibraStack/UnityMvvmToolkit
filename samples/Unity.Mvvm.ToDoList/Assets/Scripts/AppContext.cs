@@ -27,11 +27,11 @@ public class AppContext : MonoBehaviour, IAppContext, IDisposable
         RegisterInstance(new TaskBroker());
         RegisterInstance<IDialogsService>(new DialogsService(this));
 
-        RegisterInstance(new MainViewModel(this));
+        RegisterInstance(new MainViewModel(this, _taskItemAsset));
         RegisterInstance(new AddTaskDialogViewModel(this));
         
         RegisterInstance<IDataStoreService>(new DataStoreService(this));
-        RegisterInstance<IBindableElementsFactory>(new ToDoListBindableElementsFactory(_taskItemAsset));
+        // RegisterInstance<IBindableElementsFactory>(new ToDoListBindableElementsFactory(_taskItemAsset));
         RegisterInstance(GetValueConverters());
     }
 

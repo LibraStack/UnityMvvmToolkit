@@ -1,0 +1,111 @@
+:root {
+    --color-animation-duration: 150ms;
+}
+
+.check-box {
+    padding-left: 172px;
+    padding-top: 0;
+    padding-bottom: 0;
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.check-box__clickable-area {
+    position: absolute;
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    width: 128px;
+    height: 128px;
+    justify-content: center;
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    background-color: rgba(252, 251, 252, 0);
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    align-items: center;
+}
+
+.check-box__clickable-area--animation {
+    transition-property: border-color;
+    transition-duration: var(--color-animation-duration);
+}
+
+.check-box__clickable-area:hover:enabled {
+    background-color: var(--background-color--hover);
+}
+
+.check-box__label {
+    font-size: var(--font-size-h2);
+    color: rgb(54, 54, 54);
+    width: 100%;
+    height: 100%;
+    -unity-text-align: middle-left;
+    -unity-font-definition: url('project://database/Assets/UI%20Toolkit/Fonts/Montserrat/Montserrat-Medium%20SDF.asset?fileID=11400000&guid=83f05e081d656f64d883c52a5a98dbc9&type=2#Montserrat-Medium SDF');
+    overflow: hidden;
+    white-space: normal;
+}
+
+.check-box__label--done {
+    color: rgb(198, 198, 198);
+}
+
+.check-box__label--animation {
+    transition-property: color;
+    transition-duration: var(--color-animation-duration);
+}
+
+.check-box__circle {
+    width: 64px;
+    height: 64px;
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    border-left-color: rgb(188, 188, 188);
+    border-right-color: rgb(188, 188, 188);
+    border-top-color: rgb(188, 188, 188);
+    border-bottom-color: rgb(188, 188, 188);
+    border-left-width: 8px;
+    border-right-width: 8px;
+    border-top-width: 8px;
+    border-bottom-width: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.check-box__circle--done {
+    border-left-color: var(--accent-color);
+    border-right-color: var(--accent-color);
+    border-top-color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+}
+
+.check-box__tick {
+    background-image: url('project://database/Assets/UI%20Toolkit/Icons/check_icon_3.png?fileID=2800000&guid=00d78c71deea2114e8913faafe6bfafc&type=3#check_icon_3');
+    width: 0;
+    height: 0;
+    -unity-background-image-tint-color: var(--accent-color);
+}
+
+.check-box__tick--done {
+    width: 40px;
+    height: 40px;
+}
+
+.check-box__tick--animation {
+    transition-property: width height;
+    transition-duration: 150ms, 150ms;
+    transition-timing-function: ease-out-back, ease-out-back;
+}

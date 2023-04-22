@@ -4,25 +4,25 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace ViewModels
 {
-    public class AddTaskDialogViewModel : ViewModel
+    public class AddTaskDialogViewModel : IBindingContext
     {
         private readonly TaskBroker _taskBroker;
-
-        private string _taskName;
-        private string _keyboardHeight;
+        private readonly IProperty<string> _taskName;
 
         public AddTaskDialogViewModel(IAppContext appContext)
         {
             _taskBroker = appContext.Resolve<TaskBroker>();
+            _taskName = new ObservableProperty<string>();
+
             AddTaskCommand = new Command(AddTask, CanAddTask);
         }
 
         public string TaskName
         {
-            get => _taskName;
+            get => _taskName.Value;
             set
             {
-                if (Set(ref _taskName, value))
+                if (_taskName.TrySetValue(value))
                 {
                     AddTaskCommand.RaiseCanExecuteChanged();
                 }

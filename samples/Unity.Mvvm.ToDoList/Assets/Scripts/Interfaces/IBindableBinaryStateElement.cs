@@ -2,7 +2,7 @@
 
 namespace Interfaces
 {
-    public interface IBindableBinaryStateElement : IBindableUIElement
+    public interface IBindableBinaryStateElement : IBindableElement
     {
         string BindingStatePath { get; }
 
