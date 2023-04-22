@@ -67,7 +67,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         protected virtual VisualElement MakeItem()
         {
-            return MakeItem(_itemTemplate.Value); // TODO: Pool.
+            return MakeItem(_itemTemplate.Value);
         }
 
         protected virtual void BindItem(VisualElement item, int index)
@@ -81,7 +81,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static VisualElement MakeItem(VisualTreeAsset itemAsset)
         {
-            return itemAsset.InstantiateBindableElement();
+            return itemAsset.InstantiateBindableElement(); // TODO: Pool.
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

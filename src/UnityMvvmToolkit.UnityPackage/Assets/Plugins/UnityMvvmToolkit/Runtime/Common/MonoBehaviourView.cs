@@ -1,5 +1,7 @@
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
 
@@ -17,15 +19,12 @@ namespace UnityMvvmToolkit.Common
         private void Awake()
         {
             OnInit();
-            SetBindingContext(GetBindingContext(), GetObjectProvider());
+            SetBindingContext(GetBindableElements(), GetBindingContext(), GetObjectProvider(), true);
         }
 
         private void OnDestroy()
         {
-            if (_objectProvider != null)
-            {
-                ResetBindingContext(_objectProvider);
-            }
+            ResetBindingContext(GetBindableElements(), _objectProvider, true);
         }
 
         public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
@@ -39,25 +38,12 @@ namespace UnityMvvmToolkit.Common
             _bindingContext = (TBindingContext) context;
             _objectProvider = objectProvider;
 
-            var bindableElementsSpan = GetBindableElements().AsSpan();
-
-            for (var i = 0; i < bindableElementsSpan.Length; i++)
-            {
-                bindableElementsSpan[i].SetBindingContext(context, objectProvider);
-            }
+            SetBindingContext(GetBindableElements(), context, objectProvider, false);
         }
 
         public void ResetBindingContext(IObjectProvider objectProvider)
         {
-            var bindableElementsSpan = GetBindableElements().AsSpan();
-
-            for (var i = 0; i < bindableElementsSpan.Length; i++)
-            {
-                bindableElementsSpan[i].ResetBindingContext(objectProvider);
-            }
-
-            _bindingContext = null;
-            _objectProvider = null;
+            ResetBindingContext(GetBindableElements(), objectProvider, false);
         }
 
         protected abstract void OnInit();
@@ -82,6 +68,53 @@ namespace UnityMvvmToolkit.Common
         protected virtual IObjectProvider GetObjectProvider()
         {
             return new BindingContextObjectProvider(GetValueConverters());
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetBindingContext(ReadOnlySpan<IBindableElement> bindableElements, IBindingContext context,
+            IObjectProvider objectProvider, bool initialize)
+        {
+            // TODO: Self set;
+
+            _bindingContext = (TBindingContext) context;
+            _objectProvider = objectProvider;
+
+            for (var i = 0; i < bindableElements.Length; i++)
+            {
+                var bindableElement = bindableElements[i];
+
+                if (initialize && bindableElement is IInitializable initializable)
+                {
+                    initializable.Initialize();
+                }
+
+                bindableElement.SetBindingContext(context, objectProvider);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ResetBindingContext(ReadOnlySpan<IBindableElement> bindableElements,
+            IObjectProvider objectProvider, bool dispose)
+        {
+            // TODO: Self reset;
+
+            for (var i = 0; i < bindableElements.Length; i++)
+            {
+                var bindableElement = bindableElements[i];
+
+                if (objectProvider != null)
+                {
+                    bindableElement.ResetBindingContext(objectProvider);
+                }
+
+                if (dispose && bindableElement is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+
+            _bindingContext = null;
+            _objectProvider = null;
         }
     }
 }
