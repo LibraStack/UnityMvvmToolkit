@@ -26,20 +26,20 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private ObjectPool<VisualElement> _itemAssetsPool;
         private Dictionary<int, VisualElement> _itemAssets;
 
-        public void Initialize()
+        public virtual void Initialize()
         {
             _itemAssets = new Dictionary<int, VisualElement>();
             _itemAssetsPool = new ObjectPool<VisualElement>(OnPoolInstantiateItem, actionOnRelease: OnPooReleaseItem,
                 actionOnDestroy: OnPoolDestroyItem);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             _itemAssets.Clear();
             _itemAssetsPool.Dispose();
         }
 
-        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
+        public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
             _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
             _itemTemplateBindingData ??= BindingItemTemplatePath.ToPropertyBindingData();
@@ -56,7 +56,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             AddItems(_itemsSource.Value);
         }
 
-        public void ResetBindingContext(IObjectProvider objectProvider)
+        public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
             if (_itemsSource == null)
             {
@@ -108,6 +108,11 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AddItem(ICollectionItem itemBindingContext)
         {
+            if (itemBindingContext is IInitializable initializable)
+            {
+                initializable.Initialize();
+            }
+
             var item = _itemAssetsPool.Get();
             item.SetBindingContext(itemBindingContext, _objectProvider, true);
 
@@ -116,10 +121,15 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void RemoveItem(ICollectionItem itemData)
+        private void RemoveItem(ICollectionItem itemBindingContext)
         {
-            _itemAssetsPool.Release(_itemAssets[itemData.Id]);
-            _itemAssets.Remove(itemData.Id);
+            if (itemBindingContext is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            _itemAssetsPool.Release(_itemAssets[itemBindingContext.Id]);
+            _itemAssets.Remove(itemBindingContext.Id);
         }
 
         private void ClearItems()

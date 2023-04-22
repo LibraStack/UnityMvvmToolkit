@@ -11,8 +11,13 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private IProperty<string> _valueProperty;
         private PropertyBindingData _propertyBindingData;
 
-        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
+        public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
+            if (string.IsNullOrWhiteSpace(BindingValuePath))
+            {
+                return;
+            }
+
             _propertyBindingData ??= BindingValuePath.ToPropertyBindingData();
 
             _valueProperty = objectProvider.RentProperty<string>(context, _propertyBindingData);
@@ -22,7 +27,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             this.RegisterValueChangedCallback(OnControlValueChanged);
         }
 
-        public void ResetBindingContext(IObjectProvider objectProvider)
+        public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
             if (_valueProperty == null)
             {

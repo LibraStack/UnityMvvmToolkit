@@ -12,7 +12,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private IBaseCommand _command;
         private CommandBindingData _commandBindingData;
 
-        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
+        public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
             if (string.IsNullOrWhiteSpace(Command))
             {
@@ -32,7 +32,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             SetControlEnabled(_command.CanExecute());
         }
 
-        public void ResetBindingContext(IObjectProvider objectProvider)
+        public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
             if (_command == null)
             {

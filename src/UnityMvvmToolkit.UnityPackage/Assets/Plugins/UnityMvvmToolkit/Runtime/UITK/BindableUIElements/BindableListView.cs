@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 using UnityEngine.UIElements;
@@ -7,6 +8,8 @@ using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
+
+// ReSharper disable SuspiciousTypeConversion.Global
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
@@ -20,7 +23,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         private IObjectProvider _objectProvider;
 
-        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
+        public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
             _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
             _itemTemplateBindingData ??= BindingItemTemplatePath.ToPropertyBindingData();
@@ -39,7 +42,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             bindItem += BindItem;
         }
 
-        public void ResetBindingContext(IObjectProvider objectProvider)
+        public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
             if (_itemsSource == null)
             {
@@ -57,6 +60,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             makeItem -= MakeItem;
             bindItem -= BindItem;
+            unbindItem -= UnbindItem;
             Clear();
         }
 
@@ -78,6 +82,14 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             }
         }
 
+        protected virtual void UnbindItem(VisualElement item, int index)
+        {
+            if (index >= 0 && index < itemsSource.Count)
+            {
+                UnbindItem(item, _itemsSource.Value[index], _objectProvider);
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static VisualElement MakeItem(VisualTreeAsset itemAsset)
         {
@@ -87,7 +99,24 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void BindItem(VisualElement item, IBindingContext bindingContext, IObjectProvider objectProvider)
         {
-            item.SetBindingContext(bindingContext, objectProvider);
+            if (bindingContext is IInitializable initializable)
+            {
+                initializable.Initialize();
+            }
+
+            item.SetBindingContext(bindingContext, objectProvider, true);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void UnbindItem(VisualElement item, IBindingContext bindingContext,
+            IObjectProvider objectProvider)
+        {
+            if (bindingContext is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            item.ResetBindingContext(objectProvider, true);
         }
     }
 }

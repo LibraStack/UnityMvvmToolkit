@@ -11,8 +11,13 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private IReadOnlyProperty<string> _textProperty;
         private PropertyBindingData _propertyBindingData;
 
-        public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
+        public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
+            if (string.IsNullOrWhiteSpace(BindingTextPath))
+            {
+                return;
+            }
+
             _propertyBindingData ??= BindingTextPath.ToPropertyBindingData();
 
             _textProperty = objectProvider.RentReadOnlyProperty<string>(context, _propertyBindingData);
@@ -21,7 +26,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             UpdateControlText(_textProperty.Value);
         }
 
-        public void ResetBindingContext(IObjectProvider objectProvider)
+        public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
             if (_textProperty == null)
             {
