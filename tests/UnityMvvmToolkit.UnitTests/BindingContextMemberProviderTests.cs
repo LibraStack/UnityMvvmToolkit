@@ -32,22 +32,27 @@ public class BindingContextMemberProviderTests
         var decrementMemberHash =
             HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(MyBindingContext.DecrementCommand));
 
+        var setValueMemberHash =
+            HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(MyBindingContext.SetValueCommand));
+
         // Act
         membersProvider.GetBindingContextMembers(bindingContextType, members);
 
         // Assert
-        members.Count.Should().Be(5);
+        members.Count.Should().Be(6);
 
         members.Should().ContainKey(titleMemberHash);
         members.Should().ContainKey(countMemberHash);
         members.Should().ContainKey(descriptionMemberHash);
         members.Should().ContainKey(incrementMemberHash);
         members.Should().ContainKey(decrementMemberHash);
+        members.Should().ContainKey(setValueMemberHash);
 
         members[titleMemberHash].MemberType.Should().Be(MemberTypes.Property);
         members[countMemberHash].MemberType.Should().Be(MemberTypes.Field);
         members[descriptionMemberHash].MemberType.Should().Be(MemberTypes.Field);
         members[incrementMemberHash].MemberType.Should().Be(MemberTypes.Property);
         members[decrementMemberHash].MemberType.Should().Be(MemberTypes.Property);
+        members[setValueMemberHash].MemberType.Should().Be(MemberTypes.Property);
     }
 }
