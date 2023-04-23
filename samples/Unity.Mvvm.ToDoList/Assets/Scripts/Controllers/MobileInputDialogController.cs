@@ -14,7 +14,7 @@ namespace Controllers
         public MobileInputDialogController(VisualElement mobileDialog)
         {
             _textField = mobileDialog.Q<TextField>();
-            _textField.RegisterCallback<FocusInEvent>(OnTextFieldFocusIn);
+            _textField?.RegisterCallback<FocusInEvent>(OnTextFieldFocusIn);
 
             _applyButton = mobileDialog.Q<Button>();
             _applyButton.clicked += OnApplyButtonClick;
@@ -37,7 +37,7 @@ namespace Controllers
 
         public void Dispose()
         {
-            _textField.UnregisterCallback<FocusInEvent>(OnTextFieldFocusIn);
+            _textField?.UnregisterCallback<FocusInEvent>(OnTextFieldFocusIn);
             _applyButton.clicked -= OnApplyButtonClick;
         }
 

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -31,15 +30,15 @@ namespace ViewModels
 
         private readonly IProperty<bool> _isAddTaskDialogActive;
 
-        private readonly IReadOnlyProperty<ObservableCollection<ICollectionItem>> _taskItems;
+        private readonly IReadOnlyProperty<ObservableCollection<TaskItemViewModel>> _taskItems;
 
         public MainViewModel(IAppContext appContext, VisualTreeAsset taskItemTemplate)
         {
             _dialogsService = appContext.Resolve<IDialogsService>();
 
             _taskItems =
-                new ObservableProperty<ObservableCollection<ICollectionItem>>(
-                    new ObservableCollection<ICollectionItem>());
+                new ObservableProperty<ObservableCollection<TaskItemViewModel>>(
+                    new ObservableCollection<TaskItemViewModel>());
             _taskItems.Value.CollectionChanged += OnTaskItemsCollectionChanged;
             ChangeAddTaskDialogVisibilityCommand = new AsyncCommand(ChangeAddTaskDialogVisibility);
 
@@ -57,7 +56,7 @@ namespace ViewModels
         public string Date => _date.Value;
         public int CreatedTasks => _createdTasks.Value;
         public int CompletedTasks => _completedTasks.Value;
-        public IReadOnlyCollection<ICollectionItem> TaskItems => _taskItems.Value;
+        public IReadOnlyCollection<TaskItemViewModel> TaskItems => _taskItems.Value;
 
         public IReadOnlyProperty<VisualTreeAsset> TaskItemTemplate { get; }
 
@@ -69,9 +68,16 @@ namespace ViewModels
 
         public IAsyncCommand ChangeAddTaskDialogVisibilityCommand { get; }
 
+        public event EventHandler<NotifyCollectionChangedEventArgs> TaskItemsCollectionChanged;
+
         public void Dispose()
         {
             _taskItems.Value.CollectionChanged -= OnTaskItemsCollectionChanged;
+
+            while (_taskItems.Value.Count > 0)
+            {
+                RemoveTask(_taskItems.Value[0]);
+            }
         }
 
         private async UniTask ChangeAddTaskDialogVisibility(CancellationToken cancellationToken = default)
@@ -90,11 +96,11 @@ namespace ViewModels
 
         private async UniTaskVoid SubscribeOnTaskAddMessage(TaskBroker taskBroker)
         {
-            // await foreach (var task in taskBroker.Subscribe())
-            // {
-            //     _taskItems/ValueTaskAwaiter<>.Add(new TaskItemViewModel { Name = task });
-            //     await ChangeAddTaskDialogVisibility();
-            // }
+            await foreach (var newTask in taskBroker.Subscribe())
+            {
+                AddTask(new TaskItemViewModel { Name = newTask });
+                await ChangeAddTaskDialogVisibility();
+            }
         }
 
         private string GetTodayDate()
@@ -115,6 +121,8 @@ namespace ViewModels
                     _completedTasks.Value = GetCompletedTasksCount(_taskItems.Value);
                     break;
             }
+
+            TaskItemsCollectionChanged?.Invoke(this, e);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -150,6 +158,7 @@ namespace ViewModels
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AddTask(TaskItemViewModel taskItem)
         {
+            taskItem.Initialize();
             taskItem.RemoveClick += OnTaskItemRemoveClick;
             taskItem.IsDoneChanged += OnTaskItemIsDoneChanged;
 
@@ -165,10 +174,11 @@ namespace ViewModels
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RemoveTask(TaskItemViewModel taskItem)
         {
+            _taskItems.Value.Remove(taskItem);
+
+            taskItem.Dispose();
             taskItem.RemoveClick -= OnTaskItemRemoveClick;
             taskItem.IsDoneChanged -= OnTaskItemIsDoneChanged;
-
-            _taskItems.Value.Remove(taskItem);
         }
     }
 }

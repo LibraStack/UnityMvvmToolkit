@@ -7,7 +7,7 @@
             <UnityMvvmToolkit.UITK.BindableUIElements.BindableLabel text="Add Task" class="input-dialog__header-label" />
             <BindableUIElements.BindableMobileInputField binding-value-path="TaskName" hide-mobile-input="true" class="input-dialog__text-field" />
             <ui:VisualElement name="ButtonsContainer" class="input-dialog__buttons-container">
-                <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton class="input-dialog__save-button">
+                <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton command="AddTaskCommand" class="input-dialog__save-button">
                     <ui:Label text="SAVE" class="input-dialog__save-button__label" />
                 </UnityMvvmToolkit.UITK.BindableUIElements.BindableButton>
             </ui:VisualElement>

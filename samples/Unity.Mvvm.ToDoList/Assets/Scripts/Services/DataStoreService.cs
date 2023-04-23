@@ -5,9 +5,7 @@ using Cysharp.Threading.Tasks;
 using Interfaces;
 using Interfaces.Services;
 using Newtonsoft.Json;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityMvvmToolkit.Common.Interfaces;
 using ViewModels;
 
 namespace Services
@@ -20,7 +18,7 @@ namespace Services
         private readonly string _dataFilePath;
 
         private AsyncLazy _saveDataTask;
-        private AsyncLazy<IEnumerable<ICollectionItem>> _loadDataTask;
+        private AsyncLazy<IEnumerable<TaskItemViewModel>> _loadDataTask;
 
         public DataStoreService(IAppContext appContext)
         {
@@ -36,13 +34,13 @@ namespace Services
             }
             finally
             {
-                // _mainViewModel.TaskItems.CollectionChanged += OnTaskItemsCollectionChanged;
+                _mainViewModel.TaskItemsCollectionChanged += OnTaskItemsCollectionChanged;
             }
         }
 
         public void Disable()
         {
-            // _mainViewModel.TaskItems.CollectionChanged -= OnTaskItemsCollectionChanged;
+            _mainViewModel.TaskItemsCollectionChanged -= OnTaskItemsCollectionChanged;
         }
 
         private void OnTaskItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -66,7 +64,7 @@ namespace Services
             await _saveDataTask;
         }
 
-        private async UniTask<IEnumerable<ICollectionItem>> LoadDataAsync()
+        private async UniTask<IEnumerable<TaskItemViewModel>> LoadDataAsync()
         {
             if (_loadDataTask?.Task.Status.IsCompleted() ?? true)
             {
@@ -76,21 +74,19 @@ namespace Services
             return await _loadDataTask;
         }
 
-        private static async UniTask SaveDataAsync(string filePath, IEnumerable<ICollectionItem> taskItems)
+        private static async UniTask SaveDataAsync(string filePath, IEnumerable<TaskItemViewModel> taskItems)
         {
             await File.WriteAllTextAsync(filePath, JsonConvert.SerializeObject(taskItems));
         }
 
-        private static async UniTask<IEnumerable<ICollectionItem>> LoadDataAsync(string filePath)
+        private static async UniTask<IEnumerable<TaskItemViewModel>> LoadDataAsync(string filePath)
         {
-            return GetDefaultDataSet();
-            // ;
-            // return File.Exists(filePath)
-            //     ? JsonConvert.DeserializeObject<IEnumerable<TaskItemViewModel>>(await File.ReadAllTextAsync(filePath))
-            //     : GetDefaultDataSet();
+            return File.Exists(filePath)
+                ? JsonConvert.DeserializeObject<IEnumerable<TaskItemViewModel>>(await File.ReadAllTextAsync(filePath))
+                : GetDefaultDataSet();
         }
 
-        private static IEnumerable<ICollectionItem> GetDefaultDataSet()
+        private static IEnumerable<TaskItemViewModel> GetDefaultDataSet()
         {
             return new TaskItemViewModel[]
             {

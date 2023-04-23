@@ -4,6 +4,7 @@ using Interfaces.Services;
 using Services;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
 using UnityMvvmToolkit.Core.Interfaces;
 using ViewModels;
@@ -50,6 +51,11 @@ public class AppContext : MonoBehaviour, IAppContext, IDisposable
 
     private void RegisterInstance<T>(T instance)
     {
+        if (instance is IInitializable initializable)
+        {
+            initializable.Initialize();
+        }
+
         if (instance is IDisposable disposable)
         {
             _disposables.Add(disposable);
