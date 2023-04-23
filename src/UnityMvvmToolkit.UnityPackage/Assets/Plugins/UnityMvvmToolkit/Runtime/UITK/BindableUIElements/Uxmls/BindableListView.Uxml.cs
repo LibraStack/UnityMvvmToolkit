@@ -26,6 +26,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 var bindableListView = (BindableListView) visualElement;
                 bindableListView.BindingItemsSourcePath = _bindingItemsSourceAttribute.GetValueFromBag(bag, context);
                 bindableListView.BindingItemTemplatePath = _bindingItemTemplateAttribute.GetValueFromBag(bag, context);
-            } }
+            }
+        }
     }
 }
