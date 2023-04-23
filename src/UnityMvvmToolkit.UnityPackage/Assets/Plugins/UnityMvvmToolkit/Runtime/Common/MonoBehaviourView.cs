@@ -5,12 +5,16 @@ using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
 
+// ReSharper disable SuspiciousTypeConversion.Global
+
 namespace UnityMvvmToolkit.Common
 {
     [DefaultExecutionOrder(1)]
     public abstract class MonoBehaviourView<TBindingContext> : MonoBehaviour, IBindableElement
         where TBindingContext : class, IBindingContext
     {
+        private TBindingContext _createdBindingContext;
+
         private TBindingContext _bindingContext;
         private IObjectProvider _objectProvider;
 
@@ -19,12 +23,12 @@ namespace UnityMvvmToolkit.Common
         private void Awake()
         {
             OnInit();
-            SetBindingContext(GetBindableElements(), GetBindingContext(), GetObjectProvider(), true);
+            SetBindingContext();
         }
 
         private void OnDestroy()
         {
-            ResetBindingContext(GetBindableElements(), _objectProvider, true);
+            ResetBindingContext();
         }
 
         public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
@@ -57,7 +61,9 @@ namespace UnityMvvmToolkit.Common
                     $"Cannot create an instance of the type parameter {typeof(TBindingContext)} because it does not have a parameterless constructor.");
             }
 
-            return Activator.CreateInstance<TBindingContext>();
+            _createdBindingContext = Activator.CreateInstance<TBindingContext>();
+
+            return _createdBindingContext;
         }
 
         protected virtual IValueConverter[] GetValueConverters()
@@ -71,11 +77,34 @@ namespace UnityMvvmToolkit.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetBindingContext()
+        {
+            var bindingContext = GetBindingContext();
+
+            if (bindingContext == _createdBindingContext &&
+                bindingContext is IInitializable initializable)
+            {
+                initializable.Initialize();
+            }
+
+            SetBindingContext(GetBindableElements(), bindingContext, GetObjectProvider(), true);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ResetBindingContext()
+        {
+            ResetBindingContext(GetBindableElements(), _objectProvider, true);
+
+            if (_createdBindingContext is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetBindingContext(ReadOnlySpan<IBindableElement> bindableElements, IBindingContext context,
             IObjectProvider objectProvider, bool initialize)
         {
-            // TODO: Self set;
-
             _bindingContext = (TBindingContext) context;
             _objectProvider = objectProvider;
 
@@ -96,8 +125,6 @@ namespace UnityMvvmToolkit.Common
         private void ResetBindingContext(ReadOnlySpan<IBindableElement> bindableElements,
             IObjectProvider objectProvider, bool dispose)
         {
-            // TODO: Self reset;
-
             for (var i = 0; i < bindableElements.Length; i++)
             {
                 var bindableElement = bindableElements[i];
