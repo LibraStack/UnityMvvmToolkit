@@ -30,11 +30,9 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
 
         public void CreateValueConverterInstances<T>(int capacity, WarmupType warmupType) where T : IValueConverter
         {
-            var valueConverter = _valueConverterHandler.GetValueConverterByType(typeof(T));
-
-            if (valueConverter == default)
+            if (_valueConverterHandler.TryGetValueConverterByType(typeof(T), out var valueConverter) == false)
             {
-                throw new NullReferenceException($"Converter '{typeof(T)}' not found.");
+                throw new NullReferenceException($"Converter '{typeof(T)}' not found");
             }
 
             switch (valueConverter)
@@ -79,7 +77,13 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                 _wrappersByConverter.Add(converterId, new Queue<IObjectWrapper>());
             }
 
-            var args = new object[] { _valueConverterHandler.GetValueConverterById(converterId) };
+            if (_valueConverterHandler.TryGetValueConverterById(converterId, out var valueConverter) == false)
+            {
+                throw new NullReferenceException(
+                    $"Property value converter from '{sourceType}' to '{targetType}' not found.");
+            }
+
+            var args = new object[] { valueConverter };
             var wrapperType = typeof(PropertyWrapper<,>).MakeGenericType(targetType, sourceType);
 
             return (TProperty) ObjectWrapperHelper.CreatePropertyWrapper(wrapperType, args, converterId,
@@ -129,7 +133,13 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                 _wrappersByConverter.Add(converterId, new Queue<IObjectWrapper>());
             }
 
-            var args = new object[] { _valueConverterHandler.GetValueConverterById(converterId) };
+            if (_valueConverterHandler.TryGetValueConverterById(converterId, out var valueConverter) == false)
+            {
+                throw new NullReferenceException(
+                    $"Parameter value converter to '{commandValueType}' not found.");
+            }
+
+            var args = new object[] { valueConverter };
             var wrapperType = typeof(CommandWrapper<>).MakeGenericType(commandValueType);
             var command = propertyInfo.GetValue(context);
 

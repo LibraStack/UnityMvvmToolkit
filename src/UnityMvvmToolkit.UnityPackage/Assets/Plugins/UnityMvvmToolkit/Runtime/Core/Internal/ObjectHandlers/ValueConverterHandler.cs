@@ -18,14 +18,14 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             RegisterValueConverters(valueConverters);
         }
 
-        public IValueConverter GetValueConverterById(int converterId)
+        public bool TryGetValueConverterById(int converterId, out IValueConverter valueConverter)
         {
-            return _valueConvertersByHash[converterId]; // TODO: throw clear exception.
+            return _valueConvertersByHash.TryGetValue(converterId, out valueConverter);
         }
 
-        public IValueConverter GetValueConverterByType(Type converterType)
+        public bool TryGetValueConverterByType(Type converterType, out IValueConverter valueConverter)
         {
-            return _valueConvertersByHash[converterType.GetHashCode()]; // TODO: throw clear exception.
+            return _valueConvertersByHash.TryGetValue(converterType.GetHashCode(), out valueConverter);
         }
 
         public void Dispose()
