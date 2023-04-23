@@ -33,11 +33,6 @@ namespace UnityMvvmToolkit.Common.Extensions
         public static void SetBindingContext(this VisualElement visualElement, IBindingContext context,
             IObjectProvider objectProvider, bool initialize = false)
         {
-            // if (visualElement is IBindableElement bindableElement)
-            // {
-            //     SetBindingContext(bindableElement, context, objectProvider, initialize);
-            // }
-
             var bindableElementsSpan = ((IBindableElement[]) visualElement.userData).AsSpan();
 
             for (var i = 0; i < bindableElementsSpan.Length; i++)
@@ -50,11 +45,6 @@ namespace UnityMvvmToolkit.Common.Extensions
         public static void ResetBindingContext(this VisualElement visualElement, IObjectProvider objectProvider,
             bool dispose = false)
         {
-            // if (visualElement is IBindableElement bindableElement)
-            // {
-            //     ResetBindingContext(bindableElement, objectProvider, dispose);
-            // }
-
             var bindableElementsSpan = ((IBindableElement[]) visualElement.userData).AsSpan();
 
             for (var i = 0; i < bindableElementsSpan.Length; i++)
@@ -78,11 +68,11 @@ namespace UnityMvvmToolkit.Common.Extensions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ResetBindingContext(IBindableElement bindableElement, IObjectProvider objectProvider,
-            bool disposeElements)
+            bool dispose)
         {
             bindableElement.ResetBindingContext(objectProvider);
 
-            if (disposeElements && bindableElement is IDisposable disposable)
+            if (dispose && bindableElement is IDisposable disposable)
             {
                 disposable.Dispose();
             }

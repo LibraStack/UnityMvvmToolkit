@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 using UnityEngine.UIElements;
@@ -8,8 +7,6 @@ using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
-
-// ReSharper disable SuspiciousTypeConversion.Global
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
@@ -86,7 +83,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         {
             if (index >= 0 && index < itemsSource.Count)
             {
-                UnbindItem(item, _itemsSource.Value[index], _objectProvider);
+                UnbindItem(item, _objectProvider);
             }
         }
 
@@ -99,23 +96,12 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void BindItem(VisualElement item, IBindingContext bindingContext, IObjectProvider objectProvider)
         {
-            if (bindingContext is IInitializable initializable)
-            {
-                initializable.Initialize();
-            }
-
             item.SetBindingContext(bindingContext, objectProvider, true);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void UnbindItem(VisualElement item, IBindingContext bindingContext,
-            IObjectProvider objectProvider)
+        private static void UnbindItem(VisualElement item, IObjectProvider objectProvider)
         {
-            if (bindingContext is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-
             item.ResetBindingContext(objectProvider, true);
         }
     }

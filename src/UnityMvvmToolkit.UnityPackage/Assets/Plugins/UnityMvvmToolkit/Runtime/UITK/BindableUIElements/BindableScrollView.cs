@@ -35,7 +35,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public virtual void Dispose()
         {
-            _itemAssets.Clear();
+            ClearItems();
             _itemAssetsPool.Dispose();
         }
 
@@ -63,16 +63,16 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 return;
             }
 
-            objectProvider.ReturnReadOnlyProperty(_itemsSource);
-            objectProvider.ReturnReadOnlyProperty(_itemTemplate);
-
             _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
             _itemsSource = null;
 
-            _itemTemplate = null;
-            _objectProvider = null;
+            objectProvider.ReturnReadOnlyProperty(_itemsSource);
+            objectProvider.ReturnReadOnlyProperty(_itemTemplate);
 
             ClearItems();
+
+            _itemTemplate = null;
+            _objectProvider = null;
         }
 
         protected virtual void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -108,11 +108,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AddItem(ICollectionItem itemBindingContext)
         {
-            if (itemBindingContext is IInitializable initializable)
-            {
-                initializable.Initialize();
-            }
-
             var item = _itemAssetsPool.Get();
             item.SetBindingContext(itemBindingContext, _objectProvider, true);
 
@@ -123,19 +118,24 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RemoveItem(ICollectionItem itemBindingContext)
         {
-            if (itemBindingContext is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-
             _itemAssetsPool.Release(_itemAssets[itemBindingContext.Id]);
             _itemAssets.Remove(itemBindingContext.Id);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ClearItems()
         {
+            if (_itemAssets.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var asset in _itemAssets)
+            {
+                _itemAssetsPool.Release(asset.Value);
+            }
+
             _itemAssets.Clear();
-            Clear();
         }
 
         private VisualElement OnPoolInstantiateItem()
