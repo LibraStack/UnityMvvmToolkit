@@ -100,13 +100,13 @@ namespace UnityMvvmToolkit.Core
 
             var propertyInfo = (PropertyInfo) memberInfo;
 
-            if (propertyInfo.PropertyType != typeof(TCommand))
+            if (typeof(TCommand).IsAssignableFrom(propertyInfo.PropertyType))
             {
-                throw new InvalidCastException(
-                    $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(TCommand)} command.");
+                return (TCommand) propertyInfo.GetValue(context);
             }
 
-            return (TCommand) propertyInfo.GetValue(context);
+            throw new InvalidCastException(
+                $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(TCommand)} command.");
         }
 
         public IBaseCommand RentCommandWrapper(IBindingContext context, CommandBindingData bindingData)
