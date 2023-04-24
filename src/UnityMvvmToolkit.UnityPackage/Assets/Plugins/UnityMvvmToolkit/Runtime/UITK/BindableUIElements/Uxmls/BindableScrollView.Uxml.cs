@@ -2,14 +2,10 @@
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public partial class BindableScrollView
+    public partial class BindableScrollView<TItemBindingContext>
     {
         public string BindingItemsSourcePath { get; private set; }
         public string BindingItemTemplatePath { get; private set; }
-
-        public new class UxmlFactory : UxmlFactory<BindableScrollView, UxmlTraits>
-        {
-        }
 
         public new class UxmlTraits : ScrollView.UxmlTraits
         {
@@ -23,7 +19,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             {
                 base.Init(visualElement, bag, context);
 
-                var bindableScrollView = (BindableScrollView) visualElement;
+                var bindableScrollView = (BindableScrollView<TItemBindingContext>) visualElement;
                 bindableScrollView.BindingItemsSourcePath = _bindingItemsSourceAttribute.GetValueFromBag(bag, context);
                 bindableScrollView.BindingItemTemplatePath = _bindingItemTemplateAttribute.GetValueFromBag(bag, context);
             }

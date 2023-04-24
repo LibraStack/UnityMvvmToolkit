@@ -2,14 +2,10 @@
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public partial class BindableListView
+    public partial class BindableListView<TItemBindingContext>
     {
         public string BindingItemsSourcePath { get; private set; }
         public string BindingItemTemplatePath { get; private set; }
-
-        public new class UxmlFactory : UxmlFactory<BindableListView, UxmlTraits>
-        {
-        }
 
         public new class UxmlTraits : ListView.UxmlTraits
         {
@@ -23,7 +19,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             {
                 base.Init(visualElement, bag, context);
 
-                var bindableListView = (BindableListView) visualElement;
+                var bindableListView = (BindableListView<TItemBindingContext>) visualElement;
                 bindableListView.BindingItemsSourcePath = _bindingItemsSourceAttribute.GetValueFromBag(bag, context);
                 bindableListView.BindingItemTemplatePath = _bindingItemTemplateAttribute.GetValueFromBag(bag, context);
             }
