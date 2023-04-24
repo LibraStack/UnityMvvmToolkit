@@ -15,7 +15,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="ListContainer" class="content-page__list-container">
+        <ui:VisualElement name="ItemsCollection" class="content-page__list-container">
             <BindableUIElements.BindableTaskScrollView binding-items-source-path="TaskItems" binding-item-template-path="TaskItemTemplate" scroll-deceleration-rate="0,135" elasticity="0.05" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" touch-scroll-type="Elastic" />
         </ui:VisualElement>
         <ui:VisualElement name="BottomPanel" class="content-page__bottom-panel" />
