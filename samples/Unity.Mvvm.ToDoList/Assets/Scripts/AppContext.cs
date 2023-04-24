@@ -22,18 +22,18 @@ public class AppContext : MonoBehaviour, IAppContext, IDisposable
     {
         _disposables = new List<IDisposable>();
         _registeredTypes = new Dictionary<Type, object>();
-        
+
         RegisterInstance(_addTaskView);
-        
+
         RegisterInstance(new TaskBroker());
         RegisterInstance<IDialogsService>(new DialogsService(this));
 
-        RegisterInstance(new MainViewModel(this, _taskItemAsset));
+        RegisterInstance(new MainViewModel(this));
         RegisterInstance(new AddTaskDialogViewModel(this));
-        
+
         RegisterInstance<IDataStoreService>(new DataStoreService(this));
-        // RegisterInstance<IBindableElementsFactory>(new ToDoListBindableElementsFactory(_taskItemAsset));
         RegisterInstance(GetValueConverters());
+        RegisterInstance(GetCollectionItemTemplates());
     }
 
     public T Resolve<T>()
@@ -69,6 +69,14 @@ public class AppContext : MonoBehaviour, IAppContext, IDisposable
         return new IValueConverter[]
         {
             new IntToStrConverter()
+        };
+    }
+
+    private IReadOnlyDictionary<Type, object> GetCollectionItemTemplates()
+    {
+        return new Dictionary<Type, object>
+        {
+            { typeof(TaskItemViewModel), _taskItemAsset }
         };
     }
 }

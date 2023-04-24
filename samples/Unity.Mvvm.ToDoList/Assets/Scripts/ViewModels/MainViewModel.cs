@@ -11,7 +11,6 @@ using Cysharp.Threading.Tasks;
 using Extensions;
 using Interfaces;
 using Interfaces.Services;
-using UnityEngine.UIElements;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
@@ -32,7 +31,7 @@ namespace ViewModels
 
         private readonly IReadOnlyProperty<ObservableCollection<TaskItemViewModel>> _taskItems;
 
-        public MainViewModel(IAppContext appContext, VisualTreeAsset taskItemTemplate)
+        public MainViewModel(IAppContext appContext)
         {
             _dialogsService = appContext.Resolve<IDialogsService>();
 
@@ -48,8 +47,6 @@ namespace ViewModels
 
             _isAddTaskDialogActive = new ObservableProperty<bool>();
 
-            TaskItemTemplate = new ObservableProperty<VisualTreeAsset>(taskItemTemplate);
-
             SubscribeOnTaskAddMessage(appContext.Resolve<TaskBroker>()).Forget();
         }
 
@@ -57,8 +54,6 @@ namespace ViewModels
         public int CreatedTasks => _createdTasks.Value;
         public int CompletedTasks => _completedTasks.Value;
         public IReadOnlyCollection<TaskItemViewModel> TaskItems => _taskItems.Value;
-
-        public IReadOnlyProperty<VisualTreeAsset> TaskItemTemplate { get; }
 
         public bool IsAddTaskDialogActive
         {
