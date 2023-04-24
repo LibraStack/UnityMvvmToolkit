@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
+using UnityMvvmToolkit.Core.Internal.Extensions;
 
 // ReSharper disable SuspiciousTypeConversion.Global
 
@@ -66,14 +68,19 @@ namespace UnityMvvmToolkit.Common
             return _createdBindingContext;
         }
 
+        protected virtual IObjectProvider GetObjectProvider()
+        {
+            return new BindingContextObjectProvider(GetValueConverters(), GetCollectionItemTemplates());
+        }
+
         protected virtual IValueConverter[] GetValueConverters()
         {
             return Array.Empty<IValueConverter>();
         }
 
-        protected virtual IObjectProvider GetObjectProvider()
+        protected virtual IReadOnlyDictionary<Type, object> GetCollectionItemTemplates()
         {
-            return new BindingContextObjectProvider(GetValueConverters());
+            return ImmutableDictionary.Empty<Type, object>();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

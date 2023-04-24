@@ -24,5 +24,7 @@ namespace UnityMvvmToolkit.Core.Interfaces
 
         IBaseCommand RentCommandWrapper(IBindingContext context, CommandBindingData bindingData);
         void ReturnCommandWrapper(IBaseCommand command, CommandBindingData bindingData);
+
+        internal object GetCollectionItemTemplate<T>();
     }
 }

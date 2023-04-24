@@ -16,8 +16,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
     public abstract partial class BindableScrollView<TItemBindingContext> : ScrollView, IBindableElement,
         IInitializable, IDisposable where TItemBindingContext : ICollectionItem
     {
-        private PropertyBindingData _itemTemplateBindingData;
-        private IReadOnlyProperty<VisualTreeAsset> _itemTemplate;
+        private VisualTreeAsset _itemTemplate;
 
         private PropertyBindingData _itemsSourceBindingData;
         private IReadOnlyProperty<ObservableCollection<TItemBindingContext>> _itemsSource;
@@ -43,7 +42,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
             _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
-            _itemTemplateBindingData ??= BindingItemTemplatePath.ToPropertyBindingData();
+            _itemTemplate ??= (VisualTreeAsset) objectProvider.GetCollectionItemTemplate<TItemBindingContext>();
 
             _objectProvider = objectProvider;
 
@@ -51,8 +50,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 objectProvider.RentReadOnlyProperty<ObservableCollection<TItemBindingContext>>(context,
                     _itemsSourceBindingData);
             _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
-
-            _itemTemplate = objectProvider.RentReadOnlyProperty<VisualTreeAsset>(context, _itemTemplateBindingData);
 
             AddItems(_itemsSource.Value);
         }
@@ -67,7 +64,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
 
             objectProvider.ReturnReadOnlyProperty(_itemsSource);
-            objectProvider.ReturnReadOnlyProperty(_itemTemplate);
 
             ClearItems();
 
@@ -157,7 +153,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         private VisualElement OnPoolInstantiateItem()
         {
-            return MakeItem(_itemTemplate.Value);
+            return MakeItem(_itemTemplate);
         }
 
         private void OnPooReleaseItem(VisualElement item)

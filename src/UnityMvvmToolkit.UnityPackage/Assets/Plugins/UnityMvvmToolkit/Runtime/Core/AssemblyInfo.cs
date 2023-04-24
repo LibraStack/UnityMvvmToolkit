@@ -2,4 +2,5 @@
 
 [assembly: InternalsVisibleTo("UnityMvvmToolkit.UGUI")]
 [assembly: InternalsVisibleTo("UnityMvvmToolkit.UITK")]
+[assembly: InternalsVisibleTo("UnityMvvmToolkit.Common")]
 [assembly: InternalsVisibleTo("UnityMvvmToolkit.UnitTests")]

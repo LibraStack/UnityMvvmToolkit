@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -16,11 +17,16 @@ namespace UnityMvvmToolkit.Core
         private readonly ValueConverterHandler _valueConverterHandler;
         private readonly BindingContextHandler _bindingContextHandler;
 
-        public BindingContextObjectProvider(IValueConverter[] converters)
+        private readonly IReadOnlyDictionary<Type, object> _collectionItemTemplates;
+
+        public BindingContextObjectProvider(IValueConverter[] converters,
+            IReadOnlyDictionary<Type, object> collectionItemTemplates = null)
         {
             _valueConverterHandler = new ValueConverterHandler(converters);
             _objectWrapperHandler = new ObjectWrapperHandler(_valueConverterHandler);
             _bindingContextHandler = new BindingContextHandler(new BindingContextMemberProvider());
+
+            _collectionItemTemplates = collectionItemTemplates;
         }
 
         public IObjectProvider WarmupAssemblyViewModels()
@@ -136,6 +142,16 @@ namespace UnityMvvmToolkit.Core
             _objectWrapperHandler.Dispose();
             _valueConverterHandler.Dispose();
             _bindingContextHandler.Dispose();
+        }
+
+        object IObjectProvider.GetCollectionItemTemplate<T>()
+        {
+            if (_collectionItemTemplates.TryGetValue(typeof(T), out var itemTemplate))
+            {
+                return itemTemplate;
+            }
+
+            throw new NullReferenceException($"Item template for '{typeof(T)}' not found.");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
