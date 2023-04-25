@@ -8,8 +8,8 @@ namespace ViewModels
     {
         public CounterViewModel()
         {
-            Count = new ObservableProperty<int>();
-            ThemeMode = new ObservableProperty<ThemeMode>();
+            Count = new Property<int>();
+            ThemeMode = new Property<ThemeMode>();
 
             IncrementCommand = new Command(IncrementCount);
             DecrementCommand = new Command(DecrementCount);

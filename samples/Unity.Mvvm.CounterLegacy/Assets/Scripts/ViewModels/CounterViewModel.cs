@@ -5,7 +5,7 @@ namespace ViewModels
 {
     public class CounterViewModel : IBindingContext
     {
-        private readonly IProperty<int> _count = new ObservableProperty<int>();
+        private readonly IProperty<int> _count = new Property<int>();
 
         public CounterViewModel()
         {

@@ -35,10 +35,18 @@ public class BindingContextObjectProviderTests
 
         // Assert
         countProperty
-            .Should().NotBeNull().And.BeAssignableTo<IProperty<int>>().And.BeAssignableTo<IReadOnlyProperty<int>>();
+            .Should().NotBeNull()
+            .And
+            .BeAssignableTo<IProperty<int>>()
+            .And
+            .BeAssignableTo<IReadOnlyProperty<int>>();
 
         titleProperty
-            .Should().NotBeNull().And.BeAssignableTo<IReadOnlyProperty<string>>();
+            .Should().NotBeNull()
+            .And
+            .BeAssignableTo<IReadOnlyProperty<string>>()
+            .And
+            .NotBeAssignableTo<IProperty<string>>();
 
         countProperty.Value.Should().Be(countValue);
         titleProperty.Value.Should().Be(titleValue);

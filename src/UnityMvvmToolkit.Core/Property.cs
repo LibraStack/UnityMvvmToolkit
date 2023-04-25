@@ -5,15 +5,15 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.Core
 {
-    public sealed class ObservableProperty<TType> : IProperty<TType>
+    public sealed class Property<TType> : IProperty<TType>
     {
         private TType _value;
 
-        public ObservableProperty()
+        public Property() : this(default)
         {
         }
 
-        public ObservableProperty(TType value)
+        public Property(TType value)
         {
             _value = value;
         }
@@ -50,9 +50,9 @@ namespace UnityMvvmToolkit.Core
             ValueChanged?.Invoke(this, value);
         }
 
-        public static implicit operator ObservableProperty<TType>(TType value)
+        public static implicit operator Property<TType>(TType value)
         {
-            return new ObservableProperty<TType>(value);
+            return new Property<TType>(value);
         }
     }
 }

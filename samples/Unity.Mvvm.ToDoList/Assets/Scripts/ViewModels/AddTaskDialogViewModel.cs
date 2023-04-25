@@ -13,8 +13,8 @@ namespace ViewModels
 
         public AddTaskDialogViewModel(IAppContext appContext)
         {
+            _taskName = new Property<string>();
             _taskBroker = appContext.Resolve<TaskBroker>();
-            _taskName = new ObservableProperty<string>();
 
             AddTaskCommand = new Command(AddTask, CanAddTask);
         }

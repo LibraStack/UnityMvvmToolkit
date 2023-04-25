@@ -21,31 +21,30 @@ namespace ViewModels
 {
     public class MainViewModel : IBindingContext, IDisposable
     {
-        private readonly IDialogsService _dialogsService;
-
-        private readonly IProperty<string> _date;
         private readonly IProperty<int> _createdTasks;
         private readonly IProperty<int> _completedTasks;
-
         private readonly IProperty<bool> _isAddTaskDialogActive;
 
+        private readonly IReadOnlyProperty<string> _date;
         private readonly IReadOnlyProperty<ObservableCollection<TaskItemViewModel>> _taskItems;
+
+        private readonly IDialogsService _dialogsService;
 
         public MainViewModel(IAppContext appContext)
         {
             _dialogsService = appContext.Resolve<IDialogsService>();
 
             _taskItems =
-                new ObservableProperty<ObservableCollection<TaskItemViewModel>>(
+                new ReadOnlyProperty<ObservableCollection<TaskItemViewModel>>(
                     new ObservableCollection<TaskItemViewModel>());
             _taskItems.Value.CollectionChanged += OnTaskItemsCollectionChanged;
             ChangeAddTaskDialogVisibilityCommand = new AsyncCommand(ChangeAddTaskDialogVisibility);
 
-            _date = new ObservableProperty<string>(GetTodayDate());
-            _createdTasks = new ObservableProperty<int>(GetCreatedTasksCount(_taskItems.Value));
-            _completedTasks = new ObservableProperty<int>(GetCompletedTasksCount(_taskItems.Value));
+            _date = new ReadOnlyProperty<string>(GetTodayDate());
+            _createdTasks = new Property<int>(GetCreatedTasksCount(_taskItems.Value));
+            _completedTasks = new Property<int>(GetCompletedTasksCount(_taskItems.Value));
 
-            _isAddTaskDialogActive = new ObservableProperty<bool>();
+            _isAddTaskDialogActive = new Property<bool>();
 
             SubscribeOnTaskAddMessage(appContext.Resolve<TaskBroker>()).Forget();
         }

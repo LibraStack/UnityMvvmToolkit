@@ -3,16 +3,18 @@ using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.UnitTests.Interfaces;
 using UnityMvvmToolkit.UnitTests.TestCommands;
 
+// ReSharper disable InconsistentNaming
+
 namespace UnityMvvmToolkit.UnitTests.TestBindingContext;
 
 public class MyBindingContext : IBindingContext
 {
-    private readonly IProperty<int> _count = new ObservableProperty<int>();
-    private readonly IProperty<string> m_description = new ObservableProperty<string>();
+    private readonly IProperty<int> _count = new Property<int>();
+    private readonly IProperty<string> m_description = new Property<string>();
 
     public MyBindingContext(string title = "Title")
     {
-        Title = new ObservableProperty<string>(title);
+        Title = new ReadOnlyProperty<string>(title);
 
         IncrementCommand = new Command(() => Count++);
         DecrementCommand = new MyCommand(() => Count--);

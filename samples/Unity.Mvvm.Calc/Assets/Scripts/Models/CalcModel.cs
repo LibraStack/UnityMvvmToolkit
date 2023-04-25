@@ -23,8 +23,8 @@ namespace Models
 
         public CalcModel(IAppContext appContext)
         {
-            _result = new ObservableProperty<string>(string.Empty);
-            _expression = new ObservableProperty<string>(string.Empty);
+            _result = new Property<string>(string.Empty);
+            _expression = new Property<string>(string.Empty);
 
             _converter = appContext.Resolve<FloatToStrConverter>();
             _mathOperations = appContext.Resolve<IReadOnlyDictionary<char, IMathOperation>>();

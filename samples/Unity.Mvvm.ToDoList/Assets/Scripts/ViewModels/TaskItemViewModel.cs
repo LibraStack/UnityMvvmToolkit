@@ -7,8 +7,8 @@ namespace ViewModels
 {
     public class TaskItemViewModel : ICollectionItem, IInitializable, IDisposable
     {
-        private readonly IProperty<bool> _isDone = new ObservableProperty<bool>();
-        private readonly IProperty<string> _name = new ObservableProperty<string>();
+        private readonly IProperty<bool> _isDone = new Property<bool>();
+        private readonly IProperty<string> _name = new Property<string>();
 
         public TaskItemViewModel()
         {
