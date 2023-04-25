@@ -22,7 +22,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
             _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
-            _itemTemplate ??= (VisualTreeAsset) objectProvider.GetCollectionItemTemplate<TItemBindingContext>();
+            _itemTemplate ??= objectProvider.GetCollectionItemTemplate<TItemBindingContext, VisualTreeAsset>();
 
             _objectProvider = objectProvider;
 

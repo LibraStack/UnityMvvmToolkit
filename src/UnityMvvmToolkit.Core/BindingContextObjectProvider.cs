@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Enums;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal;
+using UnityMvvmToolkit.Core.Internal.Extensions;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
 using UnityMvvmToolkit.Core.Internal.ObjectHandlers;
 
@@ -26,7 +27,7 @@ namespace UnityMvvmToolkit.Core
             _objectWrapperHandler = new ObjectWrapperHandler(_valueConverterHandler);
             _bindingContextHandler = new BindingContextHandler(new BindingContextMemberProvider());
 
-            _collectionItemTemplates = collectionItemTemplates;
+            _collectionItemTemplates = collectionItemTemplates ?? ImmutableDictionary.Empty<Type, object>();
         }
 
         public IObjectProvider WarmupAssemblyViewModels()
@@ -137,21 +138,21 @@ namespace UnityMvvmToolkit.Core
             }
         }
 
+        public TValue GetCollectionItemTemplate<TKey, TValue>()
+        {
+            if (_collectionItemTemplates.TryGetValue(typeof(TKey), out var itemTemplate))
+            {
+                return (TValue) itemTemplate;
+            }
+
+            throw new NullReferenceException($"Item template for '{typeof(TKey)}' not found.");
+        }
+
         public void Dispose()
         {
             _objectWrapperHandler.Dispose();
             _valueConverterHandler.Dispose();
             _bindingContextHandler.Dispose();
-        }
-
-        object IObjectProvider.GetCollectionItemTemplate<T>()
-        {
-            if (_collectionItemTemplates.TryGetValue(typeof(T), out var itemTemplate))
-            {
-                return itemTemplate;
-            }
-
-            throw new NullReferenceException($"Item template for '{typeof(T)}' not found.");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
