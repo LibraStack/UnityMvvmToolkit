@@ -1,7 +1,7 @@
 using FluentAssertions;
 using UnityMvvmToolkit.Core.Internal.StringParsers;
 
-namespace UnityMvvmToolkit.UnitTests;
+namespace UnityMvvmToolkit.Test.Unit;
 
 public class PropertyStringParserTests
 {

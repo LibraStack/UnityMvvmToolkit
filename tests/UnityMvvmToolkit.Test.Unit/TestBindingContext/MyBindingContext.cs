@@ -1,11 +1,11 @@
 ﻿using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UnitTests.Interfaces;
-using UnityMvvmToolkit.UnitTests.TestCommands;
+using UnityMvvmToolkit.Test.Unit.Interfaces;
+using UnityMvvmToolkit.Test.Unit.TestCommands;
 
 // ReSharper disable InconsistentNaming
 
-namespace UnityMvvmToolkit.UnitTests.TestBindingContext;
+namespace UnityMvvmToolkit.Test.Unit.TestBindingContext;
 
 public class MyBindingContext : IBindingContext
 {

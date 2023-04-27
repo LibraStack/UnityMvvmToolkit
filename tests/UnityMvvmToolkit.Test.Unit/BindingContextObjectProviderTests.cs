@@ -4,9 +4,9 @@ using UnityMvvmToolkit.Core.Converters.ParameterValueConverters;
 using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
 using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.UnitTests.TestBindingContext;
+using UnityMvvmToolkit.Test.Unit.TestBindingContext;
 
-namespace UnityMvvmToolkit.UnitTests;
+namespace UnityMvvmToolkit.Test.Unit;
 
 public class BindingContextObjectProviderTests
 {

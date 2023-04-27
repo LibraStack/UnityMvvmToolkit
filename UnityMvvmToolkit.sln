@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityMvvmToolkit.Core", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A9EFA272-7925-416B-A4B7-450672CD05C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityMvvmToolkit.UnitTests", "tests\UnityMvvmToolkit.UnitTests\UnityMvvmToolkit.UnitTests.csproj", "{DAE87E24-B2B1-4B61-B411-17201146670A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityMvvmToolkit.Test.Unit", "tests\UnityMvvmToolkit.Test.Unit\UnityMvvmToolkit.Test.Unit.csproj", "{DAE87E24-B2B1-4B61-B411-17201146670A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

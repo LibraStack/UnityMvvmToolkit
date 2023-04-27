@@ -2,9 +2,9 @@
 using FluentAssertions;
 using UnityMvvmToolkit.Core.Internal;
 using UnityMvvmToolkit.Core.Internal.Helpers;
-using UnityMvvmToolkit.UnitTests.TestBindingContext;
+using UnityMvvmToolkit.Test.Unit.TestBindingContext;
 
-namespace UnityMvvmToolkit.UnitTests;
+namespace UnityMvvmToolkit.Test.Unit;
 
 public class BindingContextMemberProviderTests
 {

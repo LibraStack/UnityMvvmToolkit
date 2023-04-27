@@ -1,7 +1,7 @@
 ﻿using UnityMvvmToolkit.Core;
-using UnityMvvmToolkit.UnitTests.Interfaces;
+using UnityMvvmToolkit.Test.Unit.Interfaces;
 
-namespace UnityMvvmToolkit.UnitTests.TestCommands;
+namespace UnityMvvmToolkit.Test.Unit.TestCommands;
 
 public class MyCommand : Command, IMyCommand
 {

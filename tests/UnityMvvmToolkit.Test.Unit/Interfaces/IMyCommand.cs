@@ -1,6 +1,6 @@
 ﻿using UnityMvvmToolkit.Core.Interfaces;
 
-namespace UnityMvvmToolkit.UnitTests.Interfaces;
+namespace UnityMvvmToolkit.Test.Unit.Interfaces;
 
 public interface IMyCommand : ICommand
 {
