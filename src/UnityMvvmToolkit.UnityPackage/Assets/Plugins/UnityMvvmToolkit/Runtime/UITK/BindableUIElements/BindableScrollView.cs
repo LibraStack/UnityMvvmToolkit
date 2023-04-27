@@ -16,6 +16,8 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
     public abstract partial class BindableScrollView<TItemBindingContext> : ScrollView, IBindableElement,
         IInitializable, IDisposable where TItemBindingContext : ICollectionItem
     {
+        private int _itemsCount;
+
         private VisualTreeAsset _itemTemplate;
 
         private PropertyBindingData _itemsSourceBindingData;
@@ -35,7 +37,16 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public virtual void Dispose()
         {
-            ClearItems();
+            if (_itemsSource == null)
+            {
+                _itemsCount = 0;
+                _itemAssets.Clear();
+            }
+            else
+            {
+                ClearItems(_itemsSource.Value);
+            }
+
             _itemAssetsPool.Dispose();
         }
 
@@ -63,9 +74,9 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
 
-            objectProvider.ReturnReadOnlyProperty(_itemsSource);
+            ClearItems(_itemsSource.Value);
 
-            ClearItems();
+            objectProvider.ReturnReadOnlyProperty(_itemsSource);
 
             _itemsSource = null;
             _itemTemplate = null;
@@ -77,13 +88,14 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             return itemTemplate.InstantiateBindableElement();
         }
 
-        protected virtual void BindItem(VisualElement item, TItemBindingContext bindingContext,
+        protected virtual void BindItem(VisualElement item, int index, TItemBindingContext bindingContext,
             IObjectProvider objectProvider)
         {
             item.SetBindingContext(bindingContext, objectProvider, true);
         }
 
-        protected virtual void UnbindItem(VisualElement item, IObjectProvider objectProvider)
+        protected virtual void UnbindItem(VisualElement item, int index, TItemBindingContext bindingContext,
+            IObjectProvider objectProvider)
         {
             item.ResetBindingContext(objectProvider, true);
         }
@@ -122,33 +134,37 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private void AddItem(TItemBindingContext itemBindingContext)
         {
             var item = _itemAssetsPool.Get();
-            BindItem(item, itemBindingContext, _objectProvider);
+            BindItem(item, _itemsCount, itemBindingContext, _objectProvider);
 
+            _itemsCount++;
             _itemAssets.Add(itemBindingContext.Id, item);
+
             contentContainer.Add(item);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RemoveItem(TItemBindingContext itemBindingContext)
         {
-            _itemAssetsPool.Release(_itemAssets[itemBindingContext.Id]);
+            _itemsCount--;
+
+            var item = _itemAssets[itemBindingContext.Id];
+
+            if (_objectProvider != null)
+            {
+                UnbindItem(item, _itemsCount, itemBindingContext, _objectProvider);
+            }
+
             _itemAssets.Remove(itemBindingContext.Id);
+            _itemAssetsPool.Release(item);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ClearItems()
+        private void ClearItems(IReadOnlyList<TItemBindingContext> items)
         {
-            if (_itemAssets.Count == 0)
+            for (var i = items.Count - 1; i >= 0; i--)
             {
-                return;
+                RemoveItem(items[i]);
             }
-
-            foreach (var asset in _itemAssets)
-            {
-                _itemAssetsPool.Release(asset.Value);
-            }
-
-            _itemAssets.Clear();
         }
 
         private VisualElement OnPoolInstantiateItem()
@@ -158,11 +174,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         private void OnPooReleaseItem(VisualElement item)
         {
-            if (_objectProvider != null)
-            {
-                UnbindItem(item, _objectProvider);
-            }
-
             item.RemoveFromHierarchy();
         }
 

@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Runtime.CompilerServices;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.Common.Extensions;
 using UnityMvvmToolkit.Common.Interfaces;
@@ -46,12 +48,13 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
 
-            objectProvider.ReturnReadOnlyProperty(_itemsSource);
-
             makeItem -= MakeItem;
             bindItem -= BindItem;
             unbindItem -= UnbindItem;
-            Clear();
+
+            ClearItems();
+
+            objectProvider.ReturnReadOnlyProperty(_itemsSource);
 
             _itemsSource = null;
             _itemTemplate = null;
@@ -63,13 +66,14 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             return itemTemplate.InstantiateBindableElement(); // TODO: Pool.
         }
 
-        protected virtual void BindItem(VisualElement item, TItemBindingContext bindingContext,
+        protected virtual void BindItem(VisualElement item, int index, TItemBindingContext bindingContext,
             IObjectProvider objectProvider)
         {
             item.SetBindingContext(bindingContext, objectProvider, true);
         }
 
-        protected virtual void UnbindItem(VisualElement item, IObjectProvider objectProvider)
+        protected virtual void UnbindItem(VisualElement item, int index, TItemBindingContext bindingContext,
+            IObjectProvider objectProvider)
         {
             item.ResetBindingContext(objectProvider, true);
         }
@@ -81,17 +85,23 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         private void BindItem(VisualElement item, int index)
         {
-            BindItem(item, _itemsSource.Value[index], _objectProvider);
+            BindItem(item, index, _itemsSource.Value[index], _objectProvider);
         }
 
         private void UnbindItem(VisualElement item, int index)
         {
-            UnbindItem(item, _objectProvider);
+            UnbindItem(item, index, _itemsSource.Value[index], _objectProvider);
         }
 
         private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             RefreshItems(); // TODO: Do not refresh all items.
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ClearItems()
+        {
+            itemsSource = Array.Empty<TItemBindingContext>();
         }
     }
 }
