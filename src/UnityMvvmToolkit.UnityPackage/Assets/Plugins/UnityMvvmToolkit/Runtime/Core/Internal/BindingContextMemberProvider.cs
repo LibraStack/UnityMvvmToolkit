@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using UnityMvvmToolkit.Core.Attributes;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Helpers;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
@@ -28,7 +29,7 @@ namespace UnityMvvmToolkit.Core.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryGetMemberHashCode(Type contextType, MemberInfo memberInfo, out int hashCode)
+        private static bool TryGetMemberHashCode(Type contextType, MemberInfo memberInfo, out int hashCode)
         {
             switch (memberInfo.MemberType)
             {
@@ -43,7 +44,7 @@ namespace UnityMvvmToolkit.Core.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryGetFieldHashCode(Type contextType, FieldInfo fieldInfo, out int hashCode)
+        private static bool TryGetFieldHashCode(Type contextType, FieldInfo fieldInfo, out int hashCode)
         {
             if (fieldInfo.IsDefined(typeof(CompilerGeneratedAttribute), false))
             {
@@ -51,7 +52,17 @@ namespace UnityMvvmToolkit.Core.Internal
                 return false;
             }
 
-            var fieldName = fieldInfo.Name;
+            if (fieldInfo.IsPublic)
+            {
+                return TryGetHashCode(contextType, fieldInfo.Name, fieldInfo.FieldType.GetInterfaces(), out hashCode);
+            }
+
+            if (TryGetPropertyNameFromAttribute(fieldInfo, out var fieldName))
+            {
+                return TryGetHashCode(contextType, fieldName, fieldInfo.FieldType.GetInterfaces(), out hashCode);
+            }
+
+            fieldName = fieldInfo.Name;
 
             if (fieldName.Length > 1)
             {
@@ -66,18 +77,39 @@ namespace UnityMvvmToolkit.Core.Internal
                 }
             }
 
+            if (string.IsNullOrEmpty(fieldName))
+            {
+                throw new InvalidOperationException($"Field name '{fieldName}' is not supported.");
+            }
+
             return TryGetHashCode(contextType, fieldName, fieldInfo.FieldType.GetInterfaces(), out hashCode);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryGetPropertyHashCode(Type contextType, PropertyInfo propertyInfo, out int hashCode)
+        private static bool TryGetPropertyNameFromAttribute(MemberInfo fieldInfo, out string propertyName)
+        {
+            var observableAttribute = fieldInfo.GetCustomAttribute<ObservableAttribute>();
+
+            if (observableAttribute == null || string.IsNullOrWhiteSpace(observableAttribute.PropertyName))
+            {
+                propertyName = default;
+                return false;
+            }
+
+            propertyName = observableAttribute.PropertyName;
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool TryGetPropertyHashCode(Type contextType, PropertyInfo propertyInfo, out int hashCode)
         {
             return TryGetHashCode(contextType, propertyInfo.Name, propertyInfo.PropertyType.GetInterfaces(),
                 out hashCode);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryGetHashCode(Type contextType, string memberName, Type[] memberInterfaces, out int hashCode)
+        private static bool TryGetHashCode(Type contextType, string memberName, Type[] memberInterfaces,
+            out int hashCode)
         {
             for (var i = 0; i < memberInterfaces.Length; i++)
             {
