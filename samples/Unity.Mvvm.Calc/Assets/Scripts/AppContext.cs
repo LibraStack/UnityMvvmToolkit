@@ -32,7 +32,7 @@ public class AppContext : MonoBehaviour, IAppContext
         _registeredTypes.Add(typeof(T), instance);
     }
 
-    private IReadOnlyDictionary<char, IMathOperation> GetMathOperations()
+    private static IReadOnlyDictionary<char, IMathOperation> GetMathOperations()
     {
         return new Dictionary<char, IMathOperation>
         {

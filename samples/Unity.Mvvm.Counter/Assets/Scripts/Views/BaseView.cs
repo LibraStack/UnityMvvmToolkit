@@ -23,9 +23,9 @@ namespace Views
             return _appContext.Resolve<TBindingContext>();
         }
 
-        protected override IObjectProvider GetObjectProvider()
+        protected override IValueConverter[] GetValueConverters()
         {
-            return _appContext.Resolve<IObjectProvider>();
+            return _appContext.Resolve<IValueConverter[]>();
         }
     }
 }

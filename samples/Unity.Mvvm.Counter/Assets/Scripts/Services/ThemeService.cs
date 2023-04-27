@@ -14,6 +14,7 @@ namespace Services
         public void SetThemeMode(ThemeMode mode)
         {
             var theme = mode == ThemeMode.Light ? _lightTheme : _darkTheme;
+
             if (_panelSettings.themeStyleSheet != theme)
             {
                 _panelSettings.themeStyleSheet = theme;

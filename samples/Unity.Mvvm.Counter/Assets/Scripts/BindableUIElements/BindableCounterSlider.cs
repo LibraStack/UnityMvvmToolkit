@@ -20,11 +20,11 @@ namespace BindableUIElements
 
         public void ResetBindingContext(IObjectProvider objectProvider)
         {
-            _incrementCommand = null;
-            _decrementCommand = null;
-
             Increment -= OnIncrement;
             Decrement -= OnDecrement;
+
+            _incrementCommand = null;
+            _decrementCommand = null;
         }
 
         private void OnIncrement(object sender, EventArgs e)

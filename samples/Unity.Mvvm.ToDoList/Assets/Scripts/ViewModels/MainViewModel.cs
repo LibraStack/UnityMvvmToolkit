@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Extensions;
@@ -13,19 +12,31 @@ using Interfaces;
 using Interfaces.Services;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Attributes;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.UniTask;
 using UnityMvvmToolkit.UniTask.Interfaces;
+
+// ReSharper disable NotAccessedField.Local
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace ViewModels
 {
     public class MainViewModel : IBindingContext, IDisposable
     {
+        [Observable("Date")]
+        private readonly IReadOnlyProperty<string> _date;
+
+        [Observable("CreatedTasks")]
         private readonly IProperty<int> _createdTasks;
+
+        [Observable("CompletedTasks")]
         private readonly IProperty<int> _completedTasks;
+
+        [Observable("IsAddTaskDialogActive")]
         private readonly IProperty<bool> _isAddTaskDialogActive;
 
-        private readonly IReadOnlyProperty<string> _date;
+        [Observable("TaskItems")]
         private readonly IReadOnlyProperty<ObservableCollection<TaskItemViewModel>> _taskItems;
 
         private readonly IDialogsService _dialogsService;
@@ -38,7 +49,6 @@ namespace ViewModels
                 new ReadOnlyProperty<ObservableCollection<TaskItemViewModel>>(
                     new ObservableCollection<TaskItemViewModel>());
             _taskItems.Value.CollectionChanged += OnTaskItemsCollectionChanged;
-            ChangeAddTaskDialogVisibilityCommand = new AsyncCommand(ChangeAddTaskDialogVisibility);
 
             _date = new ReadOnlyProperty<string>(GetTodayDate());
             _createdTasks = new Property<int>(GetCreatedTasksCount(_taskItems.Value));
@@ -46,39 +56,46 @@ namespace ViewModels
 
             _isAddTaskDialogActive = new Property<bool>();
 
+            ChangeAddTaskDialogVisibilityCommand = new AsyncCommand(ChangeAddTaskDialogVisibility);
+
             SubscribeOnTaskAddMessage(appContext.Resolve<TaskBroker>()).Forget();
-        }
-
-        public string Date => _date.Value;
-        public int CreatedTasks => _createdTasks.Value;
-        public int CompletedTasks => _completedTasks.Value;
-        public IReadOnlyCollection<TaskItemViewModel> TaskItems => _taskItems.Value;
-
-        public bool IsAddTaskDialogActive
-        {
-            get => _isAddTaskDialogActive.Value;
-            set => _isAddTaskDialogActive.Value = value;
         }
 
         public IAsyncCommand ChangeAddTaskDialogVisibilityCommand { get; }
 
-        public event EventHandler<NotifyCollectionChangedEventArgs> TaskItemsCollectionChanged;
+        public event EventHandler<NotifyCollectionChangedEventArgs> TaskItemsChanged;
+
+        public IEnumerable<TaskItemViewModel> GetTaskItems()
+        {
+            return _taskItems.Value;
+        }
+
+        public void AddTasks(IEnumerable<ICollectionItem> taskItems)
+        {
+            foreach (var taskItem in taskItems)
+            {
+                AddTask((TaskItemViewModel) taskItem);
+            }
+        }
 
         public void Dispose()
         {
-            _taskItems.Value.CollectionChanged -= OnTaskItemsCollectionChanged;
+            var taskItems = _taskItems.Value;
 
-            while (_taskItems.Value.Count > 0)
+            for (var i = 0; i < taskItems.Count; i++)
             {
-                RemoveTask(_taskItems.Value[0]);
+                RemoveTask(taskItems[i], false);
             }
+
+            _taskItems.Value.CollectionChanged -= OnTaskItemsCollectionChanged;
+            _taskItems.Value.Clear();
         }
 
         private async UniTask ChangeAddTaskDialogVisibility(CancellationToken cancellationToken = default)
         {
-            IsAddTaskDialogActive = !IsAddTaskDialogActive;
+            _isAddTaskDialogActive.Value = !_isAddTaskDialogActive.Value;
 
-            if (IsAddTaskDialogActive)
+            if (_isAddTaskDialogActive.Value)
             {
                 await _dialogsService.ShowAddTaskDialogAsync();
             }
@@ -97,11 +114,6 @@ namespace ViewModels
             }
         }
 
-        private string GetTodayDate()
-        {
-            return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(DateTime.Today.ToString("dddd, d MMM"));
-        }
-
         private void OnTaskItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -116,27 +128,46 @@ namespace ViewModels
                     break;
             }
 
-            TaskItemsCollectionChanged?.Invoke(this, e);
+            TaskItemsChanged?.Invoke(this, e);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string GetTodayDate()
+        {
+            return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(DateTime.Today.ToString("dddd, d MMM"));
+        }
+
         private static int GetCreatedTasksCount(ICollection taskItems)
         {
             return taskItems.Count;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int GetCompletedTasksCount(IEnumerable<ICollectionItem> taskItems)
         {
             return taskItems.Count(item => ((TaskItemViewModel) item).IsDone);
         }
 
-        public void AddTasks(IEnumerable<ICollectionItem> taskItems)
+        private void AddTask(TaskItemViewModel taskItem)
         {
-            foreach (var taskItem in taskItems)
+            taskItem.RemoveClick += OnTaskItemRemoveClick;
+            taskItem.IsDoneChanged += OnTaskItemIsDoneChanged;
+
+            _taskItems.Value.Add(taskItem);
+        }
+
+        private void UpdateTask(TaskItemViewModel taskItem)
+        {
+            _taskItems.Value.Update(taskItem);
+        }
+
+        private void RemoveTask(TaskItemViewModel taskItem, bool removeFromCollection)
+        {
+            if (removeFromCollection)
             {
-                AddTask((TaskItemViewModel) taskItem);
+                _taskItems.Value.Remove(taskItem);
             }
+
+            taskItem.RemoveClick -= OnTaskItemRemoveClick;
+            taskItem.IsDoneChanged -= OnTaskItemIsDoneChanged;
         }
 
         private void OnTaskItemIsDoneChanged(object sender, bool isDone)
@@ -146,33 +177,7 @@ namespace ViewModels
 
         private void OnTaskItemRemoveClick(object sender, EventArgs e)
         {
-            RemoveTask((TaskItemViewModel) sender);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddTask(TaskItemViewModel taskItem)
-        {
-            taskItem.Initialize();
-            taskItem.RemoveClick += OnTaskItemRemoveClick;
-            taskItem.IsDoneChanged += OnTaskItemIsDoneChanged;
-
-            _taskItems.Value.Add(taskItem);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void UpdateTask(TaskItemViewModel taskItem)
-        {
-            _taskItems.Value.Update(taskItem);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void RemoveTask(TaskItemViewModel taskItem)
-        {
-            _taskItems.Value.Remove(taskItem);
-
-            taskItem.Dispose();
-            taskItem.RemoveClick -= OnTaskItemRemoveClick;
-            taskItem.IsDoneChanged -= OnTaskItemIsDoneChanged;
+            RemoveTask((TaskItemViewModel) sender, true);
         }
     }
 }

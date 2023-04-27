@@ -3,6 +3,9 @@ using Models;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 namespace ViewModels
 {
     public class CalcViewModel : IBindingContext

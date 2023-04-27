@@ -181,7 +181,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Increase
+  m_text: Increment
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -538,7 +538,7 @@ GameObject:
   - component: {fileID: 1537193461}
   - component: {fileID: 1537193460}
   m_Layer: 5
-  m_Name: IncreaseButton
+  m_Name: IncrementButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -578,7 +578,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _button: {fileID: 1537193460}
-  _commandPath: IncreaseCommand
+  _commandPath: IncrementCommand
 --- !u!114 &1537193460
 MonoBehaviour:
   m_ObjectHideFlags: 0

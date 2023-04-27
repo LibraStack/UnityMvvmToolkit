@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;using Interfaces;
+using System.Collections.Generic;
+using Interfaces;
 using Interfaces.Services;
 using Services;
 using UnityEngine;
@@ -47,6 +48,9 @@ public class AppContext : MonoBehaviour, IAppContext, IDisposable
         {
             disposable.Dispose();
         }
+
+        _disposables.Clear();
+        _registeredTypes.Clear();
     }
 
     private void RegisterInstance<T>(T instance)
@@ -64,7 +68,7 @@ public class AppContext : MonoBehaviour, IAppContext, IDisposable
         _registeredTypes.Add(typeof(T), instance);
     }
 
-    private IValueConverter[] GetValueConverters()
+    private static IValueConverter[] GetValueConverters()
     {
         return new IValueConverter[]
         {

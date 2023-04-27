@@ -18,6 +18,8 @@ namespace BindableUIElements
             _valueProperty.ValueChanged += OnPropertyValueChanged;
 
             UpdateControlValue(_valueProperty.Value);
+
+            ValueChanged += OnControlValueChanged;
         }
 
         public void ResetBindingContext(IObjectProvider objectProvider)
@@ -27,13 +29,18 @@ namespace BindableUIElements
                 return;
             }
 
+            _valueProperty.ValueChanged -= OnPropertyValueChanged;
+
             objectProvider.ReturnProperty(_valueProperty);
 
-            _valueProperty.ValueChanged -= OnPropertyValueChanged;
             _valueProperty = null;
+
+            ValueChanged -= OnControlValueChanged;
+
+            UpdateControlValue(false);
         }
 
-        protected override void OnControlValueChanged(bool value)
+        private void OnControlValueChanged(object sender, bool value)
         {
             _valueProperty.Value = value;
         }

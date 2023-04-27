@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Interfaces;
-using UnityEngine.UIElements;
+﻿using Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
@@ -8,7 +6,7 @@ using UnityMvvmToolkit.UITK.BindableUIElements;
 
 namespace BindableUIElements
 {
-    public abstract class BindableBinaryStateButton : BindableButton, IBindableBinaryStateElement
+    public abstract partial class BindableBinaryStateButton : BindableButton, IBindableBinaryStateElement
     {
         private IReadOnlyProperty<bool> _stateProperty;
         private PropertyBindingData _statePathBindingData;
@@ -27,11 +25,6 @@ namespace BindableUIElements
             UpdateControl(_stateProperty.Value);
         }
 
-        private void OnStateValueChanged(object sender, bool newValue)
-        {
-            UpdateControl(newValue);
-        }
-
         public override void ResetBindingContext(IObjectProvider objectProvider)
         {
             base.ResetBindingContext(objectProvider);
@@ -41,9 +34,10 @@ namespace BindableUIElements
                 return;
             }
 
+            _stateProperty.ValueChanged -= OnStateValueChanged;
+
             objectProvider.ReturnReadOnlyProperty(_stateProperty);
 
-            _stateProperty.ValueChanged -= OnStateValueChanged;
             _stateProperty = null;
 
             UpdateControl(false);
@@ -52,7 +46,11 @@ namespace BindableUIElements
         public abstract void Activate();
         public abstract void Deactivate();
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void OnStateValueChanged(object sender, bool newValue)
+        {
+            UpdateControl(newValue);
+        }
+
         private void UpdateControl(bool value)
         {
             if (value)
@@ -62,19 +60,6 @@ namespace BindableUIElements
             else
             {
                 Deactivate();
-            }
-        }
-
-        public new class UxmlTraits : BindableButton.UxmlTraits
-        {
-            private readonly UxmlStringAttributeDescription _stateAttribute = new()
-                { name = "binding-state-path", defaultValue = "" };
-
-            public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
-            {
-                base.Init(visualElement, bag, context);
-                ((BindableBinaryStateButton) visualElement).BindingStatePath =
-                    _stateAttribute.GetValueFromBag(bag, context);
             }
         }
     }

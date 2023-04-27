@@ -19,6 +19,7 @@ namespace BindableUIElements
         protected override void UpdateControlText(string newText)
         {
             base.UpdateControlText(newText);
+
             _scaleAnimation?.PlayAsync().Forget();
         }
 

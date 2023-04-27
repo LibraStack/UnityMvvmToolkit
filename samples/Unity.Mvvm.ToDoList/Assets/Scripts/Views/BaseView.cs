@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Interfaces;
 using UnityEngine;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.UITK;
@@ -11,8 +10,6 @@ namespace Views
         where TBindingContext : class, IBindingContext
     {
         [SerializeField] private AppContext _appContext;
-
-        protected IAppContext AppContext => _appContext;
 
         protected override TBindingContext GetBindingContext()
         {

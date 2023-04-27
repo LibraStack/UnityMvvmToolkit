@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using UnityEngine.UIElements;
 
 namespace UIElements
@@ -8,9 +7,19 @@ namespace UIElements
     {
         private const string CheckBoxClassName = "check-box";
 
+        private const string TickClassName = "check-box__tick";
+        private const string TickDoneClassName = "check-box__tick--done";
+        private const string TickAnimationClassName = "check-box__tick--animation";
+
+        private const string CircleClassName = "check-box__circle";
+        private const string CircleDoneClassName = "check-box__circle--done";
+
+        private const string LabelClassName = "check-box__label";
         private const string LabelDoneClassName = "check-box__label--done";
-        private const string StateCheckDoneClassName = "check-box__tick--done";
-        private const string StateCircleDoneClassName = "check-box__circle--done";
+        private const string LabelAnimationClassName = "check-box__label--animation";
+
+        private const string ClickableAreaClassName = "check-box__clickable-area";
+        private const string ClickableAreaAnimationClassName = "check-box__clickable-area--animation";
 
         private bool _isChecked;
 
@@ -59,7 +68,6 @@ namespace UIElements
             IsChecked = !IsChecked;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetIsChecked(bool value, bool notify)
         {
             _isChecked = value;
@@ -71,20 +79,19 @@ namespace UIElements
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void UpdateVisuals(bool value)
         {
             if (value)
             {
                 _label.AddToClassList(LabelDoneClassName);
-                _tick.AddToClassList(StateCheckDoneClassName);
-                _circle.AddToClassList(StateCircleDoneClassName);
+                _tick.AddToClassList(TickDoneClassName);
+                _circle.AddToClassList(CircleDoneClassName);
             }
             else
             {
                 _label.RemoveFromClassList(LabelDoneClassName);
-                _tick.RemoveFromClassList(StateCheckDoneClassName);
-                _circle.RemoveFromClassList(StateCircleDoneClassName);
+                _tick.RemoveFromClassList(TickDoneClassName);
+                _circle.RemoveFromClassList(CircleDoneClassName);
             }
         }
 
@@ -92,18 +99,18 @@ namespace UIElements
         {
             _clickableArea = new VisualElement();
             _clickableArea.name = "ClickableArea";
-            _clickableArea.AddToClassList("check-box__clickable-area");
-            _clickableArea.AddToClassList("check-box__clickable-area--animation");
+            _clickableArea.AddToClassList(ClickableAreaClassName);
+            _clickableArea.AddToClassList(ClickableAreaAnimationClassName);
             _clickableArea.RegisterCallback<ClickEvent>(OnToggleClick);
 
             _circle = new VisualElement();
             _circle.name = "Circle";
-            _circle.AddToClassList("check-box__circle");
+            _circle.AddToClassList(CircleClassName);
 
             _tick = new VisualElement();
             _tick.name = "Tick";
-            _tick.AddToClassList("check-box__tick");
-            _tick.AddToClassList("check-box__tick--animation");
+            _tick.AddToClassList(TickClassName);
+            _tick.AddToClassList(TickAnimationClassName);
 
             _circle.Add(_tick);
             _clickableArea.Add(_circle);
@@ -115,9 +122,9 @@ namespace UIElements
         {
             _label = new Label();
             _label.name = "Label";
-            _label.text = "Select 10 Items";
-            _label.AddToClassList("check-box__label");
-            _label.AddToClassList("check-box__label--animation");
+            _label.text = GetType().Name;
+            _label.AddToClassList(LabelClassName);
+            _label.AddToClassList(LabelAnimationClassName);
 
             Add(_label);
         }

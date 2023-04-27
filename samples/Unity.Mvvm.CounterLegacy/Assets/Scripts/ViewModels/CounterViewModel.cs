@@ -1,28 +1,23 @@
 ﻿using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 namespace ViewModels
 {
     public class CounterViewModel : IBindingContext
     {
-        private readonly IProperty<int> _count = new Property<int>();
-
         public CounterViewModel()
         {
-            IncreaseCommand = new Command(Increase);
+            Count = new Property<int>();
+
+            IncrementCommand = new Command(IncrementCount);
         }
 
-        public int Count
-        {
-            get => _count.Value;
-            set => _count.Value = value;
-        }
+        public IProperty<int> Count { get; }
 
-        public ICommand IncreaseCommand { get; }
+        public ICommand IncrementCommand { get; }
 
-        private void Increase()
-        {
-            Count++;
-        }
+        private void IncrementCount() => Count.Value++;
     }
 }

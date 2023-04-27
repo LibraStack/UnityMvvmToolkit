@@ -18,8 +18,8 @@ namespace UIElements
         private float _initialPaddingBottom;
         private float _defaultPaddingBottom;
         private float? _paddingBottomWithKeyboard;
-        private MobileInputDialogController _inputDialog;
 
+        private MobileInputDialogController _inputDialog;
         private CancellationTokenSource _cancellationTokenSource;
 
         public MobileInputAdaptivePage()
@@ -79,6 +79,7 @@ namespace UIElements
         public void Dispose()
         {
             _inputDialog?.Dispose();
+            _cancellationTokenSource?.Cancel();
             _cancellationTokenSource?.Dispose();
         }
 
@@ -140,7 +141,7 @@ namespace UIElements
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool IsScreenKeyboardSupported()
+        private static bool IsScreenKeyboardSupported()
         {
             return TouchScreenKeyboard.isSupported;
         }

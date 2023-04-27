@@ -14,16 +14,16 @@ namespace Services
     {
         private const string DataFileName = "todolist.json";
 
-        private readonly MainViewModel _mainViewModel;
         private readonly string _dataFilePath;
+        private readonly MainViewModel _mainViewModel;
 
         private AsyncLazy _saveDataTask;
         private AsyncLazy<IEnumerable<TaskItemViewModel>> _loadDataTask;
 
         public DataStoreService(IAppContext appContext)
         {
-            _mainViewModel = appContext.Resolve<MainViewModel>();
             _dataFilePath = Path.Combine(Application.persistentDataPath, DataFileName);
+            _mainViewModel = appContext.Resolve<MainViewModel>();
         }
 
         public async void Enable()
@@ -34,16 +34,16 @@ namespace Services
             }
             finally
             {
-                _mainViewModel.TaskItemsCollectionChanged += OnTaskItemsCollectionChanged;
+                _mainViewModel.TaskItemsChanged += OnTaskItemsChanged;
             }
         }
 
         public void Disable()
         {
-            _mainViewModel.TaskItemsCollectionChanged -= OnTaskItemsCollectionChanged;
+            _mainViewModel.TaskItemsChanged -= OnTaskItemsChanged;
         }
 
-        private void OnTaskItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnTaskItemsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action is
                 NotifyCollectionChangedAction.Add or
@@ -58,7 +58,7 @@ namespace Services
         {
             if (_saveDataTask?.Task.Status.IsCompleted() ?? true)
             {
-                _saveDataTask = SaveDataAsync(_dataFilePath, _mainViewModel.TaskItems).ToAsyncLazy();
+                _saveDataTask = SaveDataAsync(_dataFilePath, _mainViewModel.GetTaskItems()).ToAsyncLazy();
             }
 
             await _saveDataTask;

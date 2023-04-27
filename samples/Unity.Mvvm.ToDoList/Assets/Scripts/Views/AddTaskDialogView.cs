@@ -9,7 +9,7 @@ namespace Views
     public class AddTaskDialogView : BaseView<AddTaskDialogViewModel>, IDisposable
     {
         private MobileInputAdaptivePage _mobileInputAdaptivePage;
-        
+
         protected override void OnInit()
         {
             base.OnInit();
@@ -18,7 +18,7 @@ namespace Views
 
         public async UniTask ShowDialogAsync()
         {
-            BindingContext.TaskName = string.Empty;
+            BindingContext.TaskName.Value = string.Empty;
             await _mobileInputAdaptivePage.ActivateAsync();
         }
 

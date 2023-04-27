@@ -4,7 +4,7 @@ using UnityMvvmToolkit.UniTask;
 
 namespace BindableUIElements
 {
-    public class BindablePageBlocker : BindableBinaryStateButton
+    public partial class BindablePageBlocker : BindableBinaryStateButton
     {
         public BindablePageBlocker()
         {
@@ -37,15 +37,8 @@ namespace BindableUIElements
         {
             visible = false;
             style.opacity = 0;
+
             UnregisterCallback<GeometryChangedEvent>(OnLayoutCalculated);
-        }
-
-        public new class UxmlFactory : UxmlFactory<BindablePageBlocker, UxmlTraits>
-        {
-        }
-
-        public new class UxmlTraits : BindableBinaryStateButton.UxmlTraits
-        {
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using UIElements;
+﻿using UIElements;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Extensions;
@@ -42,13 +41,13 @@ namespace BindableUIElements
                 return;
             }
 
+            _textProperty.ValueChanged -= OnTextPropertyValueChanged;
+            _isCheckedProperty.ValueChanged -= OnIsCheckedPropertyValueChanged;
+
             objectProvider.ReturnReadOnlyProperty(_textProperty);
             objectProvider.ReturnProperty(_isCheckedProperty);
 
-            _textProperty.ValueChanged -= OnTextPropertyValueChanged;
             _textProperty = null;
-
-            _isCheckedProperty.ValueChanged -= OnIsCheckedPropertyValueChanged;
             _isCheckedProperty = null;
 
             IsCheckedChanged -= OnControlIsCheckedChanged;
@@ -72,13 +71,11 @@ namespace BindableUIElements
             UpdateIsCheckedState(newValue);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void UpdateText(string text)
         {
             Text = text;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void UpdateIsCheckedState(bool isChecked)
         {
             SetIsCheckedWithoutNotify(isChecked);

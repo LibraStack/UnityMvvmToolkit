@@ -2,6 +2,8 @@
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 namespace ViewModels
 {
     public class CounterViewModel : IBindingContext

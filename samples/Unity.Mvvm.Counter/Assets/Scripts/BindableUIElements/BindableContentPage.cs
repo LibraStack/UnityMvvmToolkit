@@ -28,9 +28,10 @@ namespace BindableUIElements
                 return;
             }
 
+            _themeModeProperty.ValueChanged -= OnPropertyValueChanged;
+
             objectProvider.ReturnReadOnlyProperty(_themeModeProperty);
 
-            _themeModeProperty.ValueChanged -= OnPropertyValueChanged;
             _themeModeProperty = null;
         }
 

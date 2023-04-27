@@ -1,47 +1,32 @@
-﻿using System;
-using Interfaces;
-using UnityMvvmToolkit.Common.Interfaces;
+﻿using Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace ViewModels
 {
-    public class AddTaskDialogViewModel : IBindingContext, IInitializable, IDisposable
+    public class AddTaskDialogViewModel : IBindingContext
     {
         private readonly TaskBroker _taskBroker;
-        private readonly IProperty<string> _taskName;
 
         public AddTaskDialogViewModel(IAppContext appContext)
         {
-            _taskName = new Property<string>();
             _taskBroker = appContext.Resolve<TaskBroker>();
+
+            TaskName = new Property<string>();
+            TaskName.ValueChanged += OnTaskNameValueChanged;
 
             AddTaskCommand = new Command(AddTask, CanAddTask);
         }
 
-        public string TaskName
-        {
-            get => _taskName.Value;
-            set => _taskName.Value = value;
-        }
+        public IProperty<string> TaskName { get; }
 
         public ICommand AddTaskCommand { get; }
 
-        public void Initialize()
-        {
-            _taskName.ValueChanged += OnTaskNameValueChanged;
-        }
-
-        public void Dispose()
-        {
-            _taskName.ValueChanged -= OnTaskNameValueChanged;
-        }
-
-        private bool CanAddTask() => string.IsNullOrWhiteSpace(TaskName) == false;
+        private bool CanAddTask() => string.IsNullOrWhiteSpace(TaskName.Value) == false;
 
         private void AddTask()
         {
-            _taskBroker.Publish(TaskName);
+            _taskBroker.Publish(TaskName.Value);
         }
 
         private void OnTaskNameValueChanged(object sender, string newValue)
