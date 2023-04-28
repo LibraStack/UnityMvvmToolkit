@@ -13,6 +13,12 @@ namespace UnityMvvmToolkit.Core.Internal
     {
         public void GetBindingContextMembers(Type bindingContextType, IDictionary<int, MemberInfo> result)
         {
+            if (typeof(IBindingContext).IsAssignableFrom(bindingContextType) == false)
+            {
+                throw new InvalidOperationException(
+                    $"{bindingContextType.Name} is not assignable from {nameof(IBindingContext)}.");
+            }
+
             var memberInfosSpan = bindingContextType
                 .GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .AsSpan();
@@ -23,7 +29,7 @@ namespace UnityMvvmToolkit.Core.Internal
 
                 if (TryGetMemberHashCode(bindingContextType, memberInfo, out var hashCode))
                 {
-                    result.TryAdd(hashCode, memberInfo);
+                    result.Add(hashCode, memberInfo);
                 }
             }
         }

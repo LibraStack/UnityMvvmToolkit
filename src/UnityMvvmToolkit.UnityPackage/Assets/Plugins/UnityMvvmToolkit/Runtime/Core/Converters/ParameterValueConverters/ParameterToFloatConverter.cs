@@ -8,7 +8,7 @@ namespace UnityMvvmToolkit.Core.Converters.ParameterValueConverters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override float Convert(string parameter)
         {
-            parameter.TryParse(out var result);
+            _ = parameter.TryParse(out var result);
             return result;
         }
     }

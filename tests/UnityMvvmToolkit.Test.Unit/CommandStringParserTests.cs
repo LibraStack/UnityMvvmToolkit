@@ -1,24 +1,25 @@
 ﻿using FluentAssertions;
 using UnityMvvmToolkit.Core.Internal.StringParsers;
+using UnityMvvmToolkit.Test.Unit.TestData;
 
 namespace UnityMvvmToolkit.Test.Unit;
 
 public class CommandStringParserTests
 {
-    [Theory]
-    [InlineData("ClickCommand", "ClickCommand", null, null)]
-    [InlineData("ClickCommand, 55", "ClickCommand", "55", null)]
-    [InlineData("ClickCommand, 55, ParameterToIntConverter", "ClickCommand", "55", "ParameterToIntConverter")]
-    [InlineData("ClickCommand, Parameter={55}, Converter={ParameterConverter}", "ClickCommand", "55", "ParameterConverter")]
-    [InlineData("ClickCommand, Converter={ParameterConverter}, Parameter={55}", "ClickCommand", "55", "ParameterConverter")]
-    public void GetCommandData_ShouldParseString_WhenParametersAreValid(string propertyStringData, string propertyName,
-        string parameterValue, string parameterConverterName)
-    {
-        // Arrange
-        var commandParser = new CommandStringParser();
+    private readonly CommandStringParser _commandStringParser;
 
+    public CommandStringParserTests()
+    {
+        _commandStringParser = new CommandStringParser();
+    }
+
+    [Theory]
+    [ClassData(typeof(CommandValidBindingStringTestData))]
+    public void GetCommandData_ShouldReturnCommandBindingData_WhenBindingStringIsValid(string bindingString,
+        string propertyName, string parameterValue, string parameterConverterName)
+    {
         // Act
-        var result = commandParser.GetCommandData(0, propertyStringData.AsMemory());
+        var result = _commandStringParser.GetCommandData(0, bindingString.AsMemory());
 
         // Assert
         string.IsNullOrEmpty(result.PropertyName).Should().Be(string.IsNullOrEmpty(propertyName));
@@ -28,5 +29,20 @@ public class CommandStringParserTests
         result.PropertyName.Should().Be(propertyName);
         result.ParameterValue.Should().Be(parameterValue);
         result.ConverterName.Should().Be(parameterConverterName);
+    }
+
+    [Theory]
+    [ClassData(typeof(CommandNotValidBindingStringTestData))]
+    public void GetCommandData_ShouldThrow_WhenBindingStringIsNotValid(string bindingString)
+    {
+        // Arrange
+        const int elementId = 69;
+
+        // Assert
+        _commandStringParser
+            .Invoking(parser => parser.GetCommandData(elementId, bindingString.AsMemory()))
+            .Should()
+            .Throw<NullReferenceException>()
+            .WithMessage("lineData");
     }
 }

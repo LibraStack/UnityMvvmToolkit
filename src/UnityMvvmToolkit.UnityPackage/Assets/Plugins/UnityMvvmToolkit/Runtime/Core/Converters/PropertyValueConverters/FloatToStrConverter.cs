@@ -15,7 +15,7 @@ namespace UnityMvvmToolkit.Core.Converters.PropertyValueConverters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override float ConvertBack(string value)
         {
-            value.TryParse(out var result);
+            _ = value.TryParse(out var result);
             return result;
         }
     }

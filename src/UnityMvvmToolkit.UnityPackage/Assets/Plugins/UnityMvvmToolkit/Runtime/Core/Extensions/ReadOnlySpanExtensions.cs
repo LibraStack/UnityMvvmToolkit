@@ -6,12 +6,6 @@ namespace UnityMvvmToolkit.Core.Extensions
     public static class ReadOnlySpanExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsEmptyOrWhiteSpace(this ReadOnlySpan<char> span)
-        {
-            return span.IsEmpty || span.IsWhiteSpace();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Contains(this ReadOnlySpan<char> span, char value, out int index)
         {
             index = span.IndexOf(value);

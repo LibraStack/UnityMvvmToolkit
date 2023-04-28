@@ -1,22 +1,25 @@
 using FluentAssertions;
 using UnityMvvmToolkit.Core.Internal.StringParsers;
+using UnityMvvmToolkit.Test.Unit.TestData;
 
 namespace UnityMvvmToolkit.Test.Unit;
 
 public class PropertyStringParserTests
 {
-    [Theory]
-    [InlineData("Count", "Count", null)]
-    [InlineData("Count, IntToStrConverter", "Count", "IntToStrConverter")]
-    [InlineData("Count, Converter={IntToStrConverter}", "Count", "IntToStrConverter")]
-    public void GetPropertyData_ShouldParseString_WhenParametersAreValid(string propertyStringData, string propertyName,
-        string converterName)
-    {
-        // Arrange
-        var propertyParser = new PropertyStringParser();
+    private readonly PropertyStringParser _propertyStringParser;
 
+    public PropertyStringParserTests()
+    {
+        _propertyStringParser = new PropertyStringParser();
+    }
+
+    [Theory]
+    [ClassData(typeof(PropertyValidBindingStringTestData))]
+    public void GetPropertyData_ShouldReturnPropertyBindingData_WhenBindingStringIsValid(string bindingString,
+        string propertyName, string converterName)
+    {
         // Act
-        var result = propertyParser.GetPropertyData(propertyStringData.AsMemory());
+        var result = _propertyStringParser.GetPropertyData(bindingString.AsMemory());
 
         // Assert
         string.IsNullOrEmpty(result.PropertyName).Should().Be(string.IsNullOrEmpty(propertyName));
@@ -27,16 +30,12 @@ public class PropertyStringParserTests
     }
 
     [Theory]
-    [InlineData("Count,, IntToStrConverter")]
-    [InlineData("Count, IntToStrConverter,,")]
-    public void GetPropertyData_EnsureExceptionThrown(string propertyStringData)
+    [ClassData(typeof(PropertyNotValidBindingStringTestData))]
+    public void GetPropertyData_ShouldThrow_WhenBindingStringIsNotValid(string bindingString)
     {
-        // Arrange
-        var propertyParser = new PropertyStringParser();
-
         // Assert
-        propertyParser
-            .Invoking(parser => parser.GetPropertyData(propertyStringData.AsMemory()))
+        _propertyStringParser
+            .Invoking(parser => parser.GetPropertyData(bindingString.AsMemory()))
             .Should()
             .Throw<NullReferenceException>()
             .WithMessage("lineData");

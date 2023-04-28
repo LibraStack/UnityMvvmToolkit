@@ -41,9 +41,9 @@ namespace UnityMvvmToolkit.Core.Internal.StringParsers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void AssureLineIsNotEmpty(ReadOnlySpan<char> lineData)
+        protected static void AssureLineIsNotEmpty(ReadOnlySpan<char> lineData)
         {
-            if (lineData.IsEmptyOrWhiteSpace())
+            if (lineData.IsWhiteSpace())
             {
                 throw new NullReferenceException(nameof(lineData));
             }
