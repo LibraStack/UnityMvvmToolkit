@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityMvvmToolkit.Core.Attributes;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
 
@@ -15,6 +16,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 
         private ICommand<TCommandValueType> _command;
 
+        [Preserve]
         public CommandWrapper(IParameterValueConverter<TCommandValueType> parameterConverter)
         {
             _commandId = -1;

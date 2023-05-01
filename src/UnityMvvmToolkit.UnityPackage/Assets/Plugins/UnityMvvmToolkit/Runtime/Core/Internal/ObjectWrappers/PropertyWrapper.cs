@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityMvvmToolkit.Core.Attributes;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
 
@@ -16,6 +17,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
         private TSourceType _sourceValue;
         private IProperty<TSourceType> _property;
 
+        [Preserve]
         public PropertyWrapper(IPropertyValueConverter<TSourceType, TValueType> valueConverter)
         {
             _converterId = -1;
