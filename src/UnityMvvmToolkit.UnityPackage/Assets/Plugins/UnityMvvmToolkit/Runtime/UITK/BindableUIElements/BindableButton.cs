@@ -39,9 +39,10 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 return;
             }
 
+            _command.CanExecuteChanged -= OnCommandCanExecuteChanged;
+
             objectProvider.ReturnCommandWrapper(_command, _commandBindingData);
 
-            _command.CanExecuteChanged -= OnCommandCanExecuteChanged;
             _command = null;
 
             clicked -= OnButtonClicked;

@@ -33,9 +33,10 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
                 return;
             }
 
+            _valueProperty.ValueChanged -= OnPropertyValueChanged;
+
             objectProvider.ReturnProperty(_valueProperty);
 
-            _valueProperty.ValueChanged -= OnPropertyValueChanged;
             _valueProperty = null;
 
             _inputField.onValueChanged.RemoveListener(OnControlValueChanged);

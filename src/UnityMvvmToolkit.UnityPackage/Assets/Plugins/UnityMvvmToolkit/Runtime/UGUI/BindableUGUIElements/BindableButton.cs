@@ -40,9 +40,10 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
                 return;
             }
 
+            _command.CanExecuteChanged -= OnCommandCanExecuteChanged;
+
             objectProvider.ReturnCommandWrapper(_command, _commandBindingData);
 
-            _command.CanExecuteChanged -= OnCommandCanExecuteChanged;
             _command = null;
 
             _button.onClick.RemoveListener(OnButtonClicked);

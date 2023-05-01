@@ -34,9 +34,10 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 return;
             }
 
+            _valueProperty.ValueChanged -= OnPropertyValueChanged;
+
             objectProvider.ReturnProperty(_valueProperty);
 
-            _valueProperty.ValueChanged -= OnPropertyValueChanged;
             _valueProperty = null;
 
             this.UnregisterValueChangedCallback(OnControlValueChanged);

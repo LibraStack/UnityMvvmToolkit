@@ -33,9 +33,10 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
                 return;
             }
 
+            _textProperty.ValueChanged -= OnPropertyValueChanged;
+
             objectProvider.ReturnReadOnlyProperty(_textProperty);
 
-            _textProperty.ValueChanged -= OnPropertyValueChanged;
             _textProperty = null;
 
             UpdateControlText(default);
