@@ -33,7 +33,7 @@ namespace UnityMvvmToolkit.Core
         public IObjectProvider WarmupAssemblyViewModels()
         {
             var assemblyTypes = Assembly
-                .GetExecutingAssembly()
+                .GetCallingAssembly()
                 .GetTypes()
                 .Where(type => type.IsInterface == false && type.IsAbstract == false &&
                                typeof(IBindingContext).IsAssignableFrom(type));
@@ -53,6 +53,12 @@ namespace UnityMvvmToolkit.Core
 
         public IObjectProvider WarmupViewModel(Type bindingContextType)
         {
+            if (bindingContextType.IsInterface || bindingContextType.IsAbstract ||
+                typeof(IBindingContext).IsAssignableFrom(bindingContextType) == false)
+            {
+                throw new InvalidOperationException($"Can not warmup {bindingContextType.Name}.");
+            }
+
             if (_bindingContextHandler.TryRegisterBindingContext(bindingContextType) == false)
             {
                 throw new InvalidOperationException($"{bindingContextType.Name} already warmed up.");

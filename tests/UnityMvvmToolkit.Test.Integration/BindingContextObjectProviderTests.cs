@@ -7,13 +7,37 @@ using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.ObjectHandlers;
 using UnityMvvmToolkit.Core.Internal.ObjectWrappers;
 using UnityMvvmToolkit.Test.Integration.TestBindingContext;
+using UnityMvvmToolkit.Test.Unit.TestBindingContext;
 
 namespace UnityMvvmToolkit.Test.Integration;
 
 public class BindingContextObjectProviderTests
 {
     [Fact]
-    public void WarmupViewModel_ShouldWarmupBindingContext_WhenBindingContextIsNotWarmup()
+    public void WarmupAssemblyViewModels_ShouldWarmupAllViewModels()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+
+        // Act
+        objectProvider.WarmupAssemblyViewModels();
+
+        // Assert
+        objectProvider
+            .Invoking(sut => sut.WarmupViewModel<MyBindingContext>())
+            .Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage($"{nameof(MyBindingContext)} already warmed up.");
+
+        objectProvider
+            .Invoking(sut => sut.WarmupViewModel<EmptyBindingContext>())
+            .Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage($"{nameof(EmptyBindingContext)} already warmed up.");
+    }
+
+    [Fact]
+    public void WarmupViewModelT_ShouldWarmupBindingContext_WhenBindingContextIsNotWarmup()
     {
         // Arrange
         var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
@@ -27,6 +51,41 @@ public class BindingContextObjectProviderTests
             .Should()
             .Throw<InvalidOperationException>()
             .WithMessage($"{nameof(MyBindingContext)} already warmed up.");
+    }
+
+    [Fact]
+    public void WarmupViewModel_ShouldWarmupBindingContext_WhenBindingContextIsNotWarmup()
+    {
+        // Arrange
+        var bindingContextType = typeof(MyBindingContext);
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+
+        // Act
+        objectProvider.WarmupViewModel(bindingContextType);
+
+        // Assert
+        objectProvider
+            .Invoking(sut => sut.WarmupViewModel(bindingContextType))
+            .Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage($"{bindingContextType.Name} already warmed up.");
+    }
+
+    [Theory]
+    [InlineData(typeof(NoBindingContext))]
+    [InlineData(typeof(AbstractBindingContext))]
+    [InlineData(typeof(IInterfaceBindingContext))]
+    public void WarmupViewModel_ShouldThrow_WhenBindingContextIsNotSupported(Type bindingContextType)
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+
+        // Assert
+        objectProvider
+            .Invoking(sut => sut.WarmupViewModel(bindingContextType))
+            .Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage($"Can not warmup {bindingContextType.Name}.");
     }
 
     [Fact]
