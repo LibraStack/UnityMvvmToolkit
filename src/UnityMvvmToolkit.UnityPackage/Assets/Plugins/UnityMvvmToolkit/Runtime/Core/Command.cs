@@ -14,7 +14,7 @@ namespace UnityMvvmToolkit.Core
 
         public void Execute()
         {
-            _action?.Invoke();
+            _action();
         }
     }
 }

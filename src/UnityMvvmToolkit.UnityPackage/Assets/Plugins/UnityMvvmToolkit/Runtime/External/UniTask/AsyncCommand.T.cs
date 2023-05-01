@@ -26,7 +26,7 @@ namespace UnityMvvmToolkit.UniTask
             try
             {
                 IsRunning = true;
-                await _action.Invoke(parameter, cancellationToken);
+                await _action(parameter, cancellationToken);
             }
             finally
             {

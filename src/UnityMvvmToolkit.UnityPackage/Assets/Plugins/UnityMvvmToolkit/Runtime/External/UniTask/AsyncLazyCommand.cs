@@ -28,7 +28,7 @@ namespace UnityMvvmToolkit.UniTask
             {
                 if (IsRunning == false)
                 {
-                    ExecutionTask = _action.Invoke(cancellationToken).ToAsyncLazy();
+                    ExecutionTask = _action(cancellationToken).ToAsyncLazy();
                 }
 
                 await ExecutionTask;
