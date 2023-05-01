@@ -6,9 +6,11 @@ using UnityMvvmToolkit.Core.Internal.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 {
-    internal sealed class PropertyWrapper<TValueType, TSourceType> : IProperty<TValueType>, IPropertyWrapper
+    internal sealed class PropertyWrapper<TSourceType, TValueType> : IProperty<TValueType>, IPropertyWrapper
     {
         private readonly IPropertyValueConverter<TSourceType, TValueType> _valueConverter;
+
+        private int _converterId;
 
         private TValueType _value;
         private TSourceType _sourceValue;
@@ -16,10 +18,11 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 
         public PropertyWrapper(IPropertyValueConverter<TSourceType, TValueType> valueConverter)
         {
+            _converterId = -1;
             _valueConverter = valueConverter;
         }
 
-        public int ConverterId { get; private set; }
+        public int ConverterId => _converterId;
 
         public TValueType Value
         {
@@ -33,7 +36,13 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 
         public IPropertyWrapper SetConverterId(int converterId)
         {
-            ConverterId = converterId;
+            if (_converterId != -1)
+            {
+                throw new InvalidOperationException("Can not change converter ID.");
+            }
+
+            _converterId = converterId;
+
             return this;
         }
 

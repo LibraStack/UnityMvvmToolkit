@@ -2,6 +2,8 @@
 using UnityMvvmToolkit.Core.Attributes;
 using UnityMvvmToolkit.Core.Interfaces;
 
+// ReSharper disable UnusedMember.Local
+
 namespace UnityMvvmToolkit.Test.Unit.TestBindingContext;
 
 public class SameFieldNameBindingContext1 : IBindingContext

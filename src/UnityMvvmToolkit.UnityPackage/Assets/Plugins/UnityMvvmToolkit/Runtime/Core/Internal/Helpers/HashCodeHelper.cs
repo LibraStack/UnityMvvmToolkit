@@ -30,7 +30,7 @@ namespace UnityMvvmToolkit.Core.Internal.Helpers
             var targetTypeHash = converter.TargetType.GetHashCode();
             var sourceTypeHash = converter.SourceType.GetHashCode();
 
-            return string.IsNullOrEmpty(converterName)
+            return string.IsNullOrWhiteSpace(converterName)
                 ? CombineHashCode(targetTypeHash, sourceTypeHash)
                 : CombineHashCode(converterName.GetHashCode(), targetTypeHash, sourceTypeHash);
         }
@@ -49,7 +49,7 @@ namespace UnityMvvmToolkit.Core.Internal.Helpers
         {
             var targetTypeHash = converter.TargetType.GetHashCode();
 
-            return string.IsNullOrEmpty(converterName)
+            return string.IsNullOrWhiteSpace(converterName)
                 ? targetTypeHash
                 : CombineHashCode(converterName.GetHashCode(), targetTypeHash);
         }
@@ -63,7 +63,7 @@ namespace UnityMvvmToolkit.Core.Internal.Helpers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetPropertyWrapperConverterId(Type targetType, Type sourceType, string converterName = null)
         {
-            return string.IsNullOrEmpty(converterName)
+            return string.IsNullOrWhiteSpace(converterName)
                 ? CombineHashCode(targetType.GetHashCode(), sourceType.GetHashCode())
                 : CombineHashCode(converterName.GetHashCode(), targetType.GetHashCode(), sourceType.GetHashCode());
         }
@@ -77,7 +77,7 @@ namespace UnityMvvmToolkit.Core.Internal.Helpers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetCommandWrapperConverterId(Type targetType, string converterName = null)
         {
-            return string.IsNullOrEmpty(converterName)
+            return string.IsNullOrWhiteSpace(converterName)
                 ? targetType.GetHashCode()
                 : CombineHashCode(converterName.GetHashCode(), targetType.GetHashCode());
         }
@@ -85,7 +85,7 @@ namespace UnityMvvmToolkit.Core.Internal.Helpers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetCommandWrapperId(Type contextType, Type targetType, string converterName = null)
         {
-            return string.IsNullOrEmpty(converterName)
+            return string.IsNullOrWhiteSpace(converterName)
                 ? CombineHashCode(contextType.GetHashCode(), targetType.GetHashCode())
                 : CombineHashCode(contextType.GetHashCode(), converterName.GetHashCode(), targetType.GetHashCode());
         }

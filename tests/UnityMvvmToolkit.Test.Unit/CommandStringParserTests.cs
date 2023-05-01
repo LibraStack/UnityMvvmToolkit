@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using UnityMvvmToolkit.Core.Internal.StringParsers;
-using UnityMvvmToolkit.Test.Unit.TestData;
+using UnityMvvmToolkit.Test.Unit.TestDataSets;
 
 namespace UnityMvvmToolkit.Test.Unit;
 
@@ -14,7 +14,7 @@ public class CommandStringParserTests
     }
 
     [Theory]
-    [ClassData(typeof(CommandValidBindingStringTestData))]
+    [ClassData(typeof(CommandValidBindingStringDataSet))]
     public void GetCommandData_ShouldReturnCommandBindingData_WhenBindingStringIsValid(string bindingString,
         string propertyName, string parameterValue, string parameterConverterName)
     {
@@ -32,7 +32,7 @@ public class CommandStringParserTests
     }
 
     [Theory]
-    [ClassData(typeof(CommandNotValidBindingStringTestData))]
+    [ClassData(typeof(CommandNotValidBindingStringDataSet))]
     public void GetCommandData_ShouldThrow_WhenBindingStringIsNotValid(string bindingString)
     {
         // Arrange

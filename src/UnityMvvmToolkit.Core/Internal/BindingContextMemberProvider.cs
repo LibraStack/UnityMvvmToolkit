@@ -60,12 +60,12 @@ namespace UnityMvvmToolkit.Core.Internal
 
             if (fieldInfo.IsPublic)
             {
-                return TryGetHashCode(contextType, fieldInfo.Name, fieldInfo.FieldType.GetInterfaces(), out hashCode);
+                return TryGetHashCode(contextType, fieldInfo.Name, fieldInfo.FieldType, out hashCode);
             }
 
             if (TryGetPropertyNameFromAttribute(fieldInfo, out var fieldName))
             {
-                return TryGetHashCode(contextType, fieldName, fieldInfo.FieldType.GetInterfaces(), out hashCode);
+                return TryGetHashCode(contextType, fieldName, fieldInfo.FieldType, out hashCode);
             }
 
             fieldName = fieldInfo.Name;
@@ -88,7 +88,7 @@ namespace UnityMvvmToolkit.Core.Internal
                 throw new InvalidOperationException($"Field name '{fieldName}' is not supported.");
             }
 
-            return TryGetHashCode(contextType, fieldName, fieldInfo.FieldType.GetInterfaces(), out hashCode);
+            return TryGetHashCode(contextType, fieldName, fieldInfo.FieldType, out hashCode);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -109,24 +109,23 @@ namespace UnityMvvmToolkit.Core.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool TryGetPropertyHashCode(Type contextType, PropertyInfo propertyInfo, out int hashCode)
         {
-            return TryGetHashCode(contextType, propertyInfo.Name, propertyInfo.PropertyType.GetInterfaces(),
-                out hashCode);
+            if (propertyInfo.GetMethod.IsPrivate)
+            {
+                hashCode = default;
+                return false;
+            }
+
+            return TryGetHashCode(contextType, propertyInfo.Name, propertyInfo.PropertyType, out hashCode);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TryGetHashCode(Type contextType, string memberName, Type[] memberInterfaces,
-            out int hashCode)
+        private static bool TryGetHashCode(Type contextType, string memberName, Type memberType, out int hashCode)
         {
-            for (var i = 0; i < memberInterfaces.Length; i++)
+            if (typeof(IBaseCommand).IsAssignableFrom(memberType) ||
+                typeof(IBaseProperty).IsAssignableFrom(memberType))
             {
-                var interfaceType = memberInterfaces[i];
-
-                if (interfaceType == typeof(IBaseCommand) ||
-                    interfaceType == typeof(IBaseProperty))
-                {
-                    hashCode = HashCodeHelper.GetMemberHashCode(contextType, memberName);
-                    return true;
-                }
+                hashCode = HashCodeHelper.GetMemberHashCode(contextType, memberName);
+                return true;
             }
 
             hashCode = default;

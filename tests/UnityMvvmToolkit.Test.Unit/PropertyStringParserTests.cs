@@ -1,6 +1,6 @@
 using FluentAssertions;
 using UnityMvvmToolkit.Core.Internal.StringParsers;
-using UnityMvvmToolkit.Test.Unit.TestData;
+using UnityMvvmToolkit.Test.Unit.TestDataSets;
 
 namespace UnityMvvmToolkit.Test.Unit;
 
@@ -14,7 +14,7 @@ public class PropertyStringParserTests
     }
 
     [Theory]
-    [ClassData(typeof(PropertyValidBindingStringTestData))]
+    [ClassData(typeof(PropertyValidBindingStringDataSet))]
     public void GetPropertyData_ShouldReturnPropertyBindingData_WhenBindingStringIsValid(string bindingString,
         string propertyName, string converterName)
     {
@@ -30,7 +30,7 @@ public class PropertyStringParserTests
     }
 
     [Theory]
-    [ClassData(typeof(PropertyNotValidBindingStringTestData))]
+    [ClassData(typeof(PropertyNotValidBindingStringDataSet))]
     public void GetPropertyData_ShouldThrow_WhenBindingStringIsNotValid(string bindingString)
     {
         // Assert

@@ -84,7 +84,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             }
 
             var args = new object[] { valueConverter };
-            var wrapperType = typeof(PropertyWrapper<,>).MakeGenericType(targetType, sourceType);
+            var wrapperType = typeof(PropertyWrapper<,>).MakeGenericType(sourceType, targetType);
 
             return (TProperty) ObjectWrapperHelper.CreatePropertyWrapper(wrapperType, args, converterId,
                 contextProperty);
@@ -219,7 +219,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             var itemsQueue = new Queue<IObjectWrapper>();
 
             var args = new object[] { converter };
-            var wrapperType = typeof(PropertyWrapper<,>).MakeGenericType(converter.TargetType, converter.SourceType);
+            var wrapperType = typeof(PropertyWrapper<,>).MakeGenericType(converter.SourceType, converter.TargetType);
 
             for (var i = 0; i < capacity; i++)
             {

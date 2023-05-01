@@ -1,0 +1,9 @@
+{
+    "stryker-config": 
+    {
+        "test-projects": [
+            "../../../tests/UnityMvvmToolkit.Test.Unit/UnityMvvmToolkit.Test.Unit.csproj", 
+            "../../../tests/UnityMvvmToolkit.Test.Integration/UnityMvvmToolkit.Test.Integration.csproj"
+          ]
+    }
+}

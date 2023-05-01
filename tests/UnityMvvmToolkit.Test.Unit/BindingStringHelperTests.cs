@@ -1,14 +1,14 @@
 ﻿using FluentAssertions;
 using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Internal.Helpers;
-using UnityMvvmToolkit.Test.Unit.TestData;
+using UnityMvvmToolkit.Test.Unit.TestDataSets;
 
 namespace UnityMvvmToolkit.Test.Unit;
 
 public class BindingStringHelperTests
 {
     [Theory]
-    [ClassData(typeof(PropertyValidBindingStringTestData))]
+    [ClassData(typeof(PropertyValidBindingStringDataSet))]
     public void GetPropertyBindingData_ShouldReturnPropertyBindingData_WhenBindingStringIsValid(string bindingString,
         string propertyName, string converterName)
     {
@@ -24,7 +24,7 @@ public class BindingStringHelperTests
     }
 
     [Theory]
-    [ClassData(typeof(CommandValidBindingStringTestData))]
+    [ClassData(typeof(CommandValidBindingStringDataSet))]
     public void GetCommandBindingData_ShouldReturnCommandBindingData_WhenBindingStringIsValid(string bindingString,
         string propertyName, string parameterValue, string parameterConverterName)
     {

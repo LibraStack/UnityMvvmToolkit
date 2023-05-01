@@ -17,7 +17,7 @@ public class BindingContextMemberProviderTests
     }
 
     [Theory]
-    [MemberData(nameof(TestBindingContextData))]
+    [MemberData(nameof(BindingContextDataSets))]
     public void GetBindingContextMembers_ShouldReturnBindingContextMembers_WhenContextIsValid(Type bindingContextType,
         (int, MemberTypes)[] membersData)
     {
@@ -75,7 +75,8 @@ public class BindingContextMemberProviderTests
         _memberProvider
             .Invoking(sut => sut.GetBindingContextMembers(bindingContextType, members))
             .Should()
-            .Throw<InvalidOperationException>();
+            .Throw<InvalidOperationException>()
+            .WithMessage($"Field name '{string.Empty}' is not supported.");
     }
 
     [Fact]
@@ -119,11 +120,12 @@ public class BindingContextMemberProviderTests
             .Throw<NullReferenceException>();
     }
 
-    private static IEnumerable<object[]> TestBindingContextData()
+    private static IEnumerable<object[]> BindingContextDataSets()
     {
         yield return GetPrivateFieldBindingContextTestData();
         yield return GetObservableFieldBindingContextTestData();
         yield return GetPublicFieldBindingContextTestData();
+        yield return GetPrivatePropertyBindingContextTestData();
         yield return GetPublicPropertyBindingContextTestData();
         yield return GetCommandBindingContextTestData();
         yield return GetNoObservableFieldsBindingContextTestData();
@@ -137,10 +139,10 @@ public class BindingContextMemberProviderTests
             bindingContextType,
             new (int, MemberTypes)[]
             {
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, "Bool"), MemberTypes.Field),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, "Int"), MemberTypes.Field),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, "Float"), MemberTypes.Field),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, "Str"), MemberTypes.Field)
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "BoolField"), MemberTypes.Field),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "IntField"), MemberTypes.Field),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "FloatField"), MemberTypes.Field),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "StrField"), MemberTypes.Field)
             }
         };
     }
@@ -167,16 +169,21 @@ public class BindingContextMemberProviderTests
             bindingContextType,
             new (int, MemberTypes)[]
             {
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicFieldBindingContext.Bool)),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicFieldBindingContext.boolField)),
                     MemberTypes.Field),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicFieldBindingContext.Int)),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicFieldBindingContext._intField)),
                     MemberTypes.Field),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicFieldBindingContext.Float)),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicFieldBindingContext.m_floatField)),
                     MemberTypes.Field),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicFieldBindingContext.Str)),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicFieldBindingContext.StrField)),
                     MemberTypes.Field)
             }
         };
+    }
+
+    private static object[] GetPrivatePropertyBindingContextTestData()
+    {
+        return new object[] { typeof(PrivatePropertyBindingContext), Array.Empty<(int, MemberTypes)>() };
     }
 
     private static object[] GetPublicPropertyBindingContextTestData()
@@ -187,13 +194,13 @@ public class BindingContextMemberProviderTests
             bindingContextType,
             new (int, MemberTypes)[]
             {
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicPropertyBindingContext.Bool)),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicPropertyBindingContext.boolProperty)),
                     MemberTypes.Property),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicPropertyBindingContext.Int)),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicPropertyBindingContext._intProperty)),
                     MemberTypes.Property),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicPropertyBindingContext.Float)),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicPropertyBindingContext.m_floatProperty)),
                     MemberTypes.Property),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicPropertyBindingContext.Str)),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicPropertyBindingContext.StrProperty)),
                     MemberTypes.Property)
             }
         };
@@ -207,11 +214,13 @@ public class BindingContextMemberProviderTests
             bindingContextType,
             new (int, MemberTypes)[]
             {
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(CommandBindingContext.IncrementCommand)),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(CommandBindingContext.incrementCommand)),
                     MemberTypes.Property),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(CommandBindingContext.DecrementCommand)),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(CommandBindingContext._decrementCommand)),
                     MemberTypes.Property),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(CommandBindingContext.SetValueCommand)),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(CommandBindingContext.m_multiplyCommand)),
+                    MemberTypes.Property),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(CommandBindingContext.DivideCommand)),
                     MemberTypes.Property)
             }
         };

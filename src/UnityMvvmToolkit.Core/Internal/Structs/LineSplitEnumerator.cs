@@ -43,7 +43,7 @@ namespace UnityMvvmToolkit.Core.Internal.Structs
                 return true;
             }
 
-            Current = CreateNewLine(_index, _start, span.Slice(0, index));
+            Current = CreateNewLine(_index, _start, span[..index]);
 
             _index++;
             _start += index + 1;

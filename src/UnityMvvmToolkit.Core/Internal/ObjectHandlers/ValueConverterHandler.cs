@@ -43,7 +43,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                 RegisterValueConverter(convertersSpan[i]);
             }
 
-            if (_valueConvertersByHash.ContainsKey(typeof(ParameterToStrConverter).GetHashCode()) == false)
+            if (TryGetValueConverterByType(typeof(ParameterToStrConverter), out _) == false)
             {
                 RegisterValueConverter(new ParameterToStrConverter());
             }

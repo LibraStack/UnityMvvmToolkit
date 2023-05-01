@@ -17,10 +17,10 @@ namespace UnityMvvmToolkit.Core.Extensions
         };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParse(this string span, out float result)
+        public static bool TryParse(this string str, out float result)
         {
-            return float.TryParse(span, NumberStyles.Any, CommaCulture, out result) ||
-                   float.TryParse(span, NumberStyles.Any, PointCulture, out result);
+            return float.TryParse(str, NumberStyles.Any, CommaCulture, out result) ||
+                   float.TryParse(str, NumberStyles.Any, PointCulture, out result);
         }
 
         public static CommandBindingData ToCommandBindingData(this string bindingString, int elementId)

@@ -1,21 +1,23 @@
 ﻿using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
 
+// ReSharper disable InconsistentNaming
+
 namespace UnityMvvmToolkit.Test.Unit.TestBindingContext;
 
 public class PublicPropertyBindingContext : IBindingContext
 {
     public PublicPropertyBindingContext()
     {
-        Bool = new Property<bool>();
-        Int = new ReadOnlyProperty<int>(0);
+        boolProperty = new Property<bool>();
+        _intProperty = new ReadOnlyProperty<int>(0);
 
-        Float = new Property<float>();
-        Str = new ReadOnlyProperty<string>(nameof(PrivateFieldBindingContext));
+        m_floatProperty = new Property<float>();
+        StrProperty = new ReadOnlyProperty<string>(nameof(PublicPropertyBindingContext));
     }
 
-    public IProperty<bool> Bool { get; }
-    public IReadOnlyProperty<int> Int { get; }
-    public Property<float> Float { get; }
-    public ReadOnlyProperty<string> Str { get; }
+    public IProperty<bool> boolProperty { get; }
+    public IReadOnlyProperty<int> _intProperty { get; }
+    public Property<float> m_floatProperty { get; }
+    public ReadOnlyProperty<string> StrProperty { get; }
 }

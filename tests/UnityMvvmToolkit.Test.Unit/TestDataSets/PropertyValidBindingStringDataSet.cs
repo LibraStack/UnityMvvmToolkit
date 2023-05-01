@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 
-namespace UnityMvvmToolkit.Test.Unit.TestData;
+namespace UnityMvvmToolkit.Test.Unit.TestDataSets;
 
-public class PropertyValidBindingStringTestData : IEnumerable<object?[]>
+public class PropertyValidBindingStringDataSet : IEnumerable<object?[]>
 {
     public IEnumerator<object?[]> GetEnumerator()
     {

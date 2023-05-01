@@ -3,6 +3,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Test.Unit.TestCommands;
 
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 namespace UnityMvvmToolkit.Test.Integration.TestBindingContext;
 
@@ -14,6 +15,8 @@ public class MyBindingContext : IBindingContext
     public MyBindingContext(string title = "Title")
     {
         Title = new ReadOnlyProperty<string>(title);
+
+        FieldCommand = new Command(default);
 
         IncrementCommand = new Command(() => Count++);
         DecrementCommand = new MyCommand(() => Count--);
@@ -35,6 +38,7 @@ public class MyBindingContext : IBindingContext
         set => m_description.Value = value;
     }
 
+    public ICommand FieldCommand;
     public ICommand IncrementCommand { get; }
     public IMyCommand DecrementCommand { get; }
 
