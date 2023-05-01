@@ -6,23 +6,23 @@ using UnityMvvmToolkit.Core.Internal.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 {
-    internal sealed class CommandWrapper<TCommandValueType> : ICommandWrapper
+    internal sealed class CommandWrapper<TValue> : ICommandWrapper
     {
-        private readonly Dictionary<int, TCommandValueType> _parameters;
-        private readonly IParameterValueConverter<TCommandValueType> _parameterConverter;
+        private readonly Dictionary<int, TValue> _parameters;
+        private readonly IParameterValueConverter<TValue> _parameterConverter;
 
         private int _commandId;
         private int _converterId;
 
-        private ICommand<TCommandValueType> _command;
+        private ICommand<TValue> _command;
 
         [Preserve]
-        public CommandWrapper(IParameterValueConverter<TCommandValueType> parameterConverter)
+        public CommandWrapper(IParameterValueConverter<TValue> parameterConverter)
         {
             _commandId = -1;
             _converterId = -1;
 
-            _parameters = new Dictionary<int, TCommandValueType>();
+            _parameters = new Dictionary<int, TValue>();
             _parameterConverter = parameterConverter;
         }
 
@@ -48,12 +48,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             if (_command != null)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(CommandWrapper<TCommandValueType>)} was not reset.");
+                    $"{nameof(CommandWrapper<TValue>)} was not reset.");
             }
 
             _commandId = commandId;
 
-            _command = (ICommand<TCommandValueType>) command;
+            _command = (ICommand<TValue>) command;
             _command.CanExecuteChanged += OnCommandCanExecuteChanged;
 
             return this;

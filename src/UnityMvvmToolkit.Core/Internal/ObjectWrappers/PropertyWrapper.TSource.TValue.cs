@@ -7,18 +7,18 @@ using UnityMvvmToolkit.Core.Internal.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 {
-    internal sealed class PropertyWrapper<TSourceType, TValueType> : IProperty<TValueType>, IPropertyWrapper
+    internal sealed class PropertyWrapper<TSource, TValue> : IProperty<TValue>, IPropertyWrapper
     {
-        private readonly IPropertyValueConverter<TSourceType, TValueType> _valueConverter;
+        private readonly IPropertyValueConverter<TSource, TValue> _valueConverter;
 
         private int _converterId;
 
-        private TValueType _value;
-        private TSourceType _sourceValue;
-        private IProperty<TSourceType> _property;
+        private TValue _value;
+        private TSource _sourceValue;
+        private IProperty<TSource> _property;
 
         [Preserve]
-        public PropertyWrapper(IPropertyValueConverter<TSourceType, TValueType> valueConverter)
+        public PropertyWrapper(IPropertyValueConverter<TSource, TValue> valueConverter)
         {
             _converterId = -1;
             _valueConverter = valueConverter;
@@ -26,7 +26,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 
         public int ConverterId => _converterId;
 
-        public TValueType Value
+        public TValue Value
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _value;
@@ -34,7 +34,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             set => TrySetValue(value);
         }
 
-        public event EventHandler<TValueType> ValueChanged;
+        public event EventHandler<TValue> ValueChanged;
 
         public IPropertyWrapper SetConverterId(int converterId)
         {
@@ -53,10 +53,10 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             if (_property != null)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(PropertyWrapper<TValueType, TSourceType>)} was not reset.");
+                    $"{nameof(PropertyWrapper<TValue, TSource>)} was not reset.");
             }
 
-            _property = (IProperty<TSourceType>) property;
+            _property = (IProperty<TSource>) property;
             _property.ValueChanged += OnPropertyValueChanged;
 
             _sourceValue = _property.Value;
@@ -66,9 +66,9 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TrySetValue(TValueType value)
+        public bool TrySetValue(TValue value)
         {
-            if (EqualityComparer<TValueType>.Default.Equals(_value, value))
+            if (EqualityComparer<TValue>.Default.Equals(_value, value))
             {
                 return false;
             }
@@ -89,9 +89,9 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             _value = default;
         }
 
-        private void OnPropertyValueChanged(object sender, TSourceType sourceValue)
+        private void OnPropertyValueChanged(object sender, TSource sourceValue)
         {
-            if (EqualityComparer<TSourceType>.Default.Equals(_sourceValue, sourceValue) == false)
+            if (EqualityComparer<TSource>.Default.Equals(_sourceValue, sourceValue) == false)
             {
                 _sourceValue = sourceValue;
                 _value = _valueConverter.Convert(sourceValue);
@@ -100,7 +100,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             ValueChanged?.Invoke(this, _value);
         }
 
-        void IProperty<TValueType>.ForceSetValue(TValueType value)
+        void IProperty<TValue>.ForceSetValue(TValue value)
         {
             throw new NotImplementedException();
         }

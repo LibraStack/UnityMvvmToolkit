@@ -5,31 +5,31 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.Core
 {
-    public sealed class Property<TType> : IProperty<TType>
+    public sealed class Property<T> : IProperty<T>
     {
-        private TType _value;
+        private T _value;
 
         public Property() : this(default)
         {
         }
 
-        public Property(TType value)
+        public Property(T value)
         {
             _value = value;
         }
 
-        public TType Value
+        public T Value
         {
             get => _value;
             set => TrySetValue(value);
         }
 
-        public event EventHandler<TType> ValueChanged;
+        public event EventHandler<T> ValueChanged;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TrySetValue(TType value)
+        public bool TrySetValue(T value)
         {
-            if (EqualityComparer<TType>.Default.Equals(_value, value))
+            if (EqualityComparer<T>.Default.Equals(_value, value))
             {
                 return false;
             }
@@ -38,21 +38,21 @@ namespace UnityMvvmToolkit.Core
             return true;
         }
 
-        void IProperty<TType>.ForceSetValue(TType value)
+        void IProperty<T>.ForceSetValue(T value)
         {
             SetValue(value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void SetValue(TType value)
+        private void SetValue(T value)
         {
             _value = value;
             ValueChanged?.Invoke(this, value);
         }
 
-        public static implicit operator Property<TType>(TType value)
+        public static implicit operator Property<T>(T value)
         {
-            return new Property<TType>(value);
+            return new Property<T>(value);
         }
     }
 }

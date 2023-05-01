@@ -4,14 +4,14 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Converters.PropertyValueConverters
 {
-    public abstract class PropertyValueConverter<TSourceType, TTargetType> 
-        : IPropertyValueConverter<TSourceType, TTargetType>
+    public abstract class PropertyValueConverter<TSource, TTarget> 
+        : IPropertyValueConverter<TSource, TTarget>
     {
         protected PropertyValueConverter()
         {
             Name = GetType().Name;
-            SourceType = typeof(TSourceType);
-            TargetType = typeof(TTargetType);
+            SourceType = typeof(TSource);
+            TargetType = typeof(TTarget);
         }
 
         public string Name { get; }
@@ -19,9 +19,9 @@ namespace UnityMvvmToolkit.Core.Converters.PropertyValueConverters
         public Type TargetType { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public abstract TTargetType Convert(TSourceType value);
+        public abstract TTarget Convert(TSource value);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public abstract TSourceType ConvertBack(TTargetType value);
+        public abstract TSource ConvertBack(TTarget value);
     }
 }
