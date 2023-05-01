@@ -12,21 +12,23 @@ A package that brings data-binding to your Unity project.
 - [Installation](#gear-installation)
   - [IL2CPP restriction](#il2cpp-restriction)
 - [Introduction](#ledger-introduction)
-  - [ViewModel](#viewmodel)
+  - [IBindingContext](#ibindingcontext)
   - [CanvasView](#canvasviewtbindingcontext)
   - [DocumentView](#documentviewtbindingcontext)
+  - [Property](#propertyt--readonlypropertyt)
   - [Command](#command--commandt)
   - [AsyncCommand](#asynccommand--asynccommandt)
   - [AsyncLazyCommand](#asynclazycommand--asynclazycommandt)
   - [PropertyValueConverter](#propertyvalueconvertertsourcetype-ttargettype)
   - [ParameterValueConverter](#parametervalueconverterttargettype)
 - [Quick start](#watch-quick-start)
-- [How To Use](#rocket-how-to-use)
+- [How To Use](#joystick-how-to-use)
   - [Data-binding](#data-binding)
   - [Create custom control](#create-custom-control)
 - [External Assets](#link-external-assets)
   - [UniTask](#unitask)
-- [Benchmarks](#chart_with_upwards_trend-benchmarks)
+- [Performance](#rocket-performance)
+  - [Memory allocation](#memory-allocation)
 - [Contributing](#bookmark_tabs-contributing)
   - [Discussions](#discussions)
   - [Report a bug](#report-a-bug)
@@ -73,34 +75,25 @@ The following example shows the **UnityMvvmToolkit** in action using the **Count
 <br />
 
 ```csharp
-public class CounterViewModel : ViewModel
+public class CounterViewModel : IBindingContext
 {
-    private int _count;
-    private ThemeMode _themeMode;
-
     public CounterViewModel()
     {
+        Count = new Property<int>();
+        ThemeMode = new Property<ThemeMode>();
+
         IncrementCommand = new Command(IncrementCount);
         DecrementCommand = new Command(DecrementCount);
     }
 
-    public int Count
-    {
-        get => _count;
-        set => Set(ref _count, value);
-    }
-
-    public ThemeMode ThemeMode
-    {
-        get => _themeMode;
-        set => Set(ref _themeMode, value);
-    }
+    public IProperty<int> Count { get; }
+    public IProperty<ThemeMode> ThemeMode { get; }
 
     public ICommand IncrementCommand { get; }
     public ICommand DecrementCommand { get; }
 
-    private void IncrementCount() => Count++;
-    private void DecrementCount() => Count--;
+    private void IncrementCount() => Count.Value++;
+    private void DecrementCount() => Count.Value--;
 }
 ```
 
@@ -177,7 +170,7 @@ You can install UnityMvvmToolkit in one of the following ways:
   
   You can add `https://github.com/ChebanovDD/UnityMvvmToolkit.git?path=src/UnityMvvmToolkit.UnityPackage/Assets/Plugins/UnityMvvmToolkit` to the Package Manager.
 
-  If you want to set a target version, UnityMvvmToolkit uses the `v*.*.*` release tag, so you can specify a version like `#v0.1.0`. For example `https://github.com/ChebanovDD/UnityMvvmToolkit.git?path=src/UnityMvvmToolkit.UnityPackage/Assets/Plugins/UnityMvvmToolkit#v0.1.0`.
+  If you want to set a target version, UnityMvvmToolkit uses the `v*.*.*` release tag, so you can specify a version like `#v1.0.0`. For example `https://github.com/ChebanovDD/UnityMvvmToolkit.git?path=src/UnityMvvmToolkit.UnityPackage/Assets/Plugins/UnityMvvmToolkit#v1.0.0`.
   
 </details>
 
@@ -199,80 +192,72 @@ To work around this issue in `Unity 2021` you need to change the `IL2CPP Code Ge
 The package contains a collection of standard, self-contained, lightweight types that provide a starting implementation for building apps using the MVVM pattern.
 
 The included types are:
-- [ViewModel](#viewmodel)
+- [IBindingContext](#ibindingcontext)
 - [CanvasView\<TBindingContext\>](#canvasviewtbindingcontext)
 - [DocumentView\<TBindingContext\>](#documentviewtbindingcontext)
+- [Property\<T\> & ReadOnlyProperty\<T\>](#propertyt--readonlypropertyt)
 - [Command & Command\<T\>](#command--commandt)
 - [AsyncCommand & AsyncCommand\<T\>](#asynccommand--asynccommandt)
 - [AsyncLazyCommand & AsyncLazyCommand\<T\>](#asynclazycommand--asynclazycommandt)
 - [PropertyValueConverter\<TSourceType, TTargetType\>](#propertyvalueconvertertsourcetype-ttargettype)
 - [ParameterValueConverter\<TTargetType\>](#parametervalueconverterttargettype)
+- [IProperty\<T\> & IReadOnlyProperty\<T\>](#propertyt--readonlypropertyt)
 - [ICommand & ICommand\<T\>](#command--commandt)
 - [IAsyncCommand & IAsyncCommand\<T\>](#asynccommand--asynccommandt)
 - [IPropertyValueConverter\<TSourceType, TTargetType\>](#propertyvalueconvertertsourcetype-ttargettype)
 - [IParameterValueConverter\<TTargetType\>](#parametervalueconverterttargettype)
 
-### ViewModel
+### IBindingContext
 
-The `ViewModel` is a base class for objects that are observable by implementing the `INotifyPropertyChanged` interface. It can be used as a starting point for all kinds of objects that need to support property change notification.
+The `IBindingContext` is a base interface for ViewModels. It is a marker for Views that the class contains observable properties to bind to.
 
-Key functionality:
-- Provides a base implementation for `INotifyPropertyChanged`, exposing the `PropertyChanged` event
-- Provides a series of `Set` methods that can be used to easily set property values from types inheriting from `ViewModel`, and to automatically raise the appropriate events
-
-> **Note:** In case your viewmodel doesn't have a parameterless constructor, you need to override the `GetBindingContext` method in the view.
+> **Note:** In case your ViewModel doesn't have a parameterless constructor, you need to override the `GetBindingContext` method in the View.
 
 #### Simple property
 
 Here's an example of how to implement notification support to a custom property.
 
 ```csharp
-public class CounterViewModel : ViewModel
+public class CounterViewModel : IBindingContext
 {
-    private int _count;
-
-    public int Count
+    public CounterViewModel()
     {
-        get => _count;
-        set => Set(ref _count, value);
+        Count = new Property<int>();
     }
+
+    public IProperty<int> Count { get; }
 }
 ```
 
-The provided `Set<T>(ref T, T, string)` method checks the current value of the property, and updates it if different, and then also raises the `PropertyChanged` event automatically. The property name is automatically captured through the use of the `[CallerMemberName]` attribute, so there's no need to manually specify which property is being updated.
+#### Wrapping a non-observable model
 
-#### Wrapping a model
-
-To inject notification support to models, that don't implement the `INotifyPropertyChanged` interface, `ViewModel` provides a dedicated `Set<TModel, T>(T, T, TModel, Action<TModel, T>, string)` method for this.
+A common scenario, for instance, when working with collection items, is to create a wrapping "bindable" item model that relays properties of the collection item model, and raises the property value changed notifications when needed.
 
 ```csharp
-public class UserViewModel : ViewModel
+public class ItemViewModel : IBindingContext
 {
-    private readonly User _user;
-
-    public UserViewModel(User user)
-    {
-        _user = user;
-    }
+    [Observable(nameof(Name))]
+    private readonly IProperty<string> _name = new Property<string>();
 
     public string Name
     {
-        get => _user.Name;
-        set => Set(_user.Name, value, _user, (user, name) => user.Name = name);
+        get => _name.Value;
+        set => _name.Value = value;
     }
 }
 ```
 
+The `ItemViewModel` can be serialized and deserialized without any issues.
+
 ### CanvasView\<TBindingContext\>
 
-The `CanvasView<TBindingContext>` is a base class for `uGUI` view's.
+The `CanvasView<TBindingContext>` is a base class for `uGUI` views.
 
 Key functionality:
 - Provides a base implementation for `Canvas` based view
 - Automatically searches for bindable UI elements on the `Canvas`
 - Allows to override the base viewmodel instance creation
 - Allows to define [property](#propertyvalueconvertertsourcetype-ttargettype) & [parameter](#parametervalueconverterttargettype) value converters
-- Allows to provide a custom bindable elements factory
 
 ```csharp
 public class CounterView : CanvasView<CounterViewModel>
@@ -289,25 +274,18 @@ public class CounterView : CanvasView<CounterViewModel>
     {
         return _appContext.Resolve<IValueConverter[]>();
     }
-
-    // Provide a custom bindable elements factory.
-    protected override IBindableElementsFactory GetBindableElementsFactory()
-    {
-        return _appContext.Resolve<IBindableElementsFactory>();
-    }
 }
 ```
 
 ### DocumentView\<TBindingContext\>
 
-The `DocumentView<TBindingContext>` is a base class for `UI Toolkit` view's.
+The `DocumentView<TBindingContext>` is a base class for `UI Toolkit` views.
 
 Key functionality:
 - Provides a base implementation for `UI Document` based view
 - Automatically searches for bindable UI elements on the `UI Document`
 - Allows to override the base viewmodel instance creation
 - Allows to define [property](#propertyvalueconvertertsourcetype-ttargettype) & [parameter](#parametervalueconverterttargettype) value converters
-- Allows to provide a custom bindable elements factory
 
 ```csharp
 public class CounterView : DocumentView<CounterViewModel>
@@ -324,14 +302,20 @@ public class CounterView : DocumentView<CounterViewModel>
     {
         return _appContext.Resolve<IValueConverter[]>();
     }
-
-    // Provide a custom bindable elements factory.
-    protected override IBindableElementsFactory GetBindableElementsFactory()
-    {
-        return _appContext.Resolve<IBindableElementsFactory>();
-    }
 }
 ```
+
+### Property\<T\> & ReadOnlyProperty\<T\>
+
+The `Property<T>` and `ReadOnlyProperty<T>` provide a way to bind properties between a ViewModel and UI elements.
+
+Key functionality:
+- Provide a base implementation of the `IBaseProperty` interface
+- Implement the `IProperty<T>` & `IReadOnlyProperty<T>` interface, which exposes a `ValueChanged` event
+
+The following shows how to set up a simple observable property:
+- [Simple property](#simple-property)
+- [Wrapping a non-observable model](#wrapping-a-non-observable-model)
 
 ### Command & Command\<T\>
 
@@ -635,25 +619,19 @@ public class MyViewModel : ViewModel
 
 ## :watch: Quick start
 
-Once the `UnityMVVMToolkit` is installed, create a class `MyFirstViewModel` that inherits the `ViewModel` class.
+Once the `UnityMVVMToolkit` is installed, create a class `MyFirstViewModel` that implements the `IBindingContext` interface.
 
 ```csharp
 using UnityMvvmToolkit.Core;
 
-public class MyFirstViewModel : ViewModel
+public class MyFirstViewModel : IBindingContext
 {
-    private string _text;
-
     public MyFirstViewModel()
     {
-        _text = "Hello World";
+        Text = new ReadOnlyProperty<string>("Hello World");
     }
 
-    public string Text
-    {
-        get => _text;
-        set => Set(ref _text, value);
-    }
+    public IReadOnlyProperty<string> Text { get; }
 }
 ```
 
@@ -716,7 +694,7 @@ Finally, add a `Text - TextMeshPro` UI element to the canvas, add the `BindableL
 
 </details>
 
-## :rocket: How To Use
+## :joystick: How To Use
 
 ### Data-binding
 
@@ -736,22 +714,16 @@ The included UI elements are:
 The `BindableLabel` element uses the `OneWay` binding by default.
 
 ```csharp
-public class LabelViewModel : ViewModel
+public class LabelViewModel : IBindingContext
 {
-    private int _intValue;
-    private string _strValue;
-
-    public int IntValue
+    public LabelViewModel()
     {
-        get => _intValue;
-        set => Set(ref _intValue, value);
+        IntValue = new ReadOnlyProperty<int>(55);
+        StrValue = new ReadOnlyProperty<string>("69");
     }
 
-    public string StrValue
-    {
-        get => _strValue;
-        set => Set(ref _strValue, value);
-    }
+    public IReadOnlyProperty<int> IntValue { get; }
+    public IReadOnlyProperty<string> StrValue { get; }
 }
 
 public class LabelView : DocumentView<LabelViewModel>
@@ -775,15 +747,14 @@ public class LabelView : DocumentView<LabelViewModel>
 The `BindableTextField` element uses the `TwoWay` binding by default.
 
 ```csharp
-public class TextFieldViewModel : ViewModel
+public class TextFieldViewModel : IBindingContext
 {
-    private string _textValue;
-
-    public string TextValue
+    public TextFieldViewModel()
     {
-        get => _textValue;
-        set => Set(ref _textValue, value);
+        TextValue = new Property<string>();
     }
+
+    public IProperty<string> TextValue { get; }
 }
 ```
 
@@ -804,7 +775,7 @@ To pass a parameter to the viewmodel, see the [ParameterValueConverter](#paramet
 
 #### BindableListView
 
-The `BindableListView` control is the most efficient way to create lists. Use the `binding-items-source-path` of the `BindableListView` to bind to an `ObservableCollection`.
+The `BindableListView` control is the most efficient way to create lists. It uses virtualization and creates VisualElements only for visible items. Use the `binding-items-source-path` of the `BindableListView` to bind to an `ObservableCollection`.
 
 The following example demonstrates how to bind to a collection of users with `BindableListView`.
 
@@ -816,104 +787,64 @@ Create a main `UI Document` named `UsersView.uxml` with the following content.
 </ui:UXML>
 ```
 
-Create a `UI Document` named `UserEntry.uxml` for the individual entries in the list.
+Create a `UI Document` named `UserItemView.uxml` for the individual items in the list.
 
 ```xml
-<ui:UXML ...>
-    <ui:Label name="NameLabel" />
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableLabel binding-text-path="Name" />
 </ui:UXML>
 ```
 
-Create a `UserItemData` class to store user data.
+Create a `UserItemViewModel` class that implements `ICollectionItem` to store user data.
 
 ```csharp
-public class UserItemData
+public class UserItemViewModel : ICollectionItem
 {
-    public string Name { get; set; }
-}
-```
+    [Observable(nameof(Name))] 
+    private readonly IProperty<string> _name = new Property<string>();
 
-Create a `UserItemController` class to display the data of a user instance in the UI of the list entry. It needs to access the label for the user name and set it to display the name of the given user instance.
-
-```csharp
-public class UserItemController
-{
-    private readonly Label _nameLabel;
-
-    public TaskItemController(VisualElement userEntryAsset)
+    public UserItemViewModel()
     {
-        _nameLabel = userEntryAsset.Q<Label>("NameLabel");
+        Id = Guid.NewGuid().GetHashCode();
     }
 
-    public void SetData(UserItemData userItemData)
+    public int Id { get; }
+
+    public string Name
     {
-        _nameLabel.text = userItemData.Name;
+        get => _name.Value;
+        set => _name.Value = value;
     }
 }
 ```
 
-Create a `UserListViewWrapper` that inherits the `BindableListViewWrapper<TItem, TData>` abstract class and implement the `OnMakeItem` and `OnBindItem` methods.
+Create a `UserListView` that inherits the `BindableListViewWrapper<TItemBindingContext>` abstract class.
 
 ```csharp
-public class UserListViewWrapper : BindableListViewWrapper<UserItemController, UserItemData>
+public class UserListView : BindableListView<UserItemViewModel>
 {
-    public UserListViewWrapper(BindableListView listView, VisualTreeAsset itemAsset,
-        IObjectProvider objectProvider) : base(listView, itemAsset, objectProvider)
-    {
-    }
-
-    protected override UserItemController OnMakeItem(VisualElement itemAsset)
-    {
-        return new UserItemController(itemAsset);
-    }
-
-    protected override void OnBindItem(UserItemController item, UserItemData data)
-    {
-        item.SetData(data);
-    }
-}
-```
-
-Create a `CustomBindableElementsFactory` and override the `Create` method.
-
-```csharp
-public class CustomBindableElementsFactory : BindableElementsFactory
-{
-    private readonly VisualTreeAsset _userEntryAsset;
-
-    public CustomBindableElementsFactory(VisualTreeAsset userEntryAsset)
-    {
-        _userEntryAsset = userEntryAsset;
-    }
-
-    public override IBindableElement Create(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
-    {
-        return bindableUiElement switch
-        {
-            BindableListView listView => new UserListViewWrapper(listView, _userEntryAsset, objectProvider),
-
-            _ => base.Create(bindableUiElement, objectProvider)
-        };
-    }
+    public new class UxmlFactory : UxmlFactory<UserListView, UxmlTraits> {}
 }
 ```
 
 Create a `UsersViewModel`.
 
 ```csharp
-public class UsersViewModel : ViewModel
+public class UsersViewModel : IBindableContext
 {
     public UsersViewModel()
     {
-        Users = new ObservableCollection<UserItemData>
+        var users = new ObservableCollection<UserItemViewModel>
         {
             new() { Name = "User 1" },
             new() { Name = "User 2" },
             new() { Name = "User 3" },
         };
+
+        Users = new ReadOnlyProperty<ObservableCollection<UserItemViewModel>>(users);
     }
-    
-    public ObservableCollection<UserItemData> Users { get; }
+
+    public IReadOnlyProperty<ObservableCollection<UserItemViewModel>> Users { get; }
 }
 ```
 
@@ -922,27 +853,21 @@ Create a `UsersView` with the following content.
 ```csharp
 public class UsersView : DocumentView<UsersViewModel>
 {
-    [SerializeField] private VisualTreeAsset _userEntryAsset;
+    [SerializeField] private VisualTreeAsset _userItemViewAsset;
 
-    protected override IBindableElementsFactory GetBindableElementsFactory()
+    protected override IReadOnlyDictionary<Type, object> GetCollectionItemTemplates()
     {
-        return new CustomBindableElementsFactory(_userEntryAsset);
+        return new Dictionary<Type, object>
+        {
+            { typeof(UserItemViewModel), _userItemViewAsset }
+        };
     }
 }
 ```
 
 #### BindableScrollView
 
-The `BindableScrollView` has the same binding logic as the `BindableListView`, except that the `UserItemData` class must implement the `ICollectionItemData` interface.
-
-```csharp
-public class UserItemData : ICollectionItemData
-{
-    public Guid Id { get; } = Guid.NewGuid();
-
-    public string Name { get; set; }
-}
-```
+The `BindableScrollView` has the same binding logic as the `BindableListView`. It does not use virtualization and creates VisualElements for all items regardless of visibility.
 
 ### Create custom control
 
@@ -955,8 +880,6 @@ public class Image : VisualElement
 {
     public void SetImage(Texture2D image)
     {
-        // To prevent memory leaks.
-        style.backgroundImage.Release(); // Object.Destroy(background.value.texture);
         style.backgroundImage = new StyleBackground(image);
     }
 
@@ -966,14 +889,48 @@ public class Image : VisualElement
 }
 ```
 
-Then create a `BindableImage` and define `BindingImagePath` property.
+Then create a `BindableImage` class and implement the data binding logic.
 
 ```csharp
-public class BindableImage : Image, IBindableUIElement
+public class BindableImage : Image, IBindableElement
 {
-    public string BindingImagePath { get; set; }
+    private PropertyBindingData _imagePathBindingData;
+    private IReadOnlyProperty<Texture2D> _imageProperty;
 
-    public new class UxmlFactory : UxmlFactory<BindableImage, UxmlTraits> {}
+    public string BindingImagePath { get; private set; }
+
+    public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
+    {
+        _imagePathBindingData ??= BindingImagePath.ToPropertyBindingData();
+
+        _imageProperty = objectProvider.RentReadOnlyProperty<Texture2D>(context, _imagePathBindingData);
+        _imageProperty.ValueChanged += OnImageValueChanged;
+
+        SetImage(_imageProperty.Value);
+    }
+
+    public void ResetBindingContext(IObjectProvider objectProvider)
+    {
+        if (_imageProperty == null)
+        {
+            return;
+        }
+
+        _imageProperty.ValueChanged -= OnImageValueChanged;
+
+        objectProvider.ReturnReadOnlyProperty(_imageProperty);
+
+        _imageProperty = null;
+
+        SetImage(null);
+    }
+
+    private void OnImageValueChanged(object sender, Texture2D newImage)
+    {
+        SetImage(newImage);
+    }
+
+    public new class UxmlFactory : UxmlFactory<BindableImage, UxmlTraits> { }
 
     public new class UxmlTraits : Image.UxmlTraits
     {
@@ -989,70 +946,17 @@ public class BindableImage : Image, IBindableUIElement
 }
 ```
 
-The next step is to describe the data binding logic. To do that, create a `BindableImageWrapper` that inherits the `BindablePropertyElement` abstract class.
-
-```csharp
-public class BindableImageWrapper : BindablePropertyElement
-{
-    private readonly BindableImage _bindableImage;
-    private readonly IReadOnlyProperty<Texture2D> _imageProperty;
-
-    public BindableImageWrapper(BindableImage bindableImage, IObjectProvider objectProvider) : base(objectProvider)
-    {
-        _bindableImage = bindableImage;
-        _imageProperty = GetReadOnlyProperty<Texture2D>(bindableImage.BindingImagePath);
-    }
-
-    public override void UpdateValues()
-    {
-        _bindableImage.SetImage(_imageProperty.Value);
-    }
-}
-```
-
-The **UnityMvvmToolkit** contains two abstract classes `BindableCommandElement` and `BindablePropertyElement` that provide a methods for getting properties from the `BindingContext`.
-
-Finally, tell the elements factory what to do with the new UI element.
-
-```csharp
-public class CustomBindableElementsFactory : BindableElementsFactory
-{
-    public override IBindableElement Create(IBindableUIElement bindableUiElement, IObjectProvider objectProvider)
-    {
-        return bindableUiElement switch
-        {
-            BindableImage bindableImage => new BindableImageWrapper(bindableImage, objectProvider),
-
-            _ => base.Create(bindableUiElement, objectProvider)
-        };
-    }
-}
-```
-
-Don't forget to override the `GetBindableElementsFactory` method in the view.
-
-```csharp
-public class ImageViewerView : DocumentView<ImageViewerViewModel>
-{
-    protected override IBindableElementsFactory GetBindableElementsFactory()
-    {
-        return new CustomBindableElementsFactory();
-    }
-}
-```
-
 Now you can use the new UI element as following.
 
 ```csharp
-public class ImageViewerViewModel : ViewModel
+public class ImageViewerViewModel : IBindingContext
 {
-    private Texture2D _texture;
-
-    public Texture2D Image
+    public ImageItemViewModel(Texture2D image)
     {
-        get => _texture;
-        private set => Set(ref _texture, value);
+        Image = new ReadOnlyProperty<Texture2D>(image);
     }
+
+    public IReadOnlyProperty<Texture2D> Image { get; }
 }
 ```
 
@@ -1119,40 +1023,28 @@ public async UniTask DeactivatePanel()
 
 > **Note:** All transition extensions have a `timeoutMs` parameter (default value is `2500ms`).
 
-## :chart_with_upwards_trend: Benchmarks
+## :rocket: Performance
 
-The **UnityMvvmToolkit** uses delegates to get and set property values. This approach avoids boxing and unboxing for value types, and the performance improvements are really significant. In particular, this approach is ~65x faster than the one that uses standard `GetValue` and `SetValue` methods, and does not make any memory allocations at all.
+### Memory allocation
 
-<details><summary>Environment</summary>
-<br />
-<pre>
-BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19041.1165 (2004/May2020Update/20H1)
-Intel Core i7-8700 CPU 3.20GHz (Coffee Lake), 1 CPU, 12 logical and 6 physical cores
-.NET SDK=5.0.301
-  [Host]     : .NET 5.0.7 (5.0.721.25508), X64 RyuJIT
-  DefaultJob : .NET 5.0.7 (5.0.721.25508), X64 RyuJIT
-</pre>
-</details>
+The **UnityMvvmToolkit** uses object pools under the hood and reuses created objects. You can warm up certain objects in advance to avoid allocations during execution time.
 
-#### Set & Get integer value
-
-<pre>
-|              Method |        Mean |     Error |    StdDev |  Ratio |  Gen 0 | Gen 1 | Gen 2 | Allocated |
-|-------------------- |------------:|----------:|----------:|-------:|-------:|------:|------:|----------:|
-| DirectPropertyUsage |   0.4904 ns | 0.0364 ns | 0.0358 ns |   1.00 |      - |     - |     - |         - |
-|    UnityMvvmToolkit |   3.4734 ns | 0.0925 ns | 0.0865 ns |   7.13 |      - |     - |     - |         - |
-|          Reflection | 225.5382 ns | 4.4920 ns | 4.8063 ns | 463.38 | 0.0176 |     - |     - |     112 B |
-</pre>
-
-#### Complex binding
-
-<pre>
-|           Method |       Mean |    Error |   StdDev | Ratio |  Gen 0 | Gen 1 | Gen 2 | Allocated |
-|----------------- |-----------:|---------:|---------:|------:|-------:|------:|------:|----------:|
-|   ManualApproach |   209.3 ns |  3.02 ns |  2.35 ns |  1.00 | 0.0458 |     - |     - |     288 B |
-| UnityMvvmToolkit |   418.1 ns |  7.82 ns |  8.04 ns |  2.00 | 0.0458 |     - |     - |     288 B |
-|       Reflection | 1,566.4 ns | 31.01 ns | 33.18 ns |  7.46 | 0.0725 |     - |     - |     464 B |
-</pre>
+```csharp
+public abstract class BaseView<TBindingContext> : DocumentView<TBindingContext>
+        where TBindingContext : class, IBindingContext
+{
+    protected override IObjectProvider GetObjectProvider()
+    {
+        return new BindingContextObjectProvider(new IValueConverter[] { new IntToStrConverter() })
+            // Finds and warmups all classes that implement IBindingContext.
+            .WarmupAssemblyViewModels()
+            // Warmups a certain class.
+            .WarmupViewModel<CounterViewModel>()
+            // Creates 5 instances to rent 'IProperty<string>' without any allocations.
+            .WarmupValueConverter<IntToStrConverter>(5);
+    }
+}
+```
 
 ## :bookmark_tabs: Contributing
 
