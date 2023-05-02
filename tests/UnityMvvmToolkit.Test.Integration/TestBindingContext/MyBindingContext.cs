@@ -1,16 +1,18 @@
 ﻿using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Attributes;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Test.Unit.TestCommands;
 
 // ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
 
 namespace UnityMvvmToolkit.Test.Integration.TestBindingContext;
 
 public class MyBindingContext : IBindingContext
 {
     private readonly IProperty<int> _count = new Property<int>();
-    private readonly IProperty<string> m_description = new Property<string>();
+    
+    [Observable(nameof(IntValue))]
+    private readonly IReadOnlyProperty<int> m_intValue = new ReadOnlyProperty<int>(69);
 
     public MyBindingContext(string title = "Title")
     {
@@ -32,11 +34,7 @@ public class MyBindingContext : IBindingContext
         set => _count.Value = value;
     }
 
-    public string Description
-    {
-        get => m_description.Value;
-        set => m_description.Value = value;
-    }
+    public int IntValue => m_intValue.Value;
 
     public ICommand FieldCommand;
     public ICommand IncrementCommand { get; }

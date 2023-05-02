@@ -269,6 +269,26 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
+    public void RentPropertyWithConverter_ShouldThrow_WhenPropertyIsReadOnly()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(new IValueConverter[]
+        {
+            new IntToStrConverter()
+        });
+
+        var bindingContext = new MyBindingContext();
+
+        var intValueBindingData = nameof(MyBindingContext.IntValue).ToPropertyBindingData();
+
+        // Assert
+        objectProvider
+            .Invoking(sut => sut.RentReadOnlyProperty<string>(bindingContext, intValueBindingData))
+            .Should()
+            .Throw<InvalidCastException>();
+    }
+
+    [Fact]
     public void RentPropertyWithConverter_ShouldThrow_WhenConverterIsNotSet()
     {
         // Arrange
@@ -279,7 +299,7 @@ public class BindingContextObjectProviderTests
 
         // Assert
         objectProvider
-            .Invoking(objProvider => objProvider.RentProperty<string>(bindingContext, countPropertyBindingData))
+            .Invoking(sut => sut.RentProperty<string>(bindingContext, countPropertyBindingData))
             .Should()
             .Throw<NullReferenceException>()
             .WithMessage($"Property value converter from '{typeof(int)}' to '{typeof(string)}' not found.");
