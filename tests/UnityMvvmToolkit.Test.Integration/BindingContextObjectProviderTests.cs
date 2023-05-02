@@ -213,6 +213,37 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
+    public void RentPropertyWithConverter_ShouldReturnReadOnlyProperty_WhenPropertyInstanceIsNotReadOnly()
+    {
+        // Arrange
+        const int intValue = 25;
+
+        var objectProvider = new BindingContextObjectProvider(new IValueConverter[]
+        {
+            new IntToStrConverter()
+        });
+
+        var bindingContext = new MyBindingContext(intValue: intValue);
+
+        IReadOnlyProperty<int> intProperty;
+        var intPropertyBindingData = nameof(MyBindingContext.IntReadOnlyProperty).ToPropertyBindingData();
+
+        // Act
+        intProperty = objectProvider.RentProperty<int>(bindingContext, intPropertyBindingData);
+
+        // Assert
+        intProperty
+            .Should()
+            .NotBeNull()
+            .And
+            .BeAssignableTo<IProperty<int>>()
+            .And
+            .BeAssignableTo<IReadOnlyProperty<int>>();
+
+        intProperty.Value.Should().Be(intValue);
+    }
+
+    [Fact]
     public void RentProperty_ShouldThrow_WhenPropertyIsNotFound()
     {
         // Arrange
@@ -279,7 +310,7 @@ public class BindingContextObjectProviderTests
 
         var bindingContext = new MyBindingContext();
 
-        var intValueBindingData = nameof(MyBindingContext.IntValue).ToPropertyBindingData();
+        var intValueBindingData = nameof(MyBindingContext.IntReadOnlyValue).ToPropertyBindingData();
 
         // Assert
         objectProvider

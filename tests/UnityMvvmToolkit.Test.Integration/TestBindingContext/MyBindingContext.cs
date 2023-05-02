@@ -4,6 +4,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Test.Unit.TestCommands;
 
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace UnityMvvmToolkit.Test.Integration.TestBindingContext;
 
@@ -11,12 +12,13 @@ public class MyBindingContext : IBindingContext
 {
     private readonly IProperty<int> _count = new Property<int>();
     
-    [Observable(nameof(IntValue))]
-    private readonly IReadOnlyProperty<int> m_intValue = new ReadOnlyProperty<int>(69);
+    [Observable(nameof(IntReadOnlyValue))]
+    private readonly IReadOnlyProperty<int> m_intReadOnlyValue = new ReadOnlyProperty<int>(69);
 
-    public MyBindingContext(string title = "Title")
+    public MyBindingContext(string title = "Title", int intValue = default)
     {
         Title = new ReadOnlyProperty<string>(title);
+        IntReadOnlyProperty = new Property<int>(intValue);
 
         FieldCommand = new Command(default);
 
@@ -26,15 +28,17 @@ public class MyBindingContext : IBindingContext
         SetValueCommand = new Command<int>(value => Count = value);
     }
 
-    public IReadOnlyProperty<string> Title { get; }
-
     public int Count
     {
         get => _count.Value;
         set => _count.Value = value;
     }
 
-    public int IntValue => m_intValue.Value;
+    public int IntReadOnlyValue => m_intReadOnlyValue.Value;
+
+    public IReadOnlyProperty<string> Title { get; }
+
+    public IReadOnlyProperty<int> IntReadOnlyProperty { get; }
 
     public ICommand FieldCommand;
     public ICommand IncrementCommand { get; }
