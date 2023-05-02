@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using UnityMvvmToolkit.Core.Enums;
 
 namespace UnityMvvmToolkit.Core.Interfaces
@@ -6,6 +7,7 @@ namespace UnityMvvmToolkit.Core.Interfaces
     public interface IObjectProvider
     {
         IObjectProvider WarmupAssemblyViewModels();
+        IObjectProvider WarmupAssemblyViewModels(Assembly assembly);
         IObjectProvider WarmupViewModel<TBindingContext>() where TBindingContext : IBindingContext;
         IObjectProvider WarmupViewModel(Type bindingContextType);
 

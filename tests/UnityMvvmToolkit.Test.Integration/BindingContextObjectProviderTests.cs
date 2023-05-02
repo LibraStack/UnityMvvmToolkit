@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Reflection;
+using FluentAssertions;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Converters.ParameterValueConverters;
 using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
@@ -14,13 +15,36 @@ namespace UnityMvvmToolkit.Test.Integration;
 public class BindingContextObjectProviderTests
 {
     [Fact]
-    public void WarmupAssemblyViewModels_ShouldWarmupAllViewModels()
+    public void WarmupAssemblyViewModels_ShouldWarmupCallingAssemblyViewModels()
     {
         // Arrange
         var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
 
         // Act
         objectProvider.WarmupAssemblyViewModels();
+
+        // Assert
+        objectProvider
+            .Invoking(sut => sut.WarmupViewModel<MyBindingContext>())
+            .Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage($"{nameof(MyBindingContext)} already warmed up.");
+
+        objectProvider
+            .Invoking(sut => sut.WarmupViewModel<EmptyBindingContext>())
+            .Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage($"{nameof(EmptyBindingContext)} already warmed up.");
+    }
+
+    [Fact]
+    public void WarmupAssemblyViewModels_ShouldWarmupAssemblyViewModels()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+
+        // Act
+        objectProvider.WarmupAssemblyViewModels(Assembly.GetExecutingAssembly());
 
         // Assert
         objectProvider

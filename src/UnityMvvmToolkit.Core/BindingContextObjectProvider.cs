@@ -32,8 +32,12 @@ namespace UnityMvvmToolkit.Core
 
         public IObjectProvider WarmupAssemblyViewModels()
         {
-            var assemblyTypes = Assembly
-                .GetCallingAssembly()
+            return WarmupAssemblyViewModels(Assembly.GetCallingAssembly());
+        }
+
+        public IObjectProvider WarmupAssemblyViewModels(Assembly assembly)
+        {
+            var assemblyTypes = assembly
                 .GetTypes()
                 .Where(type => type.IsInterface == false && type.IsAbstract == false &&
                                typeof(IBindingContext).IsAssignableFrom(type));
