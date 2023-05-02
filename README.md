@@ -332,24 +332,20 @@ The following shows how to set up a simple command.
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Interfaces;
 
-public class CounterViewModel : ViewModel
+public class CounterViewModel : IBindingContext
 {
-    private int _count;
-
     public CounterViewModel()
     {
+        Count = new Property<int>();
+        
         IncrementCommand = new Command(IncrementCount);
     }
 
-    public int Count
-    {
-        get => _count;
-        set => Set(ref _count, value);
-    }
+    public IProperty<int> Count { get; }
 
     public ICommand IncrementCommand { get; }
 
-    private void IncrementCount() => Count++;
+    private void IncrementCount() => Count.Value++;
 }
 ```
 
@@ -378,28 +374,27 @@ Key functionality:
 Let's say we want to download an image from the web and display it as soon as it downloads.
 
 ```csharp
-public class ImageViewerViewModel : ViewModel
+public class ImageViewerViewModel : IBindingContext
 {
+    [Observable(nameof(Image))]
+    private readonly IProperty<Texture2D> _image;
     private readonly IImageDownloader _imageDownloader;
-    private Texture2D _texture;
 
     public ImageViewerViewModel(IImageDownloader imageDownloader)
     {
+        _image = new Property<Texture2D>();
         _imageDownloader = imageDownloader;
+        
         DownloadImageCommand = new AsyncCommand(DownloadImageAsync);
     }
 
-    public Texture2D Image
-    {
-        get => _texture;
-        private set => Set(ref _texture, value);
-    }
+    public Texture2D Image => _image.Value;
 
     public IAsyncCommand DownloadImageCommand { get; }
 
     private async UniTask DownloadImageAsync(CancellationToken cancellationToken)
     {
-        Image = await _imageDownloader.DownloadRandomImageAsync(cancellationToken);
+        _image.Value = await _imageDownloader.DownloadRandomImageAsync(cancellationToken);
     }
 }
 ```
@@ -420,7 +415,7 @@ With the related UI code.
 To disable the `BindableButton` while an async operation is running, simply set the `DisableOnExecution` property of the `AsyncCommand` to `true`.
 
 ```csharp
-public class ImageViewerViewModel : ViewModel
+public class ImageViewerViewModel : IBindingContext
 {
     public ImageViewerViewModel(IImageDownloader imageDownloader)
     {
@@ -433,7 +428,7 @@ public class ImageViewerViewModel : ViewModel
 If you want to create an async command that supports cancellation, use the `WithCancellation` extension method.
 
 ```csharp
-public class MyViewModel : ViewModel
+public class MyViewModel : IBindingContext
 {
     public MyViewModel()
     {
@@ -532,23 +527,22 @@ Then you can use the `ThemeModeToBoolConverter` as in the following example.
 Parameter value converter allows to convert a command parameter.
 
 Built-in parameter value converters:
-- ParameterToStrConverter
 - ParameterToIntConverter
 - ParameterToFloatConverter
 
-By default, the converter is not needed if your command has a `ReadOnlyMemory<char>` parameter type.
+By default, the converter is not needed if your command has a `string` parameter type.
 
 ```csharp
-public class MyViewModel : ViewModel
+public class MyViewModel : IBindingContext
 {
     public MyViewModel()
     {
-        PrintParameterCommand = new Command<ReadOnlyMemory<char>>(PrintParameter);
+        PrintParameterCommand = new Command<string>(PrintParameter);
     }
 
-    public ICommand<ReadOnlyMemory<char>> PrintParameterCommand { get; }
+    public ICommand<string> PrintParameterCommand { get; }
 
-    private void PrintParameter(ReadOnlyMemory<char> parameter)
+    private void PrintParameter(string parameter)
     {
         Debug.Log(parameter);
     }
@@ -568,9 +562,9 @@ If you want to create your own parameter value converter, create a class that in
 ```csharp
 public class ParameterToIntConverter : ParameterValueConverter<int>
 {
-    public override int Convert(ReadOnlyMemory<char> parameter)
+    public override int Convert(string parameter)
     {
-        return int.Parse(parameter.Span);
+        return int.Parse(parameter);
     }
 }
 ```
@@ -590,7 +584,7 @@ public class MyView : DocumentView<MyViewModel>
 Then you can use the `ParameterToIntConverter` as in the following example.
 
 ```csharp
-public class MyViewModel : ViewModel
+public class MyViewModel : IBindingContext
 {
     public MyViewModel()
     {
@@ -718,8 +712,8 @@ public class LabelViewModel : IBindingContext
 {
     public LabelViewModel()
     {
-        IntValue = new ReadOnlyProperty<int>(55);
-        StrValue = new ReadOnlyProperty<string>("69");
+        IntValue = new Property<int>(55);
+        StrValue = new Property<string>("69");
     }
 
     public IReadOnlyProperty<int> IntValue { get; }
@@ -1036,10 +1030,14 @@ public abstract class BaseView<TBindingContext> : DocumentView<TBindingContext>
     protected override IObjectProvider GetObjectProvider()
     {
         return new BindingContextObjectProvider(new IValueConverter[] { new IntToStrConverter() })
-            // Finds and warmups all classes that implement IBindingContext.
+            // Finds and warmups all classes from calling assembly that implement IBindingContext.
             .WarmupAssemblyViewModels()
+            // Finds and warmups all classes from certain assembly that implement IBindingContext.
+            .WarmupAssemblyViewModels(Assembly.GetExecutingAssembly())
             // Warmups a certain class.
             .WarmupViewModel<CounterViewModel>()
+            // Warmups a certain class.
+            .WarmupViewModel(typeof(CounterViewModel))
             // Creates 5 instances to rent 'IProperty<string>' without any allocations.
             .WarmupValueConverter<IntToStrConverter>(5);
     }
