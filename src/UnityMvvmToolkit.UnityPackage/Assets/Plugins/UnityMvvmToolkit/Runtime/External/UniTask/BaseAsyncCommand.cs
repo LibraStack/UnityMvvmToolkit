@@ -5,6 +5,7 @@ namespace UnityMvvmToolkit.UniTask
     using Core;
     using System;
     using Interfaces;
+    using Extensions;
     using System.Runtime.CompilerServices;
 
     public abstract class BaseAsyncCommand : BaseCommand, IBaseAsyncCommand
@@ -25,6 +26,8 @@ namespace UnityMvvmToolkit.UniTask
             }
         }
 
+        public bool AllowConcurrency { get; set; }
+
         public virtual bool DisableOnExecution { get; set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -40,6 +43,8 @@ namespace UnityMvvmToolkit.UniTask
 
         public virtual void Cancel()
         {
+            throw new InvalidOperationException(
+                $"To make the 'AsyncCommand' cancelable, use '{nameof(AsyncCommandExtensions.WithCancellation)}' extension.");
         }
     }
 }

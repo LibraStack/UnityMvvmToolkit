@@ -18,6 +18,11 @@ namespace UnityMvvmToolkit.UniTask
 
         public void Execute(T parameter)
         {
+            if (IsRunning && AllowConcurrency == false)
+            {
+                return;
+            }
+
             ExecuteAsync(parameter).Forget();
         }
 
