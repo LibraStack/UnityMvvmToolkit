@@ -60,7 +60,7 @@ namespace UnityMvvmToolkit.UniTask.Internal
 
                 while (_runningCommands.TryDequeue(out var asyncCommand))
                 {
-                    await asyncCommand;
+                    await asyncCommand.SuppressCancellationThrow();
                 }
             }
             finally
