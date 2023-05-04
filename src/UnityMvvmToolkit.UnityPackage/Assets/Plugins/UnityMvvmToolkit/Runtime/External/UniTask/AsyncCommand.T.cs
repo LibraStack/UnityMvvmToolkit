@@ -18,6 +18,11 @@ namespace UnityMvvmToolkit.UniTask
 
         public void Execute(T parameter)
         {
+            if (IsCommandRunning && AllowConcurrency == false)
+            {
+                return;
+            }
+
             ExecuteAsync(parameter).Forget();
         }
 
@@ -25,12 +30,13 @@ namespace UnityMvvmToolkit.UniTask
         {
             try
             {
-                IsRunning = true;
+                SetCommandRunning(true);
+
                 await _action(parameter, cancellationToken);
             }
             finally
             {
-                IsRunning = false;
+                SetCommandRunning(false);
             }
         }
     }

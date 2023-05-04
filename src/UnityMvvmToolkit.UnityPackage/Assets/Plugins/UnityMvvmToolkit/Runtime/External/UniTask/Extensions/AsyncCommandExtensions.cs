@@ -15,7 +15,9 @@ namespace UnityMvvmToolkit.UniTask.Extensions
                 throw new NullReferenceException(nameof(asyncCommand));
             }
 
-            return new AsyncCommandWithCancellation(asyncCommand);
+            return asyncCommand.AllowConcurrency
+                ? new AsyncCommandWithCancellation(asyncCommand)
+                : new AsyncLazyCommandWithCancellation(asyncCommand);
         }
 
         public static IAsyncCommand<T> WithCancellation<T>(this IAsyncCommand<T> asyncCommand)
@@ -25,7 +27,9 @@ namespace UnityMvvmToolkit.UniTask.Extensions
                 throw new NullReferenceException(nameof(asyncCommand));
             }
 
-            return new AsyncCommandWithCancellation<T>(asyncCommand);
+            return asyncCommand.AllowConcurrency
+                ? new AsyncCommandWithCancellation<T>(asyncCommand)
+                : new AsyncLazyCommandWithCancellation<T>(asyncCommand);
         }
     }
 }

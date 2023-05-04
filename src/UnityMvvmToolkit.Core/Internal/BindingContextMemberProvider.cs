@@ -63,47 +63,15 @@ namespace UnityMvvmToolkit.Core.Internal
                 return TryGetHashCode(contextType, fieldInfo.Name, fieldInfo.FieldType, out hashCode);
             }
 
-            if (TryGetPropertyNameFromAttribute(fieldInfo, out var fieldName))
+            if (HasObservableAttribute(fieldInfo, out var propertyName) == false)
             {
-                return TryGetHashCode(contextType, fieldName, fieldInfo.FieldType, out hashCode);
-            }
-
-            fieldName = fieldInfo.Name;
-
-            if (fieldName.Length > 1)
-            {
-                if (fieldName[0] == '_')
-                {
-                    fieldName = fieldName[1..]; // TODO: Get rid of allocation.
-                }
-
-                if (fieldName[0] == 'm' && fieldName[1] == '_')
-                {
-                    fieldName = fieldName[2..]; // TODO: Get rid of allocation.
-                }
-            }
-
-            if (string.IsNullOrEmpty(fieldName))
-            {
-                throw new InvalidOperationException($"Field name '{fieldName}' is not supported.");
-            }
-
-            return TryGetHashCode(contextType, fieldName, fieldInfo.FieldType, out hashCode);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TryGetPropertyNameFromAttribute(MemberInfo fieldInfo, out string propertyName)
-        {
-            var observableAttribute = fieldInfo.GetCustomAttribute<ObservableAttribute>();
-
-            if (observableAttribute == null || string.IsNullOrWhiteSpace(observableAttribute.PropertyName))
-            {
-                propertyName = default;
+                hashCode = default;
                 return false;
             }
 
-            propertyName = observableAttribute.PropertyName;
-            return true;
+            return string.IsNullOrWhiteSpace(propertyName)
+                ? TryGetHashCode(contextType, GetFieldName(fieldInfo.Name), fieldInfo.FieldType, out hashCode)
+                : TryGetHashCode(contextType, propertyName, fieldInfo.FieldType, out hashCode);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -130,6 +98,47 @@ namespace UnityMvvmToolkit.Core.Internal
 
             hashCode = default;
             return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool HasObservableAttribute(MemberInfo fieldInfo, out string propertyName)
+        {
+            var observableAttribute = fieldInfo.GetCustomAttribute<ObservableAttribute>();
+
+            if (observableAttribute == null)
+            {
+                propertyName = default;
+                return false;
+            }
+
+            propertyName = observableAttribute.PropertyName;
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string GetFieldName(string fieldName)
+        {
+            var resultName = fieldName;
+
+            if (resultName.Length > 1)
+            {
+                if (resultName[0] == '_')
+                {
+                    resultName = resultName[1..]; // TODO: Get rid of allocation.
+                }
+
+                if (resultName[0] == 'm' && resultName[1] == '_')
+                {
+                    resultName = resultName[2..]; // TODO: Get rid of allocation.
+                }
+            }
+
+            if (string.IsNullOrEmpty(resultName))
+            {
+                throw new InvalidOperationException($"Field name '{resultName}' is not supported.");
+            }
+
+            return resultName;
         }
     }
 }

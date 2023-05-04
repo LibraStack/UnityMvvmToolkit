@@ -10,6 +10,7 @@ namespace UnityMvvmToolkit.Test.Integration.TestBindingContext;
 
 public class MyBindingContext : IBindingContext
 {
+    [Observable]
     private readonly IProperty<int> _count = new Property<int>();
     
     [Observable(nameof(IntReadOnlyValue))]

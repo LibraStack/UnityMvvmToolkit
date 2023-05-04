@@ -6,20 +6,15 @@ namespace UnityMvvmToolkit.UniTask.Internal
     using Interfaces;
     using System.Threading;
     using Cysharp.Threading.Tasks;
-    using System.Collections.Concurrent;
-    using System.Runtime.CompilerServices;
 
-    internal class AsyncCommandWithCancellation : BaseAsyncCommand, IAsyncCommand
+    internal class AsyncLazyCommandWithCancellation : BaseAsyncCommand, IAsyncCommand
     {
         private readonly IAsyncCommand _asyncCommand;
-        private readonly ConcurrentQueue<UniTask> _runningCommands;
-
         private CancellationTokenSource _cancellationTokenSource;
 
-        public AsyncCommandWithCancellation(IAsyncCommand asyncCommand) : base(null)
+        public AsyncLazyCommandWithCancellation(IAsyncCommand asyncCommand) : base(null)
         {
             _asyncCommand = asyncCommand;
-            _runningCommands = new ConcurrentQueue<UniTask>();
         }
 
         public override bool DisableOnExecution
@@ -38,28 +33,21 @@ namespace UnityMvvmToolkit.UniTask.Internal
         {
             if (IsCommandRunning)
             {
-                TryEnqueueAsyncCommand(_cancellationTokenSource.Token);
+                return;
             }
-            else
-            {
-                ExecuteAsync().Forget();
-            }
+
+            ExecuteAsync().Forget();
         }
 
         public async UniTask ExecuteAsync(CancellationToken cancellationToken = default)
         {
-            _cancellationTokenSource ??= new CancellationTokenSource();
+            _cancellationTokenSource = new CancellationTokenSource();
 
             try
             {
                 SetCommandRunning(true);
 
-                TryEnqueueAsyncCommand(_cancellationTokenSource.Token);
-
-                while (_runningCommands.TryDequeue(out var asyncCommand))
-                {
-                    await asyncCommand.SuppressCancellationThrow();
-                }
+                await _asyncCommand.ExecuteAsync(_cancellationTokenSource.Token);
             }
             finally
             {
@@ -73,17 +61,6 @@ namespace UnityMvvmToolkit.UniTask.Internal
         public override void Cancel()
         {
             _cancellationTokenSource?.Cancel();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void TryEnqueueAsyncCommand(CancellationToken cancellationToken)
-        {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-
-            _runningCommands.Enqueue(_asyncCommand.ExecuteAsync(cancellationToken));
         }
     }
 }
