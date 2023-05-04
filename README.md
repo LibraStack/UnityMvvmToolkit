@@ -18,7 +18,6 @@ A package that brings data-binding to your Unity project.
   - [Property](#propertyt--readonlypropertyt)
   - [Command](#command--commandt)
   - [AsyncCommand](#asynccommand--asynccommandt)
-  - [AsyncLazyCommand](#asynclazycommand--asynclazycommandt)
   - [PropertyValueConverter](#propertyvalueconvertertsourcetype-ttargettype)
   - [ParameterValueConverter](#parametervalueconverterttargettype)
 - [Quick start](#watch-quick-start)
@@ -198,7 +197,6 @@ The included types are:
 - [Property\<T\> & ReadOnlyProperty\<T\>](#propertyt--readonlypropertyt)
 - [Command & Command\<T\>](#command--commandt)
 - [AsyncCommand & AsyncCommand\<T\>](#asynccommand--asynccommandt)
-- [AsyncLazyCommand & AsyncLazyCommand\<T\>](#asynclazycommand--asynclazycommandt)
 - [PropertyValueConverter\<TSourceType, TTargetType\>](#propertyvalueconvertertsourcetype-ttargettype)
 - [ParameterValueConverter\<TTargetType\>](#parametervalueconverterttargettype)
 - [IProperty\<T\> & IReadOnlyProperty\<T\>](#propertyt--readonlypropertyt)
@@ -425,6 +423,18 @@ public class ImageViewerViewModel : IBindingContext
 }
 ```
 
+To allow the same async command to be invoked concurrently multiple times, set the `AllowConcurrency` property of the `AsyncCommand` to `true`.
+
+```csharp
+public class MainViewModel : IBindingContext
+{
+    public MainViewModel()
+    {
+        RunConcurrentlyCommand = new AsyncCommand(RunConcurrentlyAsync) { AllowConcurrency = true };
+    }
+}
+```
+
 If you want to create an async command that supports cancellation, use the `WithCancellation` extension method.
 
 ```csharp
@@ -446,22 +456,13 @@ public class MyViewModel : IBindingContext
     
     private void Cancel()
     {
-        // If the underlying command is not running, or
-        // if it does not support cancellation, this method will perform no action.
+        // If the underlying command is not running, this method will perform no action.
         MyAsyncCommand.Cancel();
     }
 }
 ```
 
-If the command supports cancellation, previous invocations will automatically be canceled if a new one is started.
-
-> **Note:** You need to import the [UniTask](https://github.com/Cysharp/UniTask) package in order to use async commands.
-
-### AsyncLazyCommand & AsyncLazyCommand\<T\>
-
-The `AsyncLazyCommand` and `AsyncLazyCommand<T>` are have the same functionality as the `AsyncCommand`'s, except they prevent the same async command from being invoked concurrently multiple times.
-
-Let's imagine a scenario similar to the one described in the `AsyncCommand` sample, but a user clicks the `Download Image` button several times while the async operation is running. In this case, `AsyncLazyCommand` will ignore all clicks until previous async operation has completed.
+If a command supports cancellation and the `AllowConcurrency` property is set to `true`, all running commands will be canceled.
 
 > **Note:** You need to import the [UniTask](https://github.com/Cysharp/UniTask) package in order to use async commands.
 
