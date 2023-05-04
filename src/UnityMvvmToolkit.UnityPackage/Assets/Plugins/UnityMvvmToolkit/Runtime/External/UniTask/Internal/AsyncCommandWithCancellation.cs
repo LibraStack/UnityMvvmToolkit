@@ -22,8 +22,6 @@ namespace UnityMvvmToolkit.UniTask.Internal
             _runningCommands = new ConcurrentQueue<UniTask>();
         }
 
-        public override bool IsRunning { get; protected set; }
-
         public override bool DisableOnExecution
         {
             get => _asyncCommand.DisableOnExecution;
@@ -38,7 +36,7 @@ namespace UnityMvvmToolkit.UniTask.Internal
 
         public void Execute()
         {
-            if (IsRunning)
+            if (IsCommandRunning)
             {
                 TryEnqueueAsyncCommand(_cancellationTokenSource.Token);
             }
@@ -54,7 +52,7 @@ namespace UnityMvvmToolkit.UniTask.Internal
 
             try
             {
-                IsRunning = true;
+                SetCommandRunning(true);
 
                 TryEnqueueAsyncCommand(_cancellationTokenSource.Token);
 
@@ -65,7 +63,7 @@ namespace UnityMvvmToolkit.UniTask.Internal
             }
             finally
             {
-                IsRunning = false;
+                SetCommandRunning(false);
 
                 _cancellationTokenSource?.Dispose();
                 _cancellationTokenSource = null;

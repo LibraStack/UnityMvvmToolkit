@@ -7,28 +7,23 @@ namespace UnityMvvmToolkit.UniTask
     using Interfaces;
     using Extensions;
     using System.Runtime.CompilerServices;
+    using UnityMvvmToolkit.Core.Interfaces;
 
     public abstract class BaseAsyncCommand : BaseCommand, IBaseAsyncCommand
     {
-        private bool _isRunning;
+        private readonly IProperty<bool> _isRunning;
 
         protected BaseAsyncCommand(Func<bool> canExecute) : base(canExecute)
         {
-        }
-
-        public virtual bool IsRunning
-        {
-            get => _isRunning;
-            protected set
-            {
-                _isRunning = value;
-                RaiseCanExecuteChanged();
-            }
+            _isRunning = new Property<bool>();
         }
 
         public bool AllowConcurrency { get; set; }
-
         public virtual bool DisableOnExecution { get; set; }
+
+        public IReadOnlyProperty<bool> IsRunning => _isRunning;
+
+        protected bool IsCommandRunning { get; private set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool CanExecute()
@@ -38,13 +33,27 @@ namespace UnityMvvmToolkit.UniTask
                 return base.CanExecute();
             }
 
-            return IsRunning == false && base.CanExecute();
+            return IsCommandRunning == false && base.CanExecute();
         }
 
         public virtual void Cancel()
         {
             throw new InvalidOperationException(
                 $"To make the 'AsyncCommand' cancelable, use '{nameof(AsyncCommandExtensions.WithCancellation)}' extension.");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected void SetCommandRunning(bool isRunning)
+        {
+            _isRunning.Value = isRunning;
+
+            if (IsCommandRunning == isRunning)
+            {
+                return;
+            }
+
+            IsCommandRunning = isRunning;
+            RaiseCanExecuteChanged();
         }
     }
 }

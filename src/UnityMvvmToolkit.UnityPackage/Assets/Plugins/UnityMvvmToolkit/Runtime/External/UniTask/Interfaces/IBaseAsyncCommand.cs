@@ -2,11 +2,14 @@
 
 namespace UnityMvvmToolkit.UniTask.Interfaces
 {
+    using UnityMvvmToolkit.Core.Interfaces;
+
     public interface IBaseAsyncCommand
     {
-        bool IsRunning { get; }
         bool AllowConcurrency { get; set; }
         bool DisableOnExecution { get; set; }
+
+        IReadOnlyProperty<bool> IsRunning { get; }
 
         void Cancel();
     }

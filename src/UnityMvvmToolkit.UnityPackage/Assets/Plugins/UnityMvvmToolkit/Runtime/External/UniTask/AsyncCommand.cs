@@ -18,7 +18,7 @@ namespace UnityMvvmToolkit.UniTask
 
         public void Execute()
         {
-            if (IsRunning && AllowConcurrency == false)
+            if (IsCommandRunning && AllowConcurrency == false)
             {
                 return;
             }
@@ -30,12 +30,13 @@ namespace UnityMvvmToolkit.UniTask
         {
             try
             {
-                IsRunning = true;
+                SetCommandRunning(true);
+
                 await _action(cancellationToken);
             }
             finally
             {
-                IsRunning = false;
+                SetCommandRunning(false);
             }
         }
     }

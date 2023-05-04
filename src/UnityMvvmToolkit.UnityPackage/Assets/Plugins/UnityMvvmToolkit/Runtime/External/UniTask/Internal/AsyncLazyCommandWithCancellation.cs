@@ -17,8 +17,6 @@ namespace UnityMvvmToolkit.UniTask.Internal
             _asyncCommand = asyncCommand;
         }
 
-        public override bool IsRunning => _asyncCommand.IsRunning;
-
         public override bool DisableOnExecution
         {
             get => _asyncCommand.DisableOnExecution;
@@ -33,7 +31,7 @@ namespace UnityMvvmToolkit.UniTask.Internal
 
         public void Execute()
         {
-            if (IsRunning)
+            if (IsCommandRunning)
             {
                 return;
             }
@@ -47,10 +45,14 @@ namespace UnityMvvmToolkit.UniTask.Internal
 
             try
             {
+                SetCommandRunning(true);
+
                 await _asyncCommand.ExecuteAsync(_cancellationTokenSource.Token);
             }
             finally
             {
+                SetCommandRunning(false);
+
                 _cancellationTokenSource?.Dispose();
                 _cancellationTokenSource = null;
             }
