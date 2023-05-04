@@ -111,7 +111,7 @@ public class BindingContextMemberProviderTests
     public void GetBindingContextMembers_ShouldThrow_WhenResultsDictionaryIsNull()
     {
         // Arrange
-        var bindingContextType = typeof(PrivateFieldBindingContext);
+        var bindingContextType = typeof(ObservableFieldBindingContext);
 
         // Assert
         _memberProvider
@@ -126,6 +126,7 @@ public class BindingContextMemberProviderTests
         yield return GetObservableFieldBindingContextTestData();
         yield return GetPublicFieldBindingContextTestData();
         yield return GetPrivatePropertyBindingContextTestData();
+        yield return GetSameFieldAndPropertyNamesBindingContextTestData();
         yield return GetPublicPropertyBindingContextTestData();
         yield return GetCommandBindingContextTestData();
         yield return GetNoObservableFieldsBindingContextTestData();
@@ -134,17 +135,7 @@ public class BindingContextMemberProviderTests
     private static object[] GetPrivateFieldBindingContextTestData()
     {
         var bindingContextType = typeof(PrivateFieldBindingContext);
-        return new object[]
-        {
-            bindingContextType,
-            new (int, MemberTypes)[]
-            {
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, "BoolField"), MemberTypes.Field),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, "IntField"), MemberTypes.Field),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, "FloatField"), MemberTypes.Field),
-                (HashCodeHelper.GetMemberHashCode(bindingContextType, "StrField"), MemberTypes.Field)
-            }
-        };
+        return new object[] { bindingContextType, Array.Empty<(int, MemberTypes)>() };
     }
 
     private static object[] GetObservableFieldBindingContextTestData()
@@ -184,6 +175,20 @@ public class BindingContextMemberProviderTests
     private static object[] GetPrivatePropertyBindingContextTestData()
     {
         return new object[] { typeof(PrivatePropertyBindingContext), Array.Empty<(int, MemberTypes)>() };
+    }
+
+    private static object[] GetSameFieldAndPropertyNamesBindingContextTestData()
+    {
+        var bindingContextType = typeof(SameFieldAndPropertyNamesBindingContext);
+        return new object[]
+        {
+            bindingContextType,
+            new (int, MemberTypes)[]
+            {
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(SameFieldAndPropertyNamesBindingContext.Count)),
+                    MemberTypes.Property)
+            }
+        };
     }
 
     private static object[] GetPublicPropertyBindingContextTestData()
