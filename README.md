@@ -24,6 +24,7 @@ A package that brings data-binding to your Unity project.
 - [How To Use](#joystick-how-to-use)
   - [Data-binding](#data-binding)
   - [Create custom control](#create-custom-control)
+  - [Source code generator](#source-code-generator)
 - [External Assets](#link-external-assets)
   - [UniTask](#unitask)
 - [Performance](#rocket-performance)
@@ -879,8 +880,6 @@ public class Image : VisualElement
     }
 
     public new class UxmlFactory : UxmlFactory<Image, UxmlTraits> {}
-    
-    public new class UxmlTraits : VisualElement.UxmlTraits {}
 }
 ```
 
@@ -899,7 +898,7 @@ public class BindableImage : Image, IBindableElement
         _imagePathBindingData ??= BindingImagePath.ToPropertyBindingData();
 
         _imageProperty = objectProvider.RentReadOnlyProperty<Texture2D>(context, _imagePathBindingData);
-        _imageProperty.ValueChanged += OnImageValueChanged;
+        _imageProperty.ValueChanged += OnImagePropertyValueChanged;
 
         SetImage(_imageProperty.Value);
     }
@@ -911,7 +910,7 @@ public class BindableImage : Image, IBindableElement
             return;
         }
 
-        _imageProperty.ValueChanged -= OnImageValueChanged;
+        _imageProperty.ValueChanged -= OnImagePropertyValueChanged;
 
         objectProvider.ReturnReadOnlyProperty(_imageProperty);
 
@@ -920,7 +919,7 @@ public class BindableImage : Image, IBindableElement
         SetImage(null);
     }
 
-    private void OnImageValueChanged(object sender, Texture2D newImage)
+    private void OnImagePropertyValueChanged(object sender, Texture2D newImage)
     {
         SetImage(newImage);
     }
@@ -961,6 +960,181 @@ public class ImageViewerViewModel : IBindingContext
 </UXML>
 ```
 
+### Source code generator
+  
+The best way to speed up the creation of custom `VisualElement` is to use source code generators. With this powerful tool, you can achieve the same great results with minimal boilerplate code and focus on what really matters: programming!
+  
+Let's create the `BindableImage` control, but this time using source code generators.
+
+For a visual element without bindings, we will use a [UnityUxmlGenerator](https://github.com/LibraStack/UnityUxmlGenerator).
+
+```csharp
+[UxmlElement]
+public partial class Image : VisualElement
+{
+    public void SetImage(Texture2D image)
+    {
+        style.backgroundImage = new StyleBackground(image);
+    }
+}
+```
+  
+<details><summary><b>Generated code</b></summary>
+<br />
+
+`Image.UxmlFactory.g.cs`
+  
+```csharp
+partial class Image
+{
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityUxmlGenerator", "1.0.0.0")]
+    public new class UxmlFactory : global::UnityEngine.UIElements.UxmlFactory<Image, UxmlTraits> 
+    {
+    }
+}
+```
+  
+</details>
+  
+For a bindable visual element, we will use a [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator).
+
+```csharp
+[BindableElement]
+public partial class BindableImage : Image
+{
+    [BindableProperty]
+    private IReadOnlyProperty<Texture2D> _imageProperty;
+
+    partial void AfterSetBindingContext(IBindingContext context, IObjectProvider objectProvider)
+    {
+        SetImage(_imageProperty?.Value);
+    }
+
+    partial void AfterResetBindingContext(IObjectProvider objectProvider)
+    {
+        SetImage(null);
+    }
+
+    partial void OnImagePropertyValueChanged([CanBeNull] Texture2D value)
+    {
+        SetImage(value);
+    }
+}
+```
+  
+<details><summary><b>Generated code</b></summary>
+<br />
+
+`BindableImage.Bindings.g.cs`
+  
+```csharp
+partial class BindableImage : global::UnityMvvmToolkit.Core.Interfaces.IBindableElement
+{
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    private global::UnityMvvmToolkit.Core.PropertyBindingData? _imageBindingData;
+
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public void SetBindingContext(global::UnityMvvmToolkit.Core.Interfaces.IBindingContext context,
+        global::UnityMvvmToolkit.Core.Interfaces.IObjectProvider objectProvider)
+    {
+        BeforeSetBindingContext(context, objectProvider);
+
+        if (string.IsNullOrWhiteSpace(BindingImagePath) == false)
+        {
+            _imageBindingData ??=
+                global::UnityMvvmToolkit.Core.Extensions.StringExtensions.ToPropertyBindingData(BindingImagePath!);
+            _imageProperty = objectProvider.RentReadOnlyProperty<global::UnityEngine.Texture2D>(context, _imageBindingData!);
+            _imageProperty!.ValueChanged += OnImagePropertyValueChanged;
+        }
+
+        AfterSetBindingContext(context, objectProvider);
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public void ResetBindingContext(global::UnityMvvmToolkit.Core.Interfaces.IObjectProvider objectProvider)
+    {
+        BeforeResetBindingContext(objectProvider);
+
+        if (_imageProperty != null)
+        {
+            _imageProperty!.ValueChanged -= OnImagePropertyValueChanged;
+            objectProvider.ReturnReadOnlyProperty(_imageProperty);
+            _imageProperty = null;
+        }
+
+        AfterResetBindingContext(objectProvider);
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    private void OnImagePropertyValueChanged(object sender, global::UnityEngine.Texture2D value)
+    {
+        OnImagePropertyValueChanged(value);
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    partial void BeforeSetBindingContext(global::UnityMvvmToolkit.Core.Interfaces.IBindingContext context,
+        global::UnityMvvmToolkit.Core.Interfaces.IObjectProvider objectProvider);
+
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    partial void AfterSetBindingContext(global::UnityMvvmToolkit.Core.Interfaces.IBindingContext context,
+        global::UnityMvvmToolkit.Core.Interfaces.IObjectProvider objectProvider);
+
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    partial void BeforeResetBindingContext(global::UnityMvvmToolkit.Core.Interfaces.IObjectProvider objectProvider);
+
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    partial void AfterResetBindingContext(global::UnityMvvmToolkit.Core.Interfaces.IObjectProvider objectProvider);
+
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    partial void OnImagePropertyValueChanged(global::UnityEngine.Texture2D value);
+}
+```
+
+`BindableImage.Uxml.g.cs`
+
+```csharp
+partial class BindableImage
+{
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    private string BindingImagePath { get; set; }
+
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    public new class UxmlFactory : global::UnityEngine.UIElements.UxmlFactory<BindableImage, UxmlTraits>
+    {
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    public new class UxmlTraits : global::BindableUIElements.Image.UxmlTraits
+    {
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+        private readonly global::UnityEngine.UIElements.UxmlStringAttributeDescription _bindingImagePath = new() 
+            { name = "binding-image-path", defaultValue = "" };
+
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("UnityMvvmToolkit.Generator", "1.0.0.0")]
+        [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        public override void Init(global::UnityEngine.UIElements.VisualElement visualElement, 
+            global::UnityEngine.UIElements.IUxmlAttributes bag, 
+            global::UnityEngine.UIElements.CreationContext context)
+        {
+            base.Init(visualElement, bag, context);
+
+            var control = (BindableImage) visualElement;
+            control.BindingImagePath = _bindingImagePath.GetValueFromBag(bag, context);
+        }
+    }
+}
+```
+  
+</details>
+
+As you can see, using [UnityUxmlGenerator](https://github.com/LibraStack/UnityUxmlGenerator) and [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator) we can achieve the same results but with just a few lines of code.
+
+> **Note:** The [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator) is available exclusively for my [patrons](https://patreon.com/DimaChebanov).
+  
 ## :link: External Assets
 
 ### UniTask
