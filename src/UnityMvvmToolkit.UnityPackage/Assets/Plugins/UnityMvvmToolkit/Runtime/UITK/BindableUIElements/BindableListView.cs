@@ -90,7 +90,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         private void UnbindItem(VisualElement item, int index)
         {
-            UnbindItem(item, index, _itemsSource.Value[index], _objectProvider);
+            item.ResetBindingContext(_objectProvider, true);
         }
 
         private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
