@@ -85,12 +85,26 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         private void BindItem(VisualElement item, int index)
         {
-            BindItem(item, index, _itemsSource.Value[index], _objectProvider);
+            if (index >= 0 && index < itemsSource.Count)
+            {
+                BindItem(item, index, _itemsSource.Value[index], _objectProvider);
+            }
+            else
+            {
+                BindItem(item, index, default, _objectProvider);
+            }
         }
 
         private void UnbindItem(VisualElement item, int index)
         {
-            item.ResetBindingContext(_objectProvider, true);
+            if (index >= 0 && index < itemsSource.Count)
+            {
+                UnbindItem(item, index, _itemsSource.Value[index], _objectProvider);
+            }
+            else
+            {
+                UnbindItem(item, index, default, _objectProvider);
+            }
         }
 
         private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
