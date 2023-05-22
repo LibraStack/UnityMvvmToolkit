@@ -210,11 +210,7 @@ The included types are:
 
 The `IBindingContext` is a base interface for ViewModels. It is a marker for Views that the class contains observable properties to bind to.
 
-> **Note:** In case your ViewModel doesn't have a parameterless constructor, you need to override the `GetBindingContext` method in the View.
-
-#### Simple property
-
-Here's an example of how to implement notification support to a custom property.
+Here's an example of a simple ViewModel.
 
 ```csharp
 public class CounterViewModel : IBindingContext
@@ -228,25 +224,7 @@ public class CounterViewModel : IBindingContext
 }
 ```
 
-#### Wrapping a non-observable model
-
-A common scenario, for instance, when working with collection items, is to create a wrapping "bindable" item model that relays properties of the collection item model, and raises the property value changed notifications when needed.
-
-```csharp
-public class ItemViewModel : IBindingContext
-{
-    [Observable(nameof(Name))]
-    private readonly IProperty<string> _name = new Property<string>();
-
-    public string Name
-    {
-        get => _name.Value;
-        set => _name.Value = value;
-    }
-}
-```
-
-The `ItemViewModel` can be serialized and deserialized without any issues.
+> **Note:** In case your ViewModel doesn't have a parameterless constructor, you need to override the `GetBindingContext` method in the View.
 
 ### CanvasView\<TBindingContext\>
 
@@ -272,6 +250,12 @@ public class CounterView : CanvasView<CounterViewModel>
     protected override IValueConverter[] GetValueConverters()
     {
         return _appContext.Resolve<IValueConverter[]>();
+    }
+  
+    // Define a collection item templates.
+    protected override IReadOnlyDictionary<Type, object> GetCollectionItemTemplates()
+    {
+        return _appContext.Resolve<IReadOnlyDictionary<Type, object>>();
     }
 }
 ```
@@ -301,6 +285,12 @@ public class CounterView : DocumentView<CounterViewModel>
     {
         return _appContext.Resolve<IValueConverter[]>();
     }
+  
+    // Define a collection item templates.
+    protected override IReadOnlyDictionary<Type, object> GetCollectionItemTemplates()
+    {
+        return _appContext.Resolve<IReadOnlyDictionary<Type, object>>();
+    }
 }
 ```
 
@@ -312,9 +302,79 @@ Key functionality:
 - Provide a base implementation of the `IBaseProperty` interface
 - Implement the `IProperty<T>` & `IReadOnlyProperty<T>` interface, which exposes a `ValueChanged` event
 
-The following shows how to set up a simple observable property:
-- [Simple property](#simple-property)
-- [Wrapping a non-observable model](#wrapping-a-non-observable-model)
+#### Simple property
+
+Here's an example of how to implement a simple property.
+
+```csharp
+public class CounterViewModel : IBindingContext
+{
+    public CounterViewModel()
+    {
+        Count = new Property<int>();
+    }
+
+    public IProperty<int> Count { get; }
+}
+```
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableLabel binding-text-path="Count" />
+</ui:UXML>
+```
+
+> **Note:** You need to define `IntToStrConverter` to convert int to string. See the [PropertyValueConverter](#propertyvalueconvertertsourcetype-ttargettype) section for more information.
+
+#### Observable property
+
+```csharp
+public class MyViewModel : IBindingContext
+{
+    [Observable("Count")]
+    private readonly IProperty<int> _amount = new Property<int>();
+  
+    // The field name will be used if you don't provide a property name.
+    // Names '_title' and 'm_title' will be auto-converted to 'Title'.
+    [Observable]
+    private readonly IProperty<string> _title = new Property<string>();
+}
+```
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableLabel binding-text-path="Count" />
+    <uitk:BindableLabel binding-text-path="Title" />
+</ui:UXML>
+```
+
+> **Note:** You need to define `IntToStrConverter` to convert int to string. See the [PropertyValueConverter](#propertyvalueconvertertsourcetype-ttargettype) section for more information.
+
+#### Wrapping a non-observable model
+
+A common scenario, for instance, when working with collection items, is to create a wrapping "bindable" item model that relays properties of the collection item model, and raises the property value changed notifications when needed.
+
+```csharp
+public class ItemViewModel : IBindingContext
+{
+    [Observable(nameof(Name))]
+    private readonly IProperty<string> _name = new Property<string>();
+
+    public string Name
+    {
+        get => _name.Value;
+        set => _name.Value = value;
+    }
+}
+```
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableLabel binding-text-path="Name" />
+</ui:UXML>
+```
+
+The `ItemViewModel` can be serialized and deserialized without any issues.
 
 ### Command & Command\<T\>
 
