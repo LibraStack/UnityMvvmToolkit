@@ -2,7 +2,7 @@
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public partial class BindableLabel
+    partial class BindableLabel
     {
         public string BindingTextPath { get; private set; }
 

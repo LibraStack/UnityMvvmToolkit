@@ -2,7 +2,7 @@
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public partial class BindableButton
+    partial class BindableButton
     {
         public string Command { get; private set; }
 
