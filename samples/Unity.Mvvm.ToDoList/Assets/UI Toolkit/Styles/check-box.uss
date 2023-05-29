@@ -105,7 +105,7 @@
 }
 
 .check-box__tick--animation {
-    transition-property: width height;
+    transition-property: width, height;
     transition-duration: 150ms, 150ms;
     transition-timing-function: ease-out-back, ease-out-back;
 }
