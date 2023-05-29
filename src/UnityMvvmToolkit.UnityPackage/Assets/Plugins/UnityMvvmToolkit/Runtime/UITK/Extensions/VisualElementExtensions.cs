@@ -8,14 +8,8 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UITK.Extensions
 {
-    public static class VisualElementExtensions
+    public static partial class VisualElementExtensions
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T As<T>(this VisualElement visualElement) where T : VisualElement
-        {
-            return (T) visualElement;
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static VisualElement InstantiateBindableElement(this VisualTreeAsset visualTreeAsset)
         {

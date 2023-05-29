@@ -7,6 +7,25 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
     {
         public string BindingContextPath { get; protected set; }
 
+#if UNITY_2023_2_OR_NEWER
+        [System.Serializable]
+        public new class UxmlSerializedData : VisualElement.UxmlSerializedData
+        {
+            // ReSharper disable once InconsistentNaming
+            #pragma warning disable 649
+            [UnityEngine.SerializeField] private string BindingContextPath;
+            #pragma warning disable 649
+
+            public override void Deserialize(object visualElement)
+            {
+                base.Deserialize(visualElement);
+
+                visualElement
+                    .As<BindingContextProvider<TBindingContext>>()
+                    .BindingContextPath = BindingContextPath;
+            }
+        }
+#else
         public new class UxmlTraits : VisualElement.UxmlTraits
         {
             private readonly UxmlStringAttributeDescription _bindingContextPath = new()
@@ -21,5 +40,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                     .BindingContextPath = _bindingContextPath.GetValueFromBag(bag, context);
             }
         }
+#endif
     }
 }

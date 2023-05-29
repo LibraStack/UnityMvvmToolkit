@@ -7,10 +7,27 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
     {
         public string Command { get; private set; }
 
+#if UNITY_2023_2_OR_NEWER
+        [System.Serializable]
+        public new class UxmlSerializedData : BaseButton.UxmlSerializedData
+        {
+            // ReSharper disable once InconsistentNaming
+            #pragma warning disable 649
+            [UnityEngine.SerializeField] private string Command;
+            #pragma warning disable 649
+
+            public override object CreateInstance() => new BindableButton();
+            public override void Deserialize(object visualElement)
+            {
+                base.Deserialize(visualElement);
+                visualElement.As<BindableButton>().Command = Command;
+            }
+        }
+
         public new class UxmlFactory : UxmlFactory<BindableButton, UxmlTraits>
         {
         }
-
+#else
         public new class UxmlTraits : BaseButton.UxmlTraits
         {
             private readonly UxmlStringAttributeDescription _commandAttribute = new()
@@ -22,5 +39,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 visualElement.As<BindableButton>().Command = _commandAttribute.GetValueFromBag(bag, context);
             }
         }
+#endif
     }
 }

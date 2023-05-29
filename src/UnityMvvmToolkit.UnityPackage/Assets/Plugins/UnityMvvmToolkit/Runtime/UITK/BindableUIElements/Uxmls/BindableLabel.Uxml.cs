@@ -7,10 +7,27 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
     {
         public string BindingTextPath { get; private set; }
 
+#if UNITY_2023_2_OR_NEWER
+        [System.Serializable]
+        public new class UxmlSerializedData : Label.UxmlSerializedData
+        {
+            // ReSharper disable once InconsistentNaming
+            #pragma warning disable 649
+            [UnityEngine.SerializeField] private string BindingTextPath;
+            #pragma warning disable 649
+
+            public override object CreateInstance() => new BindableLabel();
+            public override void Deserialize(object visualElement)
+            {
+                base.Deserialize(visualElement);
+                visualElement.As<BindableLabel>().BindingTextPath = BindingTextPath;
+            }
+        }
+
         public new class UxmlFactory : UxmlFactory<BindableLabel, UxmlTraits>
         {
         }
-
+#else
         public new class UxmlTraits : Label.UxmlTraits
         {
             private readonly UxmlStringAttributeDescription _bindingTextAttribute = new()
@@ -22,5 +39,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 visualElement.As<BindableLabel>().BindingTextPath = _bindingTextAttribute.GetValueFromBag(bag, context);
             }
         }
+#endif
     }
 }
