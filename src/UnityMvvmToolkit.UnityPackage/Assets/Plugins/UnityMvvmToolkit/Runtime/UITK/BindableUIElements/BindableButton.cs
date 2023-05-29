@@ -5,7 +5,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public partial class BindableButton : ButtonUITK, IBindableElement
+    public partial class BindableButton : BaseButton, IBindableElement
     {
         private int? _buttonId;
 

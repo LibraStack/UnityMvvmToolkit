@@ -1,4 +1,5 @@
 ﻿using UnityEngine.UIElements;
+using UnityMvvmToolkit.UITK.Extensions;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
@@ -10,7 +11,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         {
         }
 
-        public new class UxmlTraits : ButtonUITK.UxmlTraits
+        public new class UxmlTraits : BaseButton.UxmlTraits
         {
             private readonly UxmlStringAttributeDescription _commandAttribute = new()
                 { name = "command", defaultValue = "" };
@@ -18,9 +19,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
             {
                 base.Init(visualElement, bag, context);
-
-                var bindableButton = (BindableButton) visualElement;
-                bindableButton.Command = _commandAttribute.GetValueFromBag(bag, context);
+                visualElement.As<BindableButton>().Command = _commandAttribute.GetValueFromBag(bag, context);
             }
         }
     }
