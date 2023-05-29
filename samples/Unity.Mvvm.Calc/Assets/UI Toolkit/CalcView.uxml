@@ -7,8 +7,8 @@
     <ui:VisualElement name="BottomPanel" class="bottom-panel">
         <ui:VisualElement name="Row1" class="elements-row">
             <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton text="C" name="ButtonClear" command="ClearCommand" class="round-button round-button__clear-label" />
-            <UnityMvvmToolkit.UITK.BindableUIElements.ButtonUITK text="+/-" name="ButtonSign" enabled="false" class="round-button round-button__operation-label" />
-            <UnityMvvmToolkit.UITK.BindableUIElements.ButtonUITK text="%" name="ButtonPercentage" enabled="false" class="round-button round-button__operation-label" />
+            <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton text="+/-" name="ButtonSign" enabled="false" class="round-button round-button__operation-label" />
+            <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton text="%" name="ButtonPercentage" enabled="false" class="round-button round-button__operation-label" />
             <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton text="÷" name="ButtonDivision" command="OperationCommand, ÷" class="round-button round-button__operation-label" />
         </ui:VisualElement>
         <ui:VisualElement name="Row2" class="elements-row">
@@ -31,7 +31,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="Row5" class="elements-row">
             <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton text="0" name="Button0" command="NumberCommand, 0" class="round-button round-button--wide" />
-            <UnityMvvmToolkit.UITK.BindableUIElements.ButtonUITK text="." name="ButtonDot" enabled="false" class="round-button" />
+            <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton text="." name="ButtonDot" enabled="false" class="round-button" />
             <UnityMvvmToolkit.UITK.BindableUIElements.BindableButton text="=" name="ButtonEqual" command="CalculateCommand" class="round-button round-button--highlighted" />
         </ui:VisualElement>
     </ui:VisualElement>
