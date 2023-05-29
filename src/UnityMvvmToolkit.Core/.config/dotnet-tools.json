@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "dotnet-stryker": {
-      "version": "3.7.1",
+      "version": "3.9.0",
       "commands": [
         "dotnet-stryker"
       ]
