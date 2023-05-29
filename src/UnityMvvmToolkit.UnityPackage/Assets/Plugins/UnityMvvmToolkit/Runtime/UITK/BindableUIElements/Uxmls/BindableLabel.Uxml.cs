@@ -7,6 +7,10 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
     {
         public string BindingTextPath { get; private set; }
 
+        public new class UxmlFactory : UxmlFactory<BindableLabel, UxmlTraits>
+        {
+        }
+
 #if UNITY_2023_2_OR_NEWER
         [System.Serializable]
         public new class UxmlSerializedData : Label.UxmlSerializedData
@@ -22,10 +26,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 base.Deserialize(visualElement);
                 visualElement.As<BindableLabel>().BindingTextPath = BindingTextPath;
             }
-        }
-
-        public new class UxmlFactory : UxmlFactory<BindableLabel, UxmlTraits>
-        {
         }
 #else
         public new class UxmlTraits : Label.UxmlTraits

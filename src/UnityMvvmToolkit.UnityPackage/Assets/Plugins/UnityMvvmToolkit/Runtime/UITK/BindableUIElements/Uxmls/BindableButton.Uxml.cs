@@ -7,6 +7,10 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
     {
         public string Command { get; private set; }
 
+        public new class UxmlFactory : UxmlFactory<BindableButton, UxmlTraits>
+        {
+        }
+
 #if UNITY_2023_2_OR_NEWER
         [System.Serializable]
         public new class UxmlSerializedData : BaseButton.UxmlSerializedData
@@ -22,10 +26,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 base.Deserialize(visualElement);
                 visualElement.As<BindableButton>().Command = Command;
             }
-        }
-
-        public new class UxmlFactory : UxmlFactory<BindableButton, UxmlTraits>
-        {
         }
 #else
         public new class UxmlTraits : BaseButton.UxmlTraits

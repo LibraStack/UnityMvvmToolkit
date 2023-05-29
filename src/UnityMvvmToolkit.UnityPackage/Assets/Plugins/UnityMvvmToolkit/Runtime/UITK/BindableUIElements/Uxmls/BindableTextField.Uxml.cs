@@ -7,6 +7,10 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
     {
         public string BindingValuePath { get; private set; }
 
+        public new class UxmlFactory : UxmlFactory<BindableTextField, UxmlTraits>
+        {
+        }
+
 #if UNITY_2023_2_OR_NEWER
         [System.Serializable]
         public new class UxmlSerializedData : TextField.UxmlSerializedData
@@ -22,10 +26,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 base.Deserialize(visualElement);
                 visualElement.As<BindableTextField>().BindingValuePath = BindingValuePath;
             }
-        }
-
-        public new class UxmlFactory : UxmlFactory<BindableTextField, UxmlTraits>
-        {
         }
 #else
         public new class UxmlTraits : TextField.UxmlTraits
