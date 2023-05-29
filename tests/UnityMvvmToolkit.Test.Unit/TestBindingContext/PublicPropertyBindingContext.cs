@@ -1,4 +1,5 @@
 ﻿using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Attributes;
 using UnityMvvmToolkit.Core.Interfaces;
 
 // ReSharper disable InconsistentNaming
@@ -14,10 +15,15 @@ public class PublicPropertyBindingContext : IBindingContext
 
         m_floatProperty = new Property<float>();
         StrProperty = new ReadOnlyProperty<string>(nameof(PublicPropertyBindingContext));
+
+        ObservablePublicProperty = new Property<bool>();
     }
 
     public IProperty<bool> boolProperty { get; }
     public IReadOnlyProperty<int> _intProperty { get; }
     public Property<float> m_floatProperty { get; }
     public ReadOnlyProperty<string> StrProperty { get; }
+
+    [Observable("ObservableProperty")]
+    public IProperty<bool> ObservablePublicProperty { get; }
 }

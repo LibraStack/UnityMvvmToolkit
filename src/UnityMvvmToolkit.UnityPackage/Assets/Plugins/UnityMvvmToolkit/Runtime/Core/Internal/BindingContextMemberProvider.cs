@@ -58,32 +58,39 @@ namespace UnityMvvmToolkit.Core.Internal
                 return false;
             }
 
+            if (HasObservableAttribute(fieldInfo, out var propertyName))
+            {
+                return string.IsNullOrWhiteSpace(propertyName)
+                    ? TryGetHashCode(contextType, GetBindableName(fieldInfo.Name), fieldInfo.FieldType, out hashCode)
+                    : TryGetHashCode(contextType, propertyName, fieldInfo.FieldType, out hashCode);
+            }
+
             if (fieldInfo.IsPublic)
             {
                 return TryGetHashCode(contextType, fieldInfo.Name, fieldInfo.FieldType, out hashCode);
             }
 
-            if (HasObservableAttribute(fieldInfo, out var propertyName) == false)
-            {
-                hashCode = default;
-                return false;
-            }
-
-            return string.IsNullOrWhiteSpace(propertyName)
-                ? TryGetHashCode(contextType, GetFieldName(fieldInfo.Name), fieldInfo.FieldType, out hashCode)
-                : TryGetHashCode(contextType, propertyName, fieldInfo.FieldType, out hashCode);
+            hashCode = default;
+            return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool TryGetPropertyHashCode(Type contextType, PropertyInfo propertyInfo, out int hashCode)
         {
-            if (propertyInfo.GetMethod.IsPrivate)
+            if (HasObservableAttribute(propertyInfo, out var propertyName))
             {
-                hashCode = default;
-                return false;
+                return string.IsNullOrWhiteSpace(propertyName)
+                    ? TryGetHashCode(contextType, GetBindableName(propertyInfo.Name), propertyInfo.PropertyType, out hashCode)
+                    : TryGetHashCode(contextType, propertyName, propertyInfo.PropertyType, out hashCode);
             }
 
-            return TryGetHashCode(contextType, propertyInfo.Name, propertyInfo.PropertyType, out hashCode);
+            if (propertyInfo.GetMethod.IsPublic)
+            {
+                return TryGetHashCode(contextType, propertyInfo.Name, propertyInfo.PropertyType, out hashCode);
+            }
+
+            hashCode = default;
+            return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -116,9 +123,9 @@ namespace UnityMvvmToolkit.Core.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string GetFieldName(string fieldName)
+        private static string GetBindableName(string memberName)
         {
-            var resultName = fieldName;
+            var resultName = memberName;
 
             if (resultName.Length > 1)
             {

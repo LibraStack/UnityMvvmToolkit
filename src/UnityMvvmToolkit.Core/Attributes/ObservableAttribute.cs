@@ -1,13 +1,8 @@
 ﻿using System;
 
-namespace System.Runtime.CompilerServices
-{
-    internal static class IsExternalInit {}
-}
-
 namespace UnityMvvmToolkit.Core.Attributes
 {
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public sealed class ObservableAttribute : Attribute
     {
         /// <summary>
