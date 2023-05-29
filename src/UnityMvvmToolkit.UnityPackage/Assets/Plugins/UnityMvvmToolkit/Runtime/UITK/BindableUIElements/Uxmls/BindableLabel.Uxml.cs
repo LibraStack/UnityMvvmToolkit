@@ -1,4 +1,5 @@
 ﻿using UnityEngine.UIElements;
+using UnityMvvmToolkit.UITK.Extensions;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
@@ -18,7 +19,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
             {
                 base.Init(visualElement, bag, context);
-                ((BindableLabel) visualElement).BindingTextPath = _bindingTextAttribute.GetValueFromBag(bag, context);
+                visualElement.As<BindableLabel>().BindingTextPath = _bindingTextAttribute.GetValueFromBag(bag, context);
             }
         }
     }
