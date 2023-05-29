@@ -1,8 +1,9 @@
 ﻿using UnityEngine.UIElements;
+using UnityMvvmToolkit.UITK.Extensions;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public partial class BindableListView<TItemBindingContext>
+    partial class BindableListView<TItemBindingContext>
     {
         public string BindingItemsSourcePath { get; private set; }
 
@@ -15,8 +16,9 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             {
                 base.Init(visualElement, bag, context);
 
-                var bindableListView = (BindableListView<TItemBindingContext>) visualElement;
-                bindableListView.BindingItemsSourcePath = _bindingItemsSourceAttribute.GetValueFromBag(bag, context);
+                visualElement
+                    .As<BindableListView<TItemBindingContext>>()
+                    .BindingItemsSourcePath = _bindingItemsSourceAttribute.GetValueFromBag(bag, context);
             }
         }
     }

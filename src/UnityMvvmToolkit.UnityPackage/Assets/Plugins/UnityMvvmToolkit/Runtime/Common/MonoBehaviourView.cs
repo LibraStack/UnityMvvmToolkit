@@ -31,11 +31,12 @@ namespace UnityMvvmToolkit.Common
         private void OnDestroy()
         {
             ResetBindingContext();
+            OnDispose();
         }
 
         public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
-            if (_bindingContext != null)
+            if (_bindingContext is not null)
             {
                 throw new InvalidOperationException(
                     $"{GetType().Name} - binding context was not reset. Reset the binding context first.");
@@ -53,11 +54,12 @@ namespace UnityMvvmToolkit.Common
         }
 
         protected abstract void OnInit();
-        protected abstract IBindableElement[] GetBindableElements();
+        protected abstract void OnDispose();
+        protected abstract IReadOnlyList<IBindableElement> GetBindableElements();
 
         protected virtual TBindingContext GetBindingContext()
         {
-            if (typeof(TBindingContext).GetConstructor(Type.EmptyTypes) == null)
+            if (typeof(TBindingContext).GetConstructor(Type.EmptyTypes) is null)
             {
                 throw new InvalidOperationException(
                     $"Cannot create an instance of the type parameter {typeof(TBindingContext)} because it does not have a parameterless constructor.");
@@ -109,13 +111,13 @@ namespace UnityMvvmToolkit.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void SetBindingContext(ReadOnlySpan<IBindableElement> bindableElements, IBindingContext context,
+        private void SetBindingContext(IReadOnlyList<IBindableElement> bindableElements, IBindingContext context,
             IObjectProvider objectProvider, bool initialize)
         {
             _bindingContext = (TBindingContext) context;
             _objectProvider = objectProvider;
 
-            for (var i = 0; i < bindableElements.Length; i++)
+            for (var i = 0; i < bindableElements.Count; i++)
             {
                 var bindableElement = bindableElements[i];
 
@@ -129,10 +131,10 @@ namespace UnityMvvmToolkit.Common
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ResetBindingContext(ReadOnlySpan<IBindableElement> bindableElements,
+        private void ResetBindingContext(IReadOnlyList<IBindableElement> bindableElements,
             IObjectProvider objectProvider, bool dispose)
         {
-            for (var i = 0; i < bindableElements.Length; i++)
+            for (var i = 0; i < bindableElements.Count; i++)
             {
                 var bindableElement = bindableElements[i];
 

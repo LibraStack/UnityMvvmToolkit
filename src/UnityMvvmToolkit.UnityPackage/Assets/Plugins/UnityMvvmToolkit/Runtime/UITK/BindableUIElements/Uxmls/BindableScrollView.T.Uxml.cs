@@ -1,8 +1,9 @@
 ﻿using UnityEngine.UIElements;
+using UnityMvvmToolkit.UITK.Extensions;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public partial class BindableScrollView<TItemBindingContext>
+    partial class BindableScrollView<TItemBindingContext>
     {
         public string BindingItemsSourcePath { get; private set; }
 
@@ -15,8 +16,9 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             {
                 base.Init(visualElement, bag, context);
 
-                var bindableScrollView = (BindableScrollView<TItemBindingContext>) visualElement;
-                bindableScrollView.BindingItemsSourcePath = _bindingItemsSourceAttribute.GetValueFromBag(bag, context);
+                visualElement
+                    .As<BindableScrollView<TItemBindingContext>>()
+                    .BindingItemsSourcePath = _bindingItemsSourceAttribute.GetValueFromBag(bag, context);
             }
         }
     }
