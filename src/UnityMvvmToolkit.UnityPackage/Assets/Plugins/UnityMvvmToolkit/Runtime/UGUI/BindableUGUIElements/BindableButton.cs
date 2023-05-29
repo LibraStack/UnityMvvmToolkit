@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿#if UNITYMVVMTOOLKIT_TEXTMESHPRO_SUPPORT
+
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityMvvmToolkit.Core;
@@ -67,3 +69,5 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
         }
     }
 }
+
+#endif
