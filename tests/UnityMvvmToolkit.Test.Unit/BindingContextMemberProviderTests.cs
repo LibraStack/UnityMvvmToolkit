@@ -97,14 +97,14 @@ public class BindingContextMemberProviderTests
     public void GetBindingContextMembers_ShouldThrow_WhenTypeIsNotAssignableFromIBindingContext()
     {
         // Arrange
-        var bindingContextType = typeof(NoBindingContext);
+        var bindingContextType = typeof(NotBindingContext);
 
         // Assert
         _memberProvider
             .Invoking(sut => sut.GetBindingContextMembers(bindingContextType, null))
             .Should()
             .Throw<InvalidOperationException>()
-            .WithMessage($"{nameof(NoBindingContext)} is not assignable from {nameof(IBindingContext)}.");
+            .WithMessage($"{nameof(NotBindingContext)} is not assignable from {nameof(IBindingContext)}.");
     }
 
     [Fact]
@@ -126,6 +126,7 @@ public class BindingContextMemberProviderTests
         yield return GetObservableFieldBindingContextTestData();
         yield return GetPublicFieldBindingContextTestData();
         yield return GetPrivatePropertyBindingContextTestData();
+        yield return GetObservablePropertyBindingContextTestData();
         yield return GetSameFieldAndPropertyNamesBindingContextTestData();
         yield return GetPublicPropertyBindingContextTestData();
         yield return GetCommandBindingContextTestData();
@@ -167,6 +168,8 @@ public class BindingContextMemberProviderTests
                 (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicFieldBindingContext.m_floatField)),
                     MemberTypes.Field),
                 (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicFieldBindingContext.StrField)),
+                    MemberTypes.Field),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "ObservableField"),
                     MemberTypes.Field)
             }
         };
@@ -175,6 +178,20 @@ public class BindingContextMemberProviderTests
     private static object[] GetPrivatePropertyBindingContextTestData()
     {
         return new object[] { typeof(PrivatePropertyBindingContext), Array.Empty<(int, MemberTypes)>() };
+    }
+
+    private static object[] GetObservablePropertyBindingContextTestData()
+    {
+        var bindingContextType = typeof(ObservablePropertyBindingContext);
+        return new object[]
+        {
+            bindingContextType,
+            new (int, MemberTypes)[]
+            {
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "Bool"), MemberTypes.Property),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "BoolName"), MemberTypes.Property)
+            }
+        };
     }
 
     private static object[] GetSameFieldAndPropertyNamesBindingContextTestData()
@@ -206,6 +223,8 @@ public class BindingContextMemberProviderTests
                 (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicPropertyBindingContext.m_floatProperty)),
                     MemberTypes.Property),
                 (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(PublicPropertyBindingContext.StrProperty)),
+                    MemberTypes.Property),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "ObservableProperty"),
                     MemberTypes.Property)
             }
         };
@@ -217,8 +236,18 @@ public class BindingContextMemberProviderTests
         return new object[]
         {
             bindingContextType,
-            new (int, MemberTypes)[]
+            new[]
             {
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "PrivateFieldCommand"),
+                    MemberTypes.Field),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "PrivateCommand"),
+                    MemberTypes.Field),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "ProtectedFieldCommand"),
+                    MemberTypes.Field),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "PrivatePropertyCommand"),
+                    MemberTypes.Property),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "ProtectedPropertyCommand"),
+                    MemberTypes.Property),
                 (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(CommandBindingContext.incrementCommand)),
                     MemberTypes.Property),
                 (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(CommandBindingContext._decrementCommand)),
@@ -226,6 +255,8 @@ public class BindingContextMemberProviderTests
                 (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(CommandBindingContext.m_multiplyCommand)),
                     MemberTypes.Property),
                 (HashCodeHelper.GetMemberHashCode(bindingContextType, nameof(CommandBindingContext.DivideCommand)),
+                    MemberTypes.Property),
+                (HashCodeHelper.GetMemberHashCode(bindingContextType, "ObservableCommand"),
                     MemberTypes.Property)
             }
         };

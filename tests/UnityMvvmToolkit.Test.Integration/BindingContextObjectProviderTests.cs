@@ -96,7 +96,7 @@ public class BindingContextObjectProviderTests
     }
 
     [Theory]
-    [InlineData(typeof(NoBindingContext))]
+    [InlineData(typeof(NotBindingContext))]
     [InlineData(typeof(AbstractBindingContext))]
     [InlineData(typeof(IInterfaceBindingContext))]
     public void WarmupViewModel_ShouldThrow_WhenBindingContextIsNotSupported(Type bindingContextType)
@@ -438,23 +438,6 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
-    public void GetCommand_ShouldThrow_WhenMemberTypeIsNotProperty()
-    {
-        // Arrange
-        const string commandName = nameof(MyBindingContext.FieldCommand);
-
-        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
-        var bindingContext = new MyBindingContext();
-
-        // Assert
-        objectProvider
-            .Invoking(sut => sut.GetCommand<ICommand>(bindingContext, commandName))
-            .Should()
-            .Throw<InvalidOperationException>()
-            .WithMessage($"Command '{commandName}' not found.");
-    }
-
-    [Fact]
     public void GetCommand_ShouldThrow_WhenCommandTypeIsNotAssignableFromPropertyType()
     {
         // Arrange
@@ -551,25 +534,6 @@ public class BindingContextObjectProviderTests
             .Should()
             .Throw<InvalidOperationException>()
             .WithMessage($"Command '{notPresentedCommand}' not found.");
-    }
-
-    [Fact]
-    public void RentCommandWrapper_ShouldThrow_WhenMemberTypeIsNotProperty()
-    {
-        // Arrange
-        const string commandName = nameof(MyBindingContext.FieldCommand);
-
-        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
-        var bindingContext = new MyBindingContext();
-
-        var commandBindingData = $"{commandName}, 5".ToCommandBindingData(0);
-
-        // Assert
-        objectProvider
-            .Invoking(sut => sut.RentCommandWrapper(bindingContext, commandBindingData))
-            .Should()
-            .Throw<InvalidOperationException>()
-            .WithMessage($"Command '{commandName}' not found.");
     }
 
     [Fact]

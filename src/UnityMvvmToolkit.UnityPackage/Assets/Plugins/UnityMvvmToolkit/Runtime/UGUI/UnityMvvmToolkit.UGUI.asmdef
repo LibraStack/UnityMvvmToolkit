@@ -1,6 +1,5 @@
 {
     "name": "UnityMvvmToolkit.UGUI",
-    "rootNamespace": "",
     "references": [
         "GUID:5c4878a33f8e8b04cb2f76d30bb7b0b0",
         "GUID:d63bf47557a71534d82ecda7a3a700a2",
@@ -13,6 +12,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "",
+            "define": "UNITYMVVMTOOLKIT_TEXTMESHPRO_SUPPORT"
+        }
+    ],
     "noEngineReferences": false
 }

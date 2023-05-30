@@ -5,15 +5,15 @@ using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 using UnityEngine.Pool;
 using UnityEngine.UIElements;
-using UnityMvvmToolkit.Common.Extensions;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
+using UnityMvvmToolkit.UITK.Extensions;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public abstract partial class BindableScrollView<TItemBindingContext> : ScrollView, IBindableElement,
+    public abstract partial class BindableScrollView<TItemBindingContext> : ScrollView, IBindableCollection,
         IInitializable, IDisposable where TItemBindingContext : ICollectionItem
     {
         private int _itemsCount;
@@ -37,7 +37,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public virtual void Dispose()
         {
-            if (_itemsSource == null)
+            if (_itemsSource is null)
             {
                 _itemsCount = 0;
                 _itemAssets.Clear();
@@ -57,9 +57,8 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             _objectProvider = objectProvider;
 
-            _itemsSource =
-                objectProvider.RentReadOnlyProperty<ObservableCollection<TItemBindingContext>>(context,
-                    _itemsSourceBindingData);
+            _itemsSource = objectProvider
+                .RentReadOnlyProperty<ObservableCollection<TItemBindingContext>>(context, _itemsSourceBindingData);
             _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
 
             AddItems(_itemsSource.Value);
@@ -67,7 +66,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
-            if (_itemsSource == null)
+            if (_itemsSource is null)
             {
                 return;
             }
@@ -85,19 +84,21 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         protected virtual VisualElement MakeItem(VisualTreeAsset itemTemplate)
         {
-            return itemTemplate.InstantiateBindableElement();
+            return itemTemplate
+                .InstantiateBindableElement()
+                .InitializeBindableElement();
         }
 
         protected virtual void BindItem(VisualElement item, int index, TItemBindingContext bindingContext,
             IObjectProvider objectProvider)
         {
-            item.SetBindingContext(bindingContext, objectProvider, true);
+            item.SetChildsBindingContext(bindingContext, objectProvider);
         }
 
         protected virtual void UnbindItem(VisualElement item, int index, TItemBindingContext bindingContext,
             IObjectProvider objectProvider)
         {
-            item.ResetBindingContext(objectProvider, true);
+            item.ResetChildsBindingContext(objectProvider);
         }
 
         private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -149,7 +150,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             var item = _itemAssets[itemBindingContext.Id];
 
-            if (_objectProvider != null)
+            if (_objectProvider is not null)
             {
                 UnbindItem(item, _itemsCount, itemBindingContext, _objectProvider);
             }
@@ -179,10 +180,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         private void OnPoolDestroyItem(VisualElement item)
         {
-            if (_objectProvider != null)
-            {
-                item.ResetBindingContext(_objectProvider, true);
-            }
+            item.DisposeBindableElement(_objectProvider);
         }
     }
 }

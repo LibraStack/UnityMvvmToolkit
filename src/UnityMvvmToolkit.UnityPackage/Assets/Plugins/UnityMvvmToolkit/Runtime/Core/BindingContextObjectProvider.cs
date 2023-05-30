@@ -109,8 +109,7 @@ namespace UnityMvvmToolkit.Core
         {
             EnsureIsNotNullOrWhiteSpace(propertyName, nameof(propertyName));
 
-            if (TryGetContextMemberInfo(context.GetType(), propertyName, out var memberInfo) == false ||
-                memberInfo.MemberType != MemberTypes.Property)
+            if (TryGetContextMemberInfo(context.GetType(), propertyName, out var memberInfo) == false)
             {
                 throw new InvalidOperationException($"Command '{propertyName}' not found.");
             }
@@ -131,8 +130,7 @@ namespace UnityMvvmToolkit.Core
             EnsureIsNotNullOrWhiteSpace(bindingData.ParameterValue,
                 $"Command '{bindingData.PropertyName}' has no parameter. Use {nameof(GetCommand)} instead.");
 
-            if (TryGetContextMemberInfo(context.GetType(), bindingData.PropertyName, out var memberInfo) == false ||
-                memberInfo.MemberType != MemberTypes.Property)
+            if (TryGetContextMemberInfo(context.GetType(), bindingData.PropertyName, out var memberInfo) == false)
             {
                 throw new InvalidOperationException($"Command '{bindingData.PropertyName}' not found.");
             }

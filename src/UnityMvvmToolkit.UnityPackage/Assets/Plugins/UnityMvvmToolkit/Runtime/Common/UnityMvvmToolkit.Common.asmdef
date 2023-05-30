@@ -1,6 +1,5 @@
 {
     "name": "UnityMvvmToolkit.Common",
-    "rootNamespace": "",
     "references": [
         "GUID:5c4878a33f8e8b04cb2f76d30bb7b0b0"
     ],

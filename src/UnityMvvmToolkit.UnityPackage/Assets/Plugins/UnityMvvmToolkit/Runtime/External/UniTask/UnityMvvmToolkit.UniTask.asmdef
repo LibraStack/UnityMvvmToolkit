@@ -1,6 +1,5 @@
 {
     "name": "UnityMvvmToolkit.UniTask",
-    "rootNamespace": "",
     "references": [
         "UnityMvvmToolkit.Core",
         "UniTask"

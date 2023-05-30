@@ -1,18 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using UnityEngine.UIElements;
-using UnityMvvmToolkit.Common.Extensions;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
+using UnityMvvmToolkit.UITK.Extensions;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public abstract partial class BindableListView<TItemBindingContext> : ListView, IBindableElement
-        where TItemBindingContext : ICollectionItem
+    public abstract partial class BindableListView<TItemBindingContext> : ListView, IBindableCollection,
+        IInitializable, IDisposable where TItemBindingContext : ICollectionItem
     {
         private VisualTreeAsset _itemTemplate;
 
@@ -20,6 +21,22 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private IReadOnlyProperty<ObservableCollection<TItemBindingContext>> _itemsSource;
 
         private IObjectProvider _objectProvider;
+        private List<VisualElement> _itemAssets;
+
+        public virtual void Initialize()
+        {
+            _itemAssets = new List<VisualElement>();
+        }
+
+        public virtual void Dispose()
+        {
+            for (var i = 0; i < _itemAssets.Count; i++)
+            {
+                _itemAssets[i].DisposeBindableElement(_objectProvider);
+            }
+
+            _itemAssets.Clear();
+        }
 
         public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
@@ -28,31 +45,29 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             _objectProvider = objectProvider;
 
-            _itemsSource =
-                objectProvider.RentReadOnlyProperty<ObservableCollection<TItemBindingContext>>(context,
-                    _itemsSourceBindingData);
+            _itemsSource = objectProvider
+                .RentReadOnlyProperty<ObservableCollection<TItemBindingContext>>(context, _itemsSourceBindingData);
             _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
 
             itemsSource = _itemsSource.Value;
-            makeItem += MakeItem;
-            bindItem += BindItem;
-            unbindItem += UnbindItem;
+            makeItem += OnMakeItem;
+            bindItem += OnBindItem;
+            unbindItem += OnUnbindItem;
         }
 
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
-            if (_itemsSource == null)
+            if (_itemsSource is null)
             {
                 return;
             }
 
             _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
 
-            makeItem -= MakeItem;
-            bindItem -= BindItem;
-            unbindItem -= UnbindItem;
-
-            ClearItems();
+            makeItem -= OnMakeItem;
+            bindItem -= OnBindItem;
+            unbindItem -= OnUnbindItem;
+            itemsSource = Array.Empty<TItemBindingContext>();
 
             objectProvider.ReturnReadOnlyProperty(_itemsSource);
 
@@ -63,39 +78,42 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         protected virtual VisualElement MakeItem(VisualTreeAsset itemTemplate)
         {
-            return itemTemplate.InstantiateBindableElement(); // TODO: Pool.
+            return itemTemplate
+                .InstantiateBindableElement()
+                .InitializeBindableElement();
         }
 
         protected virtual void BindItem(VisualElement item, int index, TItemBindingContext bindingContext,
             IObjectProvider objectProvider)
         {
-            item.SetBindingContext(bindingContext, objectProvider, true);
+            item.SetChildsBindingContext(bindingContext, objectProvider);
         }
 
-        protected virtual void UnbindItem(VisualElement item, int index, TItemBindingContext bindingContext,
+        protected virtual void UnbindItem(VisualElement item, int index, [CanBeNull] TItemBindingContext bindingContext,
             IObjectProvider objectProvider)
         {
-            item.ResetBindingContext(objectProvider, true);
+            item.ResetChildsBindingContext(objectProvider);
         }
 
-        private VisualElement MakeItem()
+        private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            return MakeItem(_itemTemplate);
+            RefreshItems(); // TODO: Do not refresh all items.
         }
 
-        private void BindItem(VisualElement item, int index)
+        private VisualElement OnMakeItem()
         {
-            if (index >= 0 && index < itemsSource.Count)
-            {
-                BindItem(item, index, _itemsSource.Value[index], _objectProvider);
-            }
-            else
-            {
-                BindItem(item, index, default, _objectProvider);
-            }
+            var item = MakeItem(_itemTemplate);
+            _itemAssets.Add(item);
+
+            return item;
         }
 
-        private void UnbindItem(VisualElement item, int index)
+        private void OnBindItem(VisualElement item, int index)
+        {
+            BindItem(item, index, _itemsSource.Value[index], _objectProvider);
+        }
+
+        private void OnUnbindItem(VisualElement item, int index)
         {
             if (index >= 0 && index < itemsSource.Count)
             {
@@ -105,17 +123,6 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             {
                 UnbindItem(item, index, default, _objectProvider);
             }
-        }
-
-        private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            RefreshItems(); // TODO: Do not refresh all items.
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ClearItems()
-        {
-            itemsSource = Array.Empty<TItemBindingContext>();
         }
     }
 }

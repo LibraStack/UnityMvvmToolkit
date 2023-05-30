@@ -1,8 +1,9 @@
 ﻿using UnityEngine.UIElements;
+using UnityMvvmToolkit.UITK.Extensions;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public partial class BindableLabel
+    partial class BindableLabel
     {
         public string BindingTextPath { get; private set; }
 
@@ -10,6 +11,23 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         {
         }
 
+#if UNITY_2023_2_OR_NEWER
+        [System.Serializable]
+        public new class UxmlSerializedData : Label.UxmlSerializedData
+        {
+            // ReSharper disable once InconsistentNaming
+            #pragma warning disable 649
+            [UnityEngine.SerializeField] private string BindingTextPath;
+            #pragma warning disable 649
+
+            public override object CreateInstance() => new BindableLabel();
+            public override void Deserialize(object visualElement)
+            {
+                base.Deserialize(visualElement);
+                visualElement.As<BindableLabel>().BindingTextPath = BindingTextPath;
+            }
+        }
+#else
         public new class UxmlTraits : Label.UxmlTraits
         {
             private readonly UxmlStringAttributeDescription _bindingTextAttribute = new()
@@ -18,8 +36,9 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
             {
                 base.Init(visualElement, bag, context);
-                ((BindableLabel) visualElement).BindingTextPath = _bindingTextAttribute.GetValueFromBag(bag, context);
+                visualElement.As<BindableLabel>().BindingTextPath = _bindingTextAttribute.GetValueFromBag(bag, context);
             }
         }
+#endif
     }
 }
