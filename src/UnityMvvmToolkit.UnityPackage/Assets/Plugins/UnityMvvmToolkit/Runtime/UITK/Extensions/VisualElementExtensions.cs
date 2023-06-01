@@ -121,11 +121,23 @@ namespace UnityMvvmToolkit.UITK.Extensions
                 return;
             }
 
-            var itemChildCount = visualElement.childCount;
-
-            for (var i = 0; i < itemChildCount; i++)
+            if (visualElement is TemplateContainer)
             {
-                GetBindableElements(visualElement[i], elements);
+                var hierarchyChildCount = visualElement.hierarchy.childCount;
+
+                for (var i = 0; i < hierarchyChildCount; i++)
+                {
+                    GetBindableElements(visualElement.hierarchy[i], elements);
+                }
+            }
+            else
+            {
+                var childCount = visualElement.childCount;
+
+                for (var i = 0; i < childCount; i++)
+                {
+                    GetBindableElements(visualElement[i], elements);
+                }
             }
         }
     }
