@@ -62,17 +62,19 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                     converterHashByType = HashCodeHelper.GetPropertyConverterHashCode(converter);
                     converterHashByName = HashCodeHelper.GetPropertyConverterHashCode(converter, converter.Name);
                     break;
+
                 case IParameterValueConverter converter:
                     converterHashByType = HashCodeHelper.GetParameterConverterHashCode(converter);
                     converterHashByName = HashCodeHelper.GetParameterConverterHashCode(converter, converter.Name);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
             _valueConvertersByHash.Add(converterTypeHash, valueConverter);
-            _valueConvertersByHash.Add(converterHashByType, valueConverter);
             _valueConvertersByHash.Add(converterHashByName, valueConverter);
+            _valueConvertersByHash.TryAdd(converterHashByType, valueConverter);
         }
     }
 }
