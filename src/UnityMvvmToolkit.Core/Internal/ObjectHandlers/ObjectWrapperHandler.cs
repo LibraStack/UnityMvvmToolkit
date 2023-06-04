@@ -56,7 +56,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             var targetType = typeof(TValueType);
             var contextProperty = GetMemberValue(context, memberInfo, out var sourceType);
 
-            if (targetType == sourceType)
+            if (targetType == sourceType && String.IsNullOrEmpty(bindingData.ConverterName))
             {
                 return (TProperty) contextProperty;
             }
@@ -110,7 +110,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             var commandId =
                 HashCodeHelper.GetCommandWrapperId(context.GetType(), commandValueType, bindingData.PropertyName);
 
-            if (_commandWrappers.TryGetValue(commandId, out var commandWrapper))
+            if (_commandWrappers.TryGetValue(commandId, out var commandWrapper) && String.IsNullOrEmpty(bindingData.ConverterName))
             {
                 return commandWrapper
                     .RegisterParameter(bindingData.ElementId, bindingData.ParameterValue);
