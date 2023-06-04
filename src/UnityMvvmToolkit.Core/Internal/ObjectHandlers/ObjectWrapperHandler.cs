@@ -40,9 +40,11 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                 case IPropertyValueConverter converter:
                     CreatePropertyValueConverterInstances(converter, capacity, warmupType);
                     break;
+
                 case IParameterValueConverter converter:
                     CreateParameterValueConverterInstances(converter, capacity, warmupType);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -191,10 +193,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                     converterId = HashCodeHelper.GetPropertyWrapperConverterId(converter);
                     CreatePropertyValueConverterInstances(converterId, converter, capacity);
                     break;
+
                 case WarmupType.OnlyByName:
                     converterId = HashCodeHelper.GetPropertyWrapperConverterId(converter, converter.Name);
                     CreatePropertyValueConverterInstances(converterId, converter, capacity);
                     break;
+
                 case WarmupType.ByTypeAndName:
                     converterId = HashCodeHelper.GetPropertyWrapperConverterId(converter);
                     CreatePropertyValueConverterInstances(converterId, converter, capacity);
@@ -202,6 +206,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                     converterId = HashCodeHelper.GetPropertyWrapperConverterId(converter, converter.Name);
                     CreatePropertyValueConverterInstances(converterId, converter, capacity);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(warmupType), warmupType, null);
             }
@@ -242,10 +247,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                     converterId = HashCodeHelper.GetCommandWrapperConverterId(converter);
                     CreateParameterValueConverterInstances(converterId, converter, capacity);
                     break;
+
                 case WarmupType.OnlyByName:
                     converterId = HashCodeHelper.GetCommandWrapperConverterId(converter, converter.Name);
                     CreateParameterValueConverterInstances(converterId, converter, capacity);
                     break;
+
                 case WarmupType.ByTypeAndName:
                     converterId = HashCodeHelper.GetCommandWrapperConverterId(converter);
                     CreateParameterValueConverterInstances(converterId, converter, capacity);
@@ -253,6 +260,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                     converterId = HashCodeHelper.GetCommandWrapperConverterId(converter, converter.Name);
                     CreateParameterValueConverterInstances(converterId, converter, capacity);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(warmupType), warmupType, null);
             }
