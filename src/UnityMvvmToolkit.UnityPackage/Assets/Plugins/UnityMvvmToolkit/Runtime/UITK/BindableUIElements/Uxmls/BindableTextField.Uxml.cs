@@ -18,7 +18,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             // ReSharper disable once InconsistentNaming
             #pragma warning disable 649
             [UnityEngine.SerializeField] private string BindingValuePath;
-            #pragma warning disable 649
+            #pragma warning restore 649
 
             public override object CreateInstance() => new BindableTextField();
             public override void Deserialize(object visualElement)

@@ -2,7 +2,7 @@
 
 namespace UnityMvvmToolkit.Core.Interfaces
 {
-    public interface IProperty<T> : IReadOnlyProperty<T>
+    public interface IProperty<T> : IReadOnlyProperty<T>, IProperty
     {
         new T Value { get; set; }
 

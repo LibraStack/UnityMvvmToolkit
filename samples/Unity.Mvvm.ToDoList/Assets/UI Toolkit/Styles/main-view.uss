@@ -40,8 +40,8 @@
 }
 
 .add-task-button--animation {
-    transition-property: rotate background-color;
-    transition-duration: 150ms 150ms;
+    transition-property: rotate, background-color;
+    transition-duration: 150ms, 150ms;
 }
 
 .add-task-button__icon {

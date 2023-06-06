@@ -8,6 +8,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.ObjectHandlers;
 using UnityMvvmToolkit.Core.Internal.ObjectWrappers;
 using UnityMvvmToolkit.Test.Integration.TestBindingContext;
+using UnityMvvmToolkit.Test.Integration.TestValueConverters;
 using UnityMvvmToolkit.Test.Unit.TestBindingContext;
 
 namespace UnityMvvmToolkit.Test.Integration;
@@ -160,11 +161,10 @@ public class BindingContextObjectProviderTests
             Count = countValue,
         };
 
-        IProperty<int> countProperty;
         var countPropertyBindingData = nameof(MyBindingContext.Count).ToPropertyBindingData();
 
         // Act
-        countProperty = objectProvider.RentProperty<int>(bindingContext, countPropertyBindingData);
+        var countProperty = objectProvider.RentProperty<int>(bindingContext, countPropertyBindingData);
 
         // Assert
         countProperty
@@ -179,7 +179,7 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
-    public void RentPropertyWithConverter_ShouldReturnProperty_WhenDataIsValid()
+    public void RentProperty_ShouldReturnProperty_WhenConverterIsSet()
     {
         // Arrange
         const int countValue = 69;
@@ -194,11 +194,10 @@ public class BindingContextObjectProviderTests
             Count = countValue,
         };
 
-        IProperty<string> countProperty;
         var countPropertyBindingData = nameof(MyBindingContext.Count).ToPropertyBindingData();
 
         // Act
-        countProperty = objectProvider.RentProperty<string>(bindingContext, countPropertyBindingData);
+        var countProperty = objectProvider.RentProperty<string>(bindingContext, countPropertyBindingData);
 
         // Assert
         countProperty
@@ -213,7 +212,37 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
-    public void RentPropertyWithConverter_ShouldReturnReadOnlyProperty_WhenPropertyInstanceIsNotReadOnly()
+    public void RentProperty_ShouldConvertPropertyValue_WhenSourceAndTargetTypesMatch()
+    {
+        // Arrange
+        const bool resultBoolValue = true;
+
+        var objectProvider = new BindingContextObjectProvider(new IValueConverter[]
+        {
+            new InvertBoolPropConverter()
+        });
+
+        var bindingContext = new MyBindingContext();
+
+        var boolPropertyBindingData = $"BoolProperty, {nameof(InvertBoolPropConverter)}".ToPropertyBindingData();
+
+        // Act
+        var boolProperty = objectProvider.RentProperty<bool>(bindingContext, boolPropertyBindingData);
+
+        // Assert
+        boolProperty
+            .Should()
+            .NotBeNull()
+            .And
+            .BeAssignableTo<IProperty<bool>>()
+            .And
+            .BeAssignableTo<IReadOnlyProperty<bool>>();
+
+        boolProperty.Value.Should().Be(resultBoolValue);
+    }
+
+    [Fact]
+    public void RentProperty_ShouldReturnReadOnlyProperty_WhenPropertyInstanceIsNotReadOnly()
     {
         // Arrange
         const int intValue = 25;
@@ -225,11 +254,10 @@ public class BindingContextObjectProviderTests
 
         var bindingContext = new MyBindingContext(intValue: intValue);
 
-        IReadOnlyProperty<int> intProperty;
         var intPropertyBindingData = nameof(MyBindingContext.IntReadOnlyProperty).ToPropertyBindingData();
 
         // Act
-        intProperty = objectProvider.RentProperty<int>(bindingContext, intPropertyBindingData);
+        IReadOnlyProperty<int> intProperty = objectProvider.RentProperty<int>(bindingContext, intPropertyBindingData);
 
         // Assert
         intProperty
@@ -300,27 +328,7 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
-    public void RentPropertyWithConverter_ShouldThrow_WhenPropertyIsReadOnly()
-    {
-        // Arrange
-        var objectProvider = new BindingContextObjectProvider(new IValueConverter[]
-        {
-            new IntToStrConverter()
-        });
-
-        var bindingContext = new MyBindingContext();
-
-        var intValueBindingData = nameof(MyBindingContext.IntReadOnlyValue).ToPropertyBindingData();
-
-        // Assert
-        objectProvider
-            .Invoking(sut => sut.RentReadOnlyProperty<string>(bindingContext, intValueBindingData))
-            .Should()
-            .Throw<InvalidCastException>();
-    }
-
-    [Fact]
-    public void RentPropertyWithConverter_ShouldThrow_WhenConverterIsNotSet()
+    public void RentProperty_ShouldThrow_WhenConverterIsNotSet()
     {
         // Arrange
         var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
@@ -345,11 +353,10 @@ public class BindingContextObjectProviderTests
         var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
         var bindingContext = new MyBindingContext(titleValue);
 
-        IReadOnlyProperty<string> titleProperty;
         var titlePropertyBindingData = nameof(MyBindingContext.Title).ToPropertyBindingData();
 
         // Act
-        titleProperty = objectProvider.RentReadOnlyProperty<string>(bindingContext, titlePropertyBindingData);
+        var titleProperty = objectProvider.RentReadOnlyProperty<string>(bindingContext, titlePropertyBindingData);
 
         // Assert
         titleProperty
@@ -361,6 +368,37 @@ public class BindingContextObjectProviderTests
             .NotBeAssignableTo<IProperty<string>>();
 
         titleProperty.Value.Should().Be(titleValue);
+    }
+
+    [Fact]
+    public void RentReadOnlyProperty_ShouldConvertPropertyValue_WhenSourceAndTargetTypesMatch()
+    {
+        // Arrange
+        const bool resultBoolValue = true;
+
+        var objectProvider = new BindingContextObjectProvider(new IValueConverter[]
+        {
+            new InvertBoolPropConverter()
+        });
+
+        var bindingContext = new MyBindingContext();
+
+        var boolPropertyBindingData =
+            $"BoolReadOnlyProperty, {nameof(InvertBoolPropConverter)}".ToPropertyBindingData();
+
+        // Act
+        var boolProperty = objectProvider.RentReadOnlyProperty<bool>(bindingContext, boolPropertyBindingData);
+
+        // Assert
+        boolProperty
+            .Should()
+            .NotBeNull()
+            .And
+            .NotBeAssignableTo<IProperty<bool>>()
+            .And
+            .BeAssignableTo<IReadOnlyProperty<bool>>();
+
+        boolProperty.Value.Should().Be(resultBoolValue);
     }
 
     [Fact]
@@ -391,17 +429,18 @@ public class BindingContextObjectProviderTests
         var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
         var bindingContext = new MyBindingContext();
 
-        ICommand incrementCommand;
-        ICommand decrementCommand;
-
         // Act
-        incrementCommand =
-            objectProvider.GetCommand<ICommand>(bindingContext, nameof(MyBindingContext.IncrementCommand));
+        var fieldCommand = objectProvider
+            .GetCommand<ICommand>(bindingContext, nameof(MyBindingContext.FieldCommand));
 
-        decrementCommand =
-            objectProvider.GetCommand<ICommand>(bindingContext, nameof(MyBindingContext.DecrementCommand));
+        var incrementCommand = objectProvider
+            .GetCommand<ICommand>(bindingContext, nameof(MyBindingContext.IncrementCommand));
+
+        var decrementCommand = objectProvider
+            .GetCommand<ICommand>(bindingContext, nameof(MyBindingContext.DecrementCommand));
 
         // Assert
+        fieldCommand.Should().NotBeNull().And.BeAssignableTo<IBaseCommand>();
         incrementCommand.Should().NotBeNull().And.BeAssignableTo<IBaseCommand>();
         decrementCommand.Should().NotBeNull().And.BeAssignableTo<IBaseCommand>();
     }
@@ -452,7 +491,7 @@ public class BindingContextObjectProviderTests
             .Should()
             .Throw<InvalidCastException>()
             .WithMessage(
-                $"Can not cast the {typeof(IReadOnlyProperty<string>)} command to the {typeof(ICommand)} command.");
+                $"Can not cast the '{typeof(IReadOnlyProperty<string>)}' command to the '{typeof(ICommand)}' command.");
     }
 
     [Fact]
@@ -460,6 +499,7 @@ public class BindingContextObjectProviderTests
     {
         // Arrange
         const string commandName = nameof(MyBindingContext.SetValueCommand);
+        const string fieldCommandName = nameof(MyBindingContext.SetValueFieldCommand);
 
         var objectProvider = new BindingContextObjectProvider(new IValueConverter[]
         {
@@ -468,14 +508,40 @@ public class BindingContextObjectProviderTests
 
         var bindingContext = new MyBindingContext();
 
-        IBaseCommand setValueCommand;
         var setValueCommandBindingData = $"{commandName}, 5".ToCommandBindingData(0);
+        var setValueFieldCommandBindingData = $"{fieldCommandName}, 5".ToCommandBindingData(0);
 
         // Act
-        setValueCommand = objectProvider.RentCommandWrapper(bindingContext, setValueCommandBindingData);
+        var setValueCommand = objectProvider.RentCommandWrapper(bindingContext, setValueCommandBindingData);
+        var setValueFieldCommand = objectProvider.RentCommandWrapper(bindingContext, setValueFieldCommandBindingData);
 
         // Assert
         setValueCommand.Should().NotBeNull();
+        setValueFieldCommand.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void RentCommandWrapper_ShouldReturnCommand_WithInvertedParameterValue()
+    {
+        // Arrange
+        const bool resultBoolValue = true;
+
+        var objectProvider = new BindingContextObjectProvider(new IValueConverter[]
+        {
+            new InvertBoolParamConverter()
+        });
+
+        var bindingContext = new MyBindingContext();
+
+        var boolCommandBindingData =
+            $"BoolCommand, {bool.FalseString}, {nameof(InvertBoolParamConverter)}".ToCommandBindingData(0);
+
+        // Act
+        var boolCommand = objectProvider.RentCommandWrapper(bindingContext, boolCommandBindingData);
+        boolCommand.Execute(0);
+
+        // Assert
+        bindingContext.BoolValue.Should().Be(resultBoolValue);
     }
 
     [Fact]

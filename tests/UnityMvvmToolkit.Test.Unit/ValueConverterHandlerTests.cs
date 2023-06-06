@@ -5,12 +5,30 @@ using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Helpers;
 using UnityMvvmToolkit.Core.Internal.ObjectHandlers;
+using UnityMvvmToolkit.Test.Unit.TestValueConverters;
 
 namespace UnityMvvmToolkit.Test.Unit;
 
 [SuppressMessage("Usage", "xUnit1026:Theory methods should use all of their parameters")]
 public class ValueConverterHandlerTests
 {
+    [Fact]
+    public void RegisterValueConverters_ShouldNotThrow_WhenConvertersHaveTheSameTypes()
+    {
+        // Arrange
+        var valueConverters = new IValueConverter[]
+        {
+            new IntToBoolConverter(),
+            new InvertedIntToBoolConverter()
+        };
+
+        // Assert
+        FluentActions
+            .Invoking(() => new ValueConverterHandler(valueConverters))
+            .Should()
+            .NotThrow();
+    }
+
     [Theory]
     [MemberData(nameof(PropertyConverterDataSets))]
     [MemberData(nameof(ParameterConverterDataSets))]

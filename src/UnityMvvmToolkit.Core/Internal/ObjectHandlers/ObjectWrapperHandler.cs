@@ -53,12 +53,14 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         public TProperty GetProperty<TProperty, TValueType>(IBindingContext context, BindingData bindingData,
             MemberInfo memberInfo)
         {
-            var targetType = typeof(TValueType);
-            var contextProperty = GetMemberValue(context, memberInfo, out var sourceType);
+            var property = GetMemberValue(context, memberInfo, out var propertyType);
 
-            if (targetType == sourceType)
+            var targetType = typeof(TValueType);
+            var sourceType = propertyType.GenericTypeArguments[0];
+
+            if (targetType == sourceType && string.IsNullOrWhiteSpace(bindingData.ConverterName))
             {
-                return (TProperty) contextProperty;
+                return (TProperty) property;
             }
 
             var converterId =
@@ -71,7 +73,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                     return (TProperty) propertyWrappers
                         .Dequeue()
                         .AsPropertyWrapper()
-                        .SetProperty(contextProperty);
+                        .SetProperty(property);
                 }
             }
             else
@@ -86,26 +88,40 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             }
 
             var args = new object[] { valueConverter };
-            var wrapperType = typeof(PropertyWrapper<,>).MakeGenericType(sourceType, targetType);
 
-            return (TProperty) ObjectWrapperHelper.CreatePropertyWrapper(wrapperType, args, converterId,
-                contextProperty);
+            var wrapperType = property is IProperty
+                ? typeof(PropertyWrapper<,>).MakeGenericType(sourceType, targetType)
+                : typeof(ReadOnlyPropertyWrapper<,>).MakeGenericType(sourceType, targetType);
+
+            return (TProperty) ObjectWrapperHelper.CreatePropertyWrapper(wrapperType, args, converterId, property);
+        }
+
+        public TCommand GetCommand<TCommand>(IBindingContext context, MemberInfo memberInfo)
+        {
+            var command = GetMemberValue(context, memberInfo, out var commandType);
+
+            if (typeof(TCommand).IsAssignableFrom(commandType))
+            {
+                return (TCommand) command;
+            }
+
+            throw new InvalidCastException(
+                $"Can not cast the '{commandType}' command to the '{typeof(TCommand)}' command.");
         }
 
         public ICommandWrapper GetCommandWrapper(IBindingContext context, CommandBindingData bindingData,
             MemberInfo memberInfo)
         {
-            var propertyInfo = (PropertyInfo) memberInfo;
-            var propertyType = propertyInfo.PropertyType;
+            var command = GetMemberValue(context, memberInfo, out var commandType);
 
-            if (propertyType.IsGenericType == false ||
-                propertyType.GetInterface(nameof(IBaseCommand)) == null)
+            if (commandType.IsGenericType == false ||
+                commandType.GetInterface(nameof(IBaseCommand)) == null)
             {
                 throw new InvalidCastException(
-                    $"Can not cast the {propertyType} command to the {typeof(ICommand<>)} command.");
+                    $"Can not cast the '{commandType}' command to the '{typeof(ICommand<>)}' command.");
             }
 
-            var commandValueType = propertyType.GenericTypeArguments[0];
+            var commandValueType = commandType.GenericTypeArguments[0];
 
             var commandId =
                 HashCodeHelper.GetCommandWrapperId(context.GetType(), commandValueType, bindingData.PropertyName);
@@ -126,7 +142,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                     return commandWrappers
                         .Dequeue()
                         .AsCommandWrapper()
-                        .SetCommand(commandId, propertyInfo.GetValue(context))
+                        .SetCommand(commandId, command)
                         .RegisterParameter(bindingData.ElementId, bindingData.ParameterValue);
                 }
             }
@@ -143,7 +159,6 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
 
             var args = new object[] { valueConverter };
             var wrapperType = typeof(CommandWrapper<>).MakeGenericType(commandValueType);
-            var command = propertyInfo.GetValue(context);
 
             commandWrapper = ObjectWrapperHelper
                 .CreateCommandWrapper(wrapperType, args, converterId, commandId, command)
@@ -297,24 +312,26 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private object GetMemberValue(IBindingContext context, MemberInfo memberInfo, out Type memberValueType)
+        private static object GetMemberValue(IBindingContext context, MemberInfo memberInfo, out Type memberType)
         {
             switch (memberInfo.MemberType)
             {
                 case MemberTypes.Field:
                 {
                     var fieldInfo = (FieldInfo) memberInfo;
-                    memberValueType = fieldInfo.FieldType.GenericTypeArguments[0];
+                    memberType = fieldInfo.FieldType;
 
                     return fieldInfo.GetValue(context);
                 }
+
                 case MemberTypes.Property:
                 {
                     var propertyInfo = (PropertyInfo) memberInfo;
-                    memberValueType = propertyInfo.PropertyType.GenericTypeArguments[0];
+                    memberType = propertyInfo.PropertyType;
 
                     return propertyInfo.GetValue(context);
                 }
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
