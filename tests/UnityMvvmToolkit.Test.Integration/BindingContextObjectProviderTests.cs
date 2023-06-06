@@ -391,17 +391,18 @@ public class BindingContextObjectProviderTests
         var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
         var bindingContext = new MyBindingContext();
 
-        ICommand incrementCommand;
-        ICommand decrementCommand;
-
         // Act
-        incrementCommand =
-            objectProvider.GetCommand<ICommand>(bindingContext, nameof(MyBindingContext.IncrementCommand));
+        var fieldCommand = objectProvider
+            .GetCommand<ICommand>(bindingContext, nameof(MyBindingContext.FieldCommand));
 
-        decrementCommand =
-            objectProvider.GetCommand<ICommand>(bindingContext, nameof(MyBindingContext.DecrementCommand));
+        var incrementCommand = objectProvider
+            .GetCommand<ICommand>(bindingContext, nameof(MyBindingContext.IncrementCommand));
+
+        var decrementCommand = objectProvider
+            .GetCommand<ICommand>(bindingContext, nameof(MyBindingContext.DecrementCommand));
 
         // Assert
+        fieldCommand.Should().NotBeNull().And.BeAssignableTo<IBaseCommand>();
         incrementCommand.Should().NotBeNull().And.BeAssignableTo<IBaseCommand>();
         decrementCommand.Should().NotBeNull().And.BeAssignableTo<IBaseCommand>();
     }
@@ -452,7 +453,7 @@ public class BindingContextObjectProviderTests
             .Should()
             .Throw<InvalidCastException>()
             .WithMessage(
-                $"Can not cast the {typeof(IReadOnlyProperty<string>)} command to the {typeof(ICommand)} command.");
+                $"Can not cast the '{typeof(IReadOnlyProperty<string>)}' command to the '{typeof(ICommand)}' command.");
     }
 
     [Fact]
@@ -460,6 +461,7 @@ public class BindingContextObjectProviderTests
     {
         // Arrange
         const string commandName = nameof(MyBindingContext.SetValueCommand);
+        const string fieldCommandName = nameof(MyBindingContext.SetValueFieldCommand);
 
         var objectProvider = new BindingContextObjectProvider(new IValueConverter[]
         {
@@ -468,14 +470,16 @@ public class BindingContextObjectProviderTests
 
         var bindingContext = new MyBindingContext();
 
-        IBaseCommand setValueCommand;
         var setValueCommandBindingData = $"{commandName}, 5".ToCommandBindingData(0);
+        var setValueFieldCommandBindingData = $"{fieldCommandName}, 5".ToCommandBindingData(0);
 
         // Act
-        setValueCommand = objectProvider.RentCommandWrapper(bindingContext, setValueCommandBindingData);
+        var setValueCommand = objectProvider.RentCommandWrapper(bindingContext, setValueCommandBindingData);
+        var setValueFieldCommand = objectProvider.RentCommandWrapper(bindingContext, setValueFieldCommandBindingData);
 
         // Assert
         setValueCommand.Should().NotBeNull();
+        setValueFieldCommand.Should().NotBeNull();
     }
 
     [Fact]

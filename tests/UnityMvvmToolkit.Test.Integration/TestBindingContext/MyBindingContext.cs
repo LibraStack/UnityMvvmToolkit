@@ -27,6 +27,7 @@ public class MyBindingContext : IBindingContext
         DecrementCommand = new MyCommand(() => Count--);
 
         SetValueCommand = new Command<int>(value => Count = value);
+        SetValueFieldCommand = new Command<int>(value => Count = value);
     }
 
     public int Count
@@ -46,4 +47,5 @@ public class MyBindingContext : IBindingContext
     public IMyCommand DecrementCommand { get; }
 
     public ICommand<int> SetValueCommand { get; }
+    public ICommand<int> SetValueFieldCommand;
 }
