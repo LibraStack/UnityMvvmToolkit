@@ -114,15 +114,7 @@ namespace UnityMvvmToolkit.Core
                 throw new InvalidOperationException($"Command '{propertyName}' not found.");
             }
 
-            var propertyInfo = (PropertyInfo) memberInfo;
-
-            if (typeof(TCommand).IsAssignableFrom(propertyInfo.PropertyType))
-            {
-                return (TCommand) propertyInfo.GetValue(context);
-            }
-
-            throw new InvalidCastException(
-                $"Can not cast the {propertyInfo.PropertyType} command to the {typeof(TCommand)} command.");
+            return _objectWrapperHandler.GetCommand<TCommand>(context, memberInfo);
         }
 
         public IBaseCommand RentCommandWrapper(IBindingContext context, CommandBindingData bindingData)
