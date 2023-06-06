@@ -58,7 +58,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             var targetType = typeof(TValueType);
             var sourceType = propertyType.GenericTypeArguments[0];
 
-            if (targetType == sourceType && string.IsNullOrWhiteSpace(bindingData.ConverterName))
+            if (targetType == sourceType)
             {
                 return (TProperty) property;
             }
