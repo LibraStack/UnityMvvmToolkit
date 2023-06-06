@@ -58,7 +58,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             var targetType = typeof(TValueType);
             var sourceType = propertyType.GenericTypeArguments[0];
 
-            if (targetType == sourceType)
+            if (targetType == sourceType && string.IsNullOrWhiteSpace(bindingData.ConverterName))
             {
                 return (TProperty) property;
             }
@@ -88,7 +88,10 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             }
 
             var args = new object[] { valueConverter };
-            var wrapperType = typeof(PropertyWrapper<,>).MakeGenericType(sourceType, targetType);
+
+            var wrapperType = property is IProperty
+                ? typeof(PropertyWrapper<,>).MakeGenericType(sourceType, targetType)
+                : typeof(ReadOnlyPropertyWrapper<,>).MakeGenericType(sourceType, targetType);
 
             return (TProperty) ObjectWrapperHelper.CreatePropertyWrapper(wrapperType, args, converterId, property);
         }
