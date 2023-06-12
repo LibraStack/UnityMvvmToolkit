@@ -842,7 +842,7 @@ To pass a parameter to the viewmodel, see the [ParameterValueConverter](#paramet
 
 #### BindableDropdownField
 
-The `BindableDropdownField` allows you to work with dropdown. To set the binding of the selected value, you need to write `binding-selected-value-path`, and to set the binding of all dropdown elements, you need to use `binding-choises-path`.
+The `BindableDropdownField` allows you to work with dropdown. To set the binding of the selected value, you need to write `binding-selected-item-path`, and to set the binding of all dropdown elements, you need to use `binding-items-source-path`.
 
 The following example demonstrates how to bind to a collection of strings with `BindableDropdownField`.
 
@@ -850,7 +850,7 @@ In XML, you need to write the following:
 
 ```xml
 <ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
-    <uitk:BindableDropdownField binding-selected-value-path="SelectedValue" binding-choises-path="Choices" />
+    <uitk:BindableDropdownField binding-selected-item-path="SelectedValue" binding-items-source-path="Choices" />
 </ui:UXML>
 ```
 And in the C# class the following:
