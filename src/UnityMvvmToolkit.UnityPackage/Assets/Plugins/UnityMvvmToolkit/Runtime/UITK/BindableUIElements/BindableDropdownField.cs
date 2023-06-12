@@ -4,42 +4,54 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 using UnityEngine.UIElements;
+using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Extensions;
 using UnityMvvmToolkit.Core.Interfaces;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public partial class BindableDropdownField : DropdownField, IBindableElement
+    public partial class BindableDropdownField : DropdownField, IBindableCollection, IInitializable, IDisposable
     {
-        private IProperty<string> _valueProperty;
+        private IProperty<string> _selectedItemProperty;
         private IReadOnlyProperty<ObservableCollection<string>> _itemsSource;
 
-        private PropertyBindingData _propertyBindingData;
+        private PropertyBindingData _selectedItemBindingData;
         private PropertyBindingData _itemsSourceBindingData;
+        
+        
+        public void Initialize()
+        {
+            choices = new List<string>();
+        }
+
+        public void Dispose()
+        {
+            choices.Clear();
+        }
         
         public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
-            if (string.IsNullOrWhiteSpace(BindingChoicesPath))
+            if (string.IsNullOrWhiteSpace(BindingItemsSourcePath))
             {
                 return;
             }
 
-            _itemsSourceBindingData ??= BindingChoicesPath.ToPropertyBindingData();
-            _propertyBindingData ??= BindingValuePath.ToPropertyBindingData();
+            _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
+            _selectedItemBindingData ??= BindingSelectedItemPath.ToPropertyBindingData();
 
             _itemsSource = objectProvider
                 .RentReadOnlyProperty<ObservableCollection<string>>(context, _itemsSourceBindingData);
             _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
             
-            _valueProperty = objectProvider.RentProperty<string>(context, _propertyBindingData);
-            _valueProperty.ValueChanged += OnPropertyValueChanged;
+            _selectedItemProperty = objectProvider.RentProperty<string>(context, _selectedItemBindingData);
+            _selectedItemProperty.ValueChanged += OnSelectedItemValueChanged;
 
-            UpdateControlValue(_valueProperty.Value);
+            UpdateControlValue(_selectedItemProperty.Value);
             this.RegisterValueChangedCallback(OnControlValueChanged);
 
             choices = new List<string>(_itemsSource.Value);
-            _valueProperty.Value = choices[0];
+            _selectedItemProperty.Value = choices[0];
         }
 
         private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -128,19 +140,19 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
-            if (_valueProperty == null || _itemsSource == null)
+            if (_selectedItemProperty == null || _itemsSource == null)
             {
                 return;
             }
 
-            _valueProperty.ValueChanged -= OnPropertyValueChanged;
+            _selectedItemProperty.ValueChanged -= OnSelectedItemValueChanged;
             _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
             choices = new List<string>();
 
-            objectProvider.ReturnProperty(_valueProperty);
+            objectProvider.ReturnProperty(_selectedItemProperty);
             objectProvider.ReturnReadOnlyProperty(_itemsSource);
             
-            _valueProperty = null;
+            _selectedItemProperty = null;
             _itemsSource = null;
 
             this.UnregisterValueChangedCallback(OnControlValueChanged);
@@ -149,10 +161,10 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         protected virtual void OnControlValueChanged(ChangeEvent<string> e)
         {
-            _valueProperty.Value = e.newValue;
+            _selectedItemProperty.Value = e.newValue;
         }
 
-        private void OnPropertyValueChanged(object sender, string newValue)
+        private void OnSelectedItemValueChanged(object sender, string newValue)
         {
             UpdateControlValue(newValue);
         }

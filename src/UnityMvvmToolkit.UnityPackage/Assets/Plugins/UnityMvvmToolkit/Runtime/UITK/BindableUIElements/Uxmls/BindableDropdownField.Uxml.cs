@@ -3,12 +3,11 @@ using UnityMvvmToolkit.UITK.Extensions;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public partial class BindableDropdownField
+    partial class BindableDropdownField
     {
-        public string BindingValuePath { get; private set; }
+        public string BindingSelectedItemPath { get; private set; }
 
-        public string BindingChoicesPath { get; private set; }
-
+        public string BindingItemsSourcePath { get; private set; }
 
         public new class UxmlFactory : UxmlFactory<BindableDropdownField, UxmlTraits>
         {
@@ -20,7 +19,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         {
             // ReSharper disable once InconsistentNaming
             #pragma warning disable 649
-            [UnityEngine.SerializeField] private string BindingValuePath;
+            [UnityEngine.SerializeField] private string BindingSelectedItemPath;
             [UnityEngine.SerializeField] private string BindingItemsSourcePath;
             #pragma warning restore 649
 
@@ -28,33 +27,31 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             public override void Deserialize(object visualElement)
             {
                 base.Deserialize(visualElement);
-                visualElement.As<BindableDropdownField>().BindingValuePath = BindingValuePath;
-                visualElement.As<BindableDropdownField>().BindingItemsSourcePath = BindingItemsSourcePath;
+
+                var bindableDropdownField = visualElement.As<BindableDropdownField>();
+                bindableDropdownField.BindingSelectedItemPath = BindingSelectedItemPath;
+                bindableDropdownField.BindingItemsSourcePath = BindingItemsSourcePath;
             }
         }
 #else
         public new class UxmlTraits : DropdownField.UxmlTraits
         {
-            private readonly UxmlStringAttributeDescription _bindingValueAttribute = new()
-                { name = "binding-value-path", defaultValue = "" };
+            private readonly UxmlStringAttributeDescription _bindingSelectedItemPath = new()
+                { name = "binding-selected-item-path", defaultValue = "" };
 
-            private readonly UxmlStringAttributeDescription _bindingChoicesAttribute = new()
-                { name = "binding-choices-path", defaultValue = "" };
+            private readonly UxmlStringAttributeDescription _bindingItemsSourcePath = new()
+                { name = "binding-items-source-path", defaultValue = "" };
 
             public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
             {
                 base.Init(visualElement, bag, context);
 
-                visualElement
-                    .As<BindableDropdownField>()
-                    .BindingValuePath = _bindingValueAttribute.GetValueFromBag(bag, context);
+                var bindableDropdownField = visualElement.As<BindableDropdownField>();
                 
-                visualElement
-                    .As<BindableDropdownField>()
-                    .BindingChoicesPath = _bindingChoicesAttribute.GetValueFromBag(bag, context);
+                bindableDropdownField.BindingSelectedItemPath = _bindingSelectedItemPath.GetValueFromBag(bag, context);
+                bindableDropdownField.BindingItemsSourcePath = _bindingItemsSourcePath.GetValueFromBag(bag, context);
             }
         }
 #endif
-        
     }
 }
