@@ -18,37 +18,37 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
     public class BindableDropdown : MonoBehaviour, IBindableElement
     {
         [SerializeField] private TMP_Dropdown _dropdown;
-        [SerializeField] private string _bindingValuePath;
-        [SerializeField] private string _bindingChoicesPath;
+        [SerializeField] private string _bindingSelectedItemPath;
+        [SerializeField] private string _bindingItemsSourcePath;
 
-        private IProperty<string> _valueProperty;
+        private IProperty<string> _selectedItemProperty;
         private IReadOnlyProperty<ObservableCollection<string>> _itemsSource;
 
-        private PropertyBindingData _propertyBindingData;
+        private PropertyBindingData _selectedItemBindingData;
         private PropertyBindingData _itemsSourceBindingData;
         
         public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
-            if (string.IsNullOrWhiteSpace(_bindingChoicesPath))
+            if (string.IsNullOrWhiteSpace(_bindingItemsSourcePath))
             {
                 return;
             }
 
-            _itemsSourceBindingData ??= _bindingChoicesPath.ToPropertyBindingData();
-            _propertyBindingData ??= _bindingValuePath.ToPropertyBindingData();
+            _itemsSourceBindingData ??= _bindingItemsSourcePath.ToPropertyBindingData();
+            _selectedItemBindingData ??= _bindingSelectedItemPath.ToPropertyBindingData();
 
             _itemsSource = objectProvider
                 .RentReadOnlyProperty<ObservableCollection<string>>(context, _itemsSourceBindingData);
             _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
             
-            _valueProperty = objectProvider.RentProperty<string>(context, _propertyBindingData);
-            _valueProperty.ValueChanged += OnPropertyValueChanged;
+            _selectedItemProperty = objectProvider.RentProperty<string>(context, _selectedItemBindingData);
+            _selectedItemProperty.ValueChanged += OnPropertySelectedItemChanged;
 
-            UpdateControlValue(_dropdown.options.FindIndex(option => option.text == _valueProperty.Value));
+            UpdateControlValue(_dropdown.options.FindIndex(option => option.text == _selectedItemProperty.Value));
             _dropdown.onValueChanged.AddListener(OnControlValueChanged);
 
             _dropdown.options = new List<TMP_Dropdown.OptionData>(_itemsSource.Value.Select(value => new TMP_Dropdown.OptionData(value)));
-            _valueProperty.Value = _dropdown.options[0].text;
+            _selectedItemProperty.Value = _dropdown.options[0].text;
         }
 
         private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -137,19 +137,19 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
         
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
-            if (_valueProperty == null || _itemsSource == null)
+            if (_selectedItemProperty == null || _itemsSource == null)
             {
                 return;
             }
 
-            _valueProperty.ValueChanged -= OnPropertyValueChanged;
+            _selectedItemProperty.ValueChanged -= OnPropertySelectedItemChanged;
             _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
             _dropdown.options = new List<TMP_Dropdown.OptionData>();
             
-            objectProvider.ReturnProperty(_valueProperty);
+            objectProvider.ReturnProperty(_selectedItemProperty);
             objectProvider.ReturnReadOnlyProperty(_itemsSource);
             
-            _valueProperty = null;
+            _selectedItemProperty = null;
             _itemsSource = null;
 
             _dropdown.onValueChanged.RemoveListener(OnControlValueChanged);
@@ -158,10 +158,10 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
 
         protected virtual void OnControlValueChanged(int index)
         {
-            _valueProperty.Value = _dropdown.options[index].text;
+            _selectedItemProperty.Value = _dropdown.options[index].text;
         }
 
-        private void OnPropertyValueChanged(object sender, string newValue)
+        private void OnPropertySelectedItemChanged(object sender, string newValue)
         {
             UpdateControlValue(_dropdown.options.FindIndex(option => option.text == newValue));
         }
