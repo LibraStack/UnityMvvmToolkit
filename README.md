@@ -843,6 +843,7 @@ To pass a parameter to the viewmodel, see the [ParameterValueConverter](#paramet
 #### BindableDropdownField
 
 The `BindableDropdownField` allows you to work with dropdown. To set the binding of the selected value, you need to write `binding-selected-item-path`, and to set the binding of all dropdown elements, you need to use `binding-items-source-path`.
+Moreover, you can set them independently of each other.
 
 The following example demonstrates how to bind to a collection of strings with `BindableDropdownField`.
 
