@@ -29,26 +29,24 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
         
         public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
-            if (string.IsNullOrWhiteSpace(_bindingItemsSourcePath))
+            if (string.IsNullOrWhiteSpace(_bindingItemsSourcePath) == false)
             {
-                return;
+                _itemsSourceBindingData ??= _bindingItemsSourcePath.ToPropertyBindingData();
+                _itemsSource = objectProvider
+                    .RentReadOnlyProperty<ObservableCollection<string>>(context, _itemsSourceBindingData);
+                _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
+                _dropdown.options = new List<TMP_Dropdown.OptionData>(_itemsSource.Value.Select(value => new TMP_Dropdown.OptionData(value)));
             }
-
-            _itemsSourceBindingData ??= _bindingItemsSourcePath.ToPropertyBindingData();
-            _selectedItemBindingData ??= _bindingSelectedItemPath.ToPropertyBindingData();
-
-            _itemsSource = objectProvider
-                .RentReadOnlyProperty<ObservableCollection<string>>(context, _itemsSourceBindingData);
-            _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
             
-            _selectedItemProperty = objectProvider.RentProperty<string>(context, _selectedItemBindingData);
-            _selectedItemProperty.ValueChanged += OnPropertySelectedItemChanged;
-
-            UpdateControlValue(_dropdown.options.FindIndex(option => option.text == _selectedItemProperty.Value));
-            _dropdown.onValueChanged.AddListener(OnControlValueChanged);
-
-            _dropdown.options = new List<TMP_Dropdown.OptionData>(_itemsSource.Value.Select(value => new TMP_Dropdown.OptionData(value)));
-            _selectedItemProperty.Value = _dropdown.options[0].text;
+            if (string.IsNullOrWhiteSpace(_bindingSelectedItemPath) == false)
+            {
+                _selectedItemBindingData ??= _bindingSelectedItemPath.ToPropertyBindingData();
+                _selectedItemProperty = objectProvider.RentProperty<string>(context, _selectedItemBindingData);
+                _selectedItemProperty.ValueChanged += OnPropertySelectedItemChanged;
+                UpdateControlValue(_dropdown.options.FindIndex(option => option.text == _selectedItemProperty.Value));
+                _dropdown.onValueChanged.AddListener(OnControlValueChanged);
+                _selectedItemProperty.Value = _dropdown.options[0].text;
+            }
         }
 
         private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -137,23 +135,27 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
         
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
-            if (_selectedItemProperty == null || _itemsSource == null)
+            if (_itemsSource != null)
             {
-                return;
+                _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
+                objectProvider.ReturnReadOnlyProperty(_itemsSource);
+                _itemsSource = null;
+                _dropdown.options = new List<TMP_Dropdown.OptionData>();
+            }
+            
+            if (_selectedItemProperty != null)
+            {
+                _selectedItemProperty.ValueChanged -= OnPropertySelectedItemChanged;
+                objectProvider.ReturnProperty(_selectedItemProperty);
+                _selectedItemProperty = null;
+                _dropdown.onValueChanged.RemoveListener(OnControlValueChanged);
             }
 
-            _selectedItemProperty.ValueChanged -= OnPropertySelectedItemChanged;
-            _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
-            _dropdown.options = new List<TMP_Dropdown.OptionData>();
-            
-            objectProvider.ReturnProperty(_selectedItemProperty);
-            objectProvider.ReturnReadOnlyProperty(_itemsSource);
-            
-            _selectedItemProperty = null;
-            _itemsSource = null;
-
-            _dropdown.onValueChanged.RemoveListener(OnControlValueChanged);
-            UpdateControlValue(default);
+            if (_itemsSource != null
+                || _selectedItemProperty != null)
+            {
+                UpdateControlValue(default);
+            }
         }
 
         protected virtual void OnControlValueChanged(int index)

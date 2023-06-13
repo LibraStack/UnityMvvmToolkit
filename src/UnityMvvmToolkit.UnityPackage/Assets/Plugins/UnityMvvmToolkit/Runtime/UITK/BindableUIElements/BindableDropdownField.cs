@@ -32,26 +32,24 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         
         public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
-            if (string.IsNullOrWhiteSpace(BindingItemsSourcePath))
+            if (string.IsNullOrWhiteSpace(BindingItemsSourcePath) == false)
             {
-                return;
+                _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
+                _itemsSource = objectProvider
+                    .RentReadOnlyProperty<ObservableCollection<string>>(context, _itemsSourceBindingData);
+                _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
+                choices = new List<string>(_itemsSource.Value);
             }
-
-            _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
-            _selectedItemBindingData ??= BindingSelectedItemPath.ToPropertyBindingData();
-
-            _itemsSource = objectProvider
-                .RentReadOnlyProperty<ObservableCollection<string>>(context, _itemsSourceBindingData);
-            _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
             
-            _selectedItemProperty = objectProvider.RentProperty<string>(context, _selectedItemBindingData);
-            _selectedItemProperty.ValueChanged += OnSelectedItemValueChanged;
-
-            UpdateControlValue(_selectedItemProperty.Value);
-            this.RegisterValueChangedCallback(OnControlValueChanged);
-
-            choices = new List<string>(_itemsSource.Value);
-            _selectedItemProperty.Value = choices[0];
+            if (string.IsNullOrWhiteSpace(BindingSelectedItemPath) == false)
+            {
+                _selectedItemBindingData ??= BindingSelectedItemPath.ToPropertyBindingData();
+                _selectedItemProperty = objectProvider.RentProperty<string>(context, _selectedItemBindingData);
+                _selectedItemProperty.ValueChanged += OnSelectedItemValueChanged;
+                UpdateControlValue(_selectedItemProperty.Value);
+                this.RegisterValueChangedCallback(OnControlValueChanged);
+                _selectedItemProperty.Value = choices[0];
+            }
         }
 
         private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -140,23 +138,27 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
-            if (_selectedItemProperty == null || _itemsSource == null)
+            if (_selectedItemProperty != null)
             {
-                return;
+                _selectedItemProperty.ValueChanged -= OnSelectedItemValueChanged;
+                objectProvider.ReturnProperty(_selectedItemProperty);
+                _selectedItemProperty = null;
+                this.UnregisterValueChangedCallback(OnControlValueChanged);
+            }
+            
+            if (_itemsSource != null)
+            {
+                _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
+                choices = new List<string>();
+                objectProvider.ReturnReadOnlyProperty(_itemsSource);
+                _itemsSource = null;
             }
 
-            _selectedItemProperty.ValueChanged -= OnSelectedItemValueChanged;
-            _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
-            choices = new List<string>();
-
-            objectProvider.ReturnProperty(_selectedItemProperty);
-            objectProvider.ReturnReadOnlyProperty(_itemsSource);
-            
-            _selectedItemProperty = null;
-            _itemsSource = null;
-
-            this.UnregisterValueChangedCallback(OnControlValueChanged);
-            UpdateControlValue(default);
+            if (_itemsSource != null
+                || _selectedItemProperty != null)
+            {
+                UpdateControlValue(default);
+            }
         }
 
         protected virtual void OnControlValueChanged(ChangeEvent<string> e)
