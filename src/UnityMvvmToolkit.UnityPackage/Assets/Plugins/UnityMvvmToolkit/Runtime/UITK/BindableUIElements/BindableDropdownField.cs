@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.Common.Interfaces;
@@ -45,7 +46,13 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 _selectedItemBindingData ??= BindingSelectedItemPath.ToPropertyBindingData();
                 _selectedItemProperty = objectProvider.RentProperty<string>(context, _selectedItemBindingData);
                 _selectedItemProperty.ValueChanged += OnSelectedItemValueChanged;
-                UpdateControlValue(_selectedItemProperty.Value);
+                
+                var isContains = choices.Contains(_selectedItemProperty.Value);
+                if (isContains == true)
+                {
+                    UpdateControlValue(_selectedItemProperty.Value);
+                }
+                
                 this.RegisterValueChangedCallback(OnControlValueChanged);
                 _selectedItemProperty.Value = choices.Count > 0 ? choices[0] : default;
             }
@@ -154,6 +161,12 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         private void OnSelectedItemValueChanged(object sender, string newValue)
         {
+            var isContains = choices.Contains(newValue);
+            if (isContains == false)
+            {
+                return;
+            }
+            
             UpdateControlValue(newValue);
         }
         

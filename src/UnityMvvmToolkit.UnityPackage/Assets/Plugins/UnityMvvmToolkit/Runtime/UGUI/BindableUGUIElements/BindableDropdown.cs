@@ -43,7 +43,13 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
                 _selectedItemBindingData ??= _bindingSelectedItemPath.ToPropertyBindingData();
                 _selectedItemProperty = objectProvider.RentProperty<string>(context, _selectedItemBindingData);
                 _selectedItemProperty.ValueChanged += OnPropertySelectedItemChanged;
-                UpdateControlValue(_dropdown.options.FindIndex(option => option.text == _selectedItemProperty.Value));
+                
+                var foundIndex = _dropdown.options.FindIndex(option => option.text == _selectedItemProperty.Value);
+                if (foundIndex != -1)
+                {
+                    UpdateControlValue(foundIndex);
+                }
+                
                 _dropdown.onValueChanged.AddListener(OnControlValueChanged);
                 _selectedItemProperty.Value = _dropdown.options.Count > 0 ? _dropdown.options[0].text : default;
             }
@@ -152,7 +158,13 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
 
         private void OnPropertySelectedItemChanged(object sender, string newValue)
         {
-            UpdateControlValue(_dropdown.options.FindIndex(option => option.text == newValue));
+            var foundIndex = _dropdown.options.FindIndex(option => option.text == newValue);
+            if (foundIndex == -1)
+            {
+                return;
+            }
+            
+            UpdateControlValue(foundIndex);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
