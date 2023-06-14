@@ -45,7 +45,7 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
                 _selectedItemProperty.ValueChanged += OnPropertySelectedItemChanged;
                 UpdateControlValue(_dropdown.options.FindIndex(option => option.text == _selectedItemProperty.Value));
                 _dropdown.onValueChanged.AddListener(OnControlValueChanged);
-                _selectedItemProperty.Value = _dropdown.options[0].text;
+                _selectedItemProperty.Value = _dropdown.options.Count > 0 ? _dropdown.options[0].text : default;
             }
         }
 
@@ -55,34 +55,25 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
             {
                 case NotifyCollectionChangedAction.Add:
                     
-                    if (e.NewItems.Count != 1)
+                    foreach (string newItem in e.NewItems)
                     {
-                        throw new NotSupportedException("RangeActionsNotSupported");
+                        _dropdown.options.Add(new TMP_Dropdown.OptionData(newItem));
                     }
-                    
-                    if (e.NewItems?[0] is string newValue)
-                    {
-                        _dropdown.options.Add(new TMP_Dropdown.OptionData(newValue));
-                    }
+
                     break;
                 
                 case NotifyCollectionChangedAction.Remove:
-
-                    if (e.OldItems.Count != 1)
-                    {
-                        throw new NotSupportedException("RangeActionsNotSupported");
-                    }
 
                     if (e.OldStartingIndex < 0)
                     {
                         throw new InvalidOperationException("RemovedItemNotFound");
                     }
                     
-                    
-                    if (e.OldItems?[0] is string oldValue)
+                    foreach (string oldItem in e.OldItems)
                     {
-                        _dropdown.options.Remove(new TMP_Dropdown.OptionData(oldValue));
+                        _dropdown.options.Remove(new TMP_Dropdown.OptionData(oldItem));
                     }
+
                     break;
                 
                 case NotifyCollectionChangedAction.Replace:
@@ -150,12 +141,8 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
                 _selectedItemProperty = null;
                 _dropdown.onValueChanged.RemoveListener(OnControlValueChanged);
             }
-
-            if (_itemsSource != null
-                || _selectedItemProperty != null)
-            {
-                UpdateControlValue(default);
-            }
+            
+            UpdateControlValue(default);
         }
 
         protected virtual void OnControlValueChanged(int index)

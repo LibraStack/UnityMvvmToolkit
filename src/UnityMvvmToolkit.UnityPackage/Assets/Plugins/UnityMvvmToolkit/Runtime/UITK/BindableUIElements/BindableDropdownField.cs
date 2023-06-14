@@ -18,8 +18,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         private PropertyBindingData _selectedItemBindingData;
         private PropertyBindingData _itemsSourceBindingData;
-        
-        
+
         public void Initialize()
         {
             choices = new List<string>();
@@ -48,7 +47,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 _selectedItemProperty.ValueChanged += OnSelectedItemValueChanged;
                 UpdateControlValue(_selectedItemProperty.Value);
                 this.RegisterValueChangedCallback(OnControlValueChanged);
-                _selectedItemProperty.Value = choices[0];
+                _selectedItemProperty.Value = choices.Count > 0 ? choices[0] : default;
             }
         }
 
@@ -58,34 +57,25 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             {
                 case NotifyCollectionChangedAction.Add:
                     
-                    if (e.NewItems.Count != 1)
+                    foreach (string newItem in e.NewItems)
                     {
-                        throw new NotSupportedException("RangeActionsNotSupported");
+                        choices.Add(newItem);
                     }
                     
-                    if (e.NewItems?[0] is string newValue)
-                    {
-                        choices.Add(newValue);
-                    }
                     break;
                 
                 case NotifyCollectionChangedAction.Remove:
-
-                    if (e.OldItems.Count != 1)
-                    {
-                        throw new NotSupportedException("RangeActionsNotSupported");
-                    }
 
                     if (e.OldStartingIndex < 0)
                     {
                         throw new InvalidOperationException("RemovedItemNotFound");
                     }
                     
-                    
-                    if (e.OldItems?[0] is string oldValue)
+                    foreach (string oldItem in e.OldItems)
                     {
-                        choices.Add(oldValue);
+                        choices.Remove(oldItem);
                     }
+
                     break;
                 
                 case NotifyCollectionChangedAction.Replace:
@@ -154,11 +144,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 _itemsSource = null;
             }
 
-            if (_itemsSource != null
-                || _selectedItemProperty != null)
-            {
-                UpdateControlValue(default);
-            }
+            UpdateControlValue(default);
         }
 
         protected virtual void OnControlValueChanged(ChangeEvent<string> e)
