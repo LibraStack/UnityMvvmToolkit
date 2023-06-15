@@ -58,77 +58,21 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             }
         }
 
-        private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        protected virtual void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            switch (e.Action)
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                case NotifyCollectionChangedAction.Add:
-                    
-                    foreach (string newItem in e.NewItems)
-                    {
-                        choices.Add(newItem);
-                    }
-                    
-                    break;
-                
-                case NotifyCollectionChangedAction.Remove:
-
-                    if (e.OldStartingIndex < 0)
-                    {
-                        throw new InvalidOperationException("RemovedItemNotFound");
-                    }
-                    
-                    foreach (string oldItem in e.OldItems)
-                    {
-                        choices.Remove(oldItem);
-                    }
-
-                    break;
-                
-                case NotifyCollectionChangedAction.Replace:
-                    
-                    if (e.NewItems.Count != 1 || e.OldItems.Count != 1)
-                    {
-                        throw new NotSupportedException("RangeActionsNotSupported");
-                    }
-                    
-                    if (e.NewItems?[0] is string replacingValue &&
-                        e.OldItems?[0] is string replacedValue)
-                    {
-                        int indexReplacedValue = choices.FindIndex(s => s == replacedValue);
-
-                        if (indexReplacedValue != -1)
-                        {
-                            choices[indexReplacedValue] = replacingValue;
-                        }
-                    }
-                    break;
-                
-                case NotifyCollectionChangedAction.Move:
-                    
-                    if (e.NewItems.Count != 1)
-                    {
-                        throw new NotSupportedException("RangeActionsNotSupported");
-                    }
-                    if (e.NewStartingIndex < 0)
-                    {
-                        throw new InvalidOperationException("CannotMoveToUnknownPosition");
-                    }
-                    
-                    if (e.OldItems?[0] is string oldItemMoved)
-                    {
-                        choices.Remove(oldItemMoved);
-                        choices.Insert(e.NewStartingIndex, oldItemMoved);
-                    }
-                    break;
-                
-                case NotifyCollectionChangedAction.Reset:
-                    choices.Clear();
-                    break;
-                
-                default:
+                foreach (string newItem in e.NewItems)
                 {
-                    throw new NotSupportedException("UnexpectedCollectionChangeAction");
+                    choices.Add(newItem);
+                }
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (string oldItem in e.OldItems)
+                {
+                    choices.Remove(oldItem);
                 }
             }
         }

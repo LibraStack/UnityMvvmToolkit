@@ -57,75 +57,19 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
 
         private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            switch (e.Action)
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                case NotifyCollectionChangedAction.Add:
-                    
-                    foreach (string newItem in e.NewItems)
-                    {
-                        _dropdown.options.Add(new TMP_Dropdown.OptionData(newItem));
-                    }
-
-                    break;
-                
-                case NotifyCollectionChangedAction.Remove:
-
-                    if (e.OldStartingIndex < 0)
-                    {
-                        throw new InvalidOperationException("RemovedItemNotFound");
-                    }
-                    
-                    foreach (string oldItem in e.OldItems)
-                    {
-                        _dropdown.options.Remove(new TMP_Dropdown.OptionData(oldItem));
-                    }
-
-                    break;
-                
-                case NotifyCollectionChangedAction.Replace:
-                    
-                    if (e.NewItems.Count != 1 || e.OldItems.Count != 1)
-                    {
-                        throw new NotSupportedException("RangeActionsNotSupported");
-                    }
-                    
-                    if (e.NewItems?[0] is string replacingValue &&
-                        e.OldItems?[0] is string replacedValue)
-                    {
-                        int indexReplacedValue =  _dropdown.options.FindIndex(s => s.text == replacedValue);
-
-                        if (indexReplacedValue != -1)
-                        {
-                            _dropdown.options[indexReplacedValue] = new TMP_Dropdown.OptionData(replacingValue);
-                        }
-                    }
-                    break;
-                
-                case NotifyCollectionChangedAction.Move:
-                    
-                    if (e.NewItems.Count != 1)
-                    {
-                        throw new NotSupportedException("RangeActionsNotSupported");
-                    }
-                    if (e.NewStartingIndex < 0)
-                    {
-                        throw new InvalidOperationException("CannotMoveToUnknownPosition");
-                    }
-                    
-                    if (e.OldItems?[0] is string oldItemMoved)
-                    {
-                        _dropdown.options.Remove(new TMP_Dropdown.OptionData(oldItemMoved));
-                        _dropdown.options.Insert(e.NewStartingIndex, new TMP_Dropdown.OptionData(oldItemMoved));
-                    }
-                    break;
-                
-                case NotifyCollectionChangedAction.Reset:
-                    _dropdown.options.Clear();
-                    break;
-                
-                default:
+                foreach (string newItem in e.NewItems)
                 {
-                    throw new NotSupportedException("UnexpectedCollectionChangeAction");
+                    _dropdown.options.Add(new TMP_Dropdown.OptionData(newItem));
+                }
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (string oldItem in e.OldItems)
+                {
+                    _dropdown.options.Remove(new TMP_Dropdown.OptionData(oldItem));
                 }
             }
         }
