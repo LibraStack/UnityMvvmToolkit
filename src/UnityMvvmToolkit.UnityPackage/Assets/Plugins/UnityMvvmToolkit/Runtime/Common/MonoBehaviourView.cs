@@ -15,23 +15,41 @@ namespace UnityMvvmToolkit.Common
     public abstract class MonoBehaviourView<TBindingContext> : MonoBehaviour, IBindableElement
         where TBindingContext : class, IBindingContext
     {
-        private TBindingContext _createdBindingContext;
+        private bool _isInitialized;
 
         private TBindingContext _bindingContext;
         private IObjectProvider _objectProvider;
 
+        private TBindingContext _createdBindingContext;
+
+        protected virtual bool InitOnAwake => true;
         public TBindingContext BindingContext => _bindingContext;
 
         private void Awake()
         {
-            OnInit();
-            SetBindingContext();
+            if (InitOnAwake)
+            {
+                Init();
+            }
         }
 
         private void OnDestroy()
         {
             ResetBindingContext();
             OnDispose();
+        }
+
+        protected void Init()
+        {
+            if (_isInitialized)
+            {
+                throw new InvalidOperationException($"{GetType().Name} already initialized.");
+            }
+
+            OnInit();
+            SetBindingContext();
+
+            _isInitialized = true;
         }
 
         public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
