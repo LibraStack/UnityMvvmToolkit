@@ -40,6 +40,11 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
+            if (string.IsNullOrWhiteSpace(BindingItemsSourcePath))
+            {
+                return;
+            }
+
             _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
             _itemTemplate ??= objectProvider.GetCollectionItemTemplate<TItemBindingContext, VisualTreeAsset>();
 
@@ -95,14 +100,22 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             item.ResetChildsBindingContext(objectProvider);
         }
 
-        private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        protected virtual void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            RefreshItems(); // TODO: Do not refresh all items.
+            if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                Rebuild();
+            }
+            else
+            {
+                RefreshItems();
+            }
         }
 
         private VisualElement OnMakeItem()
         {
             var item = MakeItem(_itemTemplate);
+
             _itemAssets.Add(item);
 
             return item;
