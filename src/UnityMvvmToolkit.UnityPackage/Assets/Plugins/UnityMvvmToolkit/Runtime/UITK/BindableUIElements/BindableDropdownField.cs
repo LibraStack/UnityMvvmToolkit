@@ -75,8 +75,13 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                     choices.Remove(oldItem);
                 }
             }
+            
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                choices.Clear();
+            }
         }
-        
+
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
             if (_selectedItemProperty != null)

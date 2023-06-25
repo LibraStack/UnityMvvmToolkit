@@ -72,6 +72,11 @@ namespace UnityMvvmToolkit.UGUI.BindableUGUIElements
                     _dropdown.options.Remove(new TMP_Dropdown.OptionData(oldItem));
                 }
             }
+            
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                _dropdown.options.Clear();
+            }
         }
         
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
