@@ -840,6 +840,44 @@ The `BindableButton` can be bound to the following commands:
 
 To pass a parameter to the viewmodel, see the [ParameterValueConverter](#parametervalueconverterttargettype) section.
 
+#### BindableDropdownField
+
+The `BindableDropdownField` allows you to work with dropdown. To set the binding of the selected value, you need to write `binding-selected-item-path`, and to set the binding of all dropdown elements, you need to use `binding-items-source-path`.
+Moreover, you can set them independently of each other.
+
+The following example demonstrates how to bind to a collection of strings with `BindableDropdownField`.
+
+In XML, you need to write the following:
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableDropdownField binding-selected-item-path="SelectedValue" binding-items-source-path="Choices" />
+</ui:UXML>
+```
+And in the C# class the following:
+
+```csharp
+public class DropdownFieldViewModel : IBindingContext
+{
+    public DropdownFieldViewModel()
+    {
+        TextValues = new ReadOnlyProperty<ObservableCollection<string>>(new ObservableCollection<string>()
+        {
+            "Value1",
+            "Value2",
+            "Value3"
+        });
+        
+        SelectedValue = new Property<string>();
+        SelectedValue.Value = "Value1";
+    }
+    
+    public IProperty<string> SelectedValue { get; }
+    
+    public IReadOnlyProperty<ObservableCollection<string>> Choices { get; }
+}
+```
+
 #### BindableListView
 
 The `BindableListView` control is the most efficient way to create lists. It uses virtualization and creates VisualElements only for visible items. Use the `binding-items-source-path` of the `BindableListView` to bind to an `ObservableCollection`.
