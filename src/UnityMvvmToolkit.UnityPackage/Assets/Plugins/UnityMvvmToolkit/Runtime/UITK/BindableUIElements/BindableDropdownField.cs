@@ -15,10 +15,10 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
     public partial class BindableDropdownField : DropdownField, IBindableCollection, IInitializable, IDisposable
     {
         private IProperty<string> _selectedItemProperty;
-        private IReadOnlyProperty<ObservableCollection<string>> _itemsSource;
-
         private PropertyBindingData _selectedItemBindingData;
+
         private PropertyBindingData _itemsSourceBindingData;
+        private IReadOnlyProperty<ObservableCollection<string>> _itemsSource;
 
         public void Initialize()
         {
@@ -27,35 +27,65 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public void Dispose()
         {
-            choices.Clear();
+            RemoveAllItems();
         }
-        
+
         public void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
-            if (string.IsNullOrWhiteSpace(BindingItemsSourcePath) == false)
+            if (string.IsNullOrWhiteSpace(BindingItemsSourcePath))
             {
-                _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
-                _itemsSource = objectProvider
-                    .RentReadOnlyProperty<ObservableCollection<string>>(context, _itemsSourceBindingData);
-                _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
-                choices = new List<string>(_itemsSource.Value);
+                return;
             }
-            
+
+            _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
+
+            _itemsSource =
+                objectProvider.RentReadOnlyProperty<ObservableCollection<string>>(context, _itemsSourceBindingData);
+            _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
+
+            AddItems(_itemsSource.Value);
+
             if (string.IsNullOrWhiteSpace(BindingSelectedItemPath) == false)
             {
                 _selectedItemBindingData ??= BindingSelectedItemPath.ToPropertyBindingData();
+
                 _selectedItemProperty = objectProvider.RentProperty<string>(context, _selectedItemBindingData);
-                _selectedItemProperty.ValueChanged += OnSelectedItemValueChanged;
-                
-                var isContains = choices.Contains(_selectedItemProperty.Value);
-                if (isContains == true)
+
+                if (string.IsNullOrWhiteSpace(_selectedItemProperty.Value))
+                {
+                    _selectedItemProperty.Value = choices.Count > 0 ? choices[0] : default;
+                }
+                else
                 {
                     UpdateControlValue(_selectedItemProperty.Value);
                 }
-                
-                this.RegisterValueChangedCallback(OnControlValueChanged);
-                _selectedItemProperty.Value = choices.Count > 0 ? choices[0] : default;
+
+                _selectedItemProperty.ValueChanged += OnSelectedItemValueChanged;
+                this.RegisterValueChangedCallback(OnControlSelectedValueChanged);
             }
+        }
+
+        public virtual void ResetBindingContext(IObjectProvider objectProvider)
+        {
+            if (_itemsSource is null)
+            {
+                return;
+            }
+
+            _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
+            objectProvider.ReturnReadOnlyProperty(_itemsSource);
+            _itemsSource = null;
+
+            if (_selectedItemProperty is not null)
+            {
+                _selectedItemProperty.ValueChanged -= OnSelectedItemValueChanged;
+                objectProvider.ReturnProperty(_selectedItemProperty);
+                _selectedItemProperty = null;
+
+                this.UnregisterValueChangedCallback(OnControlSelectedValueChanged);
+            }
+
+            RemoveAllItems();
         }
 
         protected virtual void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -64,7 +94,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             {
                 foreach (string newItem in e.NewItems)
                 {
-                    choices.Add(newItem);
+                    AddItem(newItem);
                 }
             }
 
@@ -72,57 +102,80 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             {
                 foreach (string oldItem in e.OldItems)
                 {
-                    choices.Remove(oldItem);
+                    RemoveItem(oldItem);
                 }
             }
-            
+
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                choices.Clear();
+                if (_itemsSource.Value.Count == 0)
+                {
+                    RemoveAllItems();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Action not supported.");
+                }
             }
         }
 
-        public virtual void ResetBindingContext(IObjectProvider objectProvider)
-        {
-            if (_selectedItemProperty != null)
-            {
-                _selectedItemProperty.ValueChanged -= OnSelectedItemValueChanged;
-                objectProvider.ReturnProperty(_selectedItemProperty);
-                _selectedItemProperty = null;
-                this.UnregisterValueChangedCallback(OnControlValueChanged);
-            }
-            
-            if (_itemsSource != null)
-            {
-                _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
-                choices = new List<string>();
-                objectProvider.ReturnReadOnlyProperty(_itemsSource);
-                _itemsSource = null;
-            }
-
-            UpdateControlValue(default);
-        }
-
-        protected virtual void OnControlValueChanged(ChangeEvent<string> e)
+        protected virtual void OnControlSelectedValueChanged(ChangeEvent<string> e)
         {
             _selectedItemProperty.Value = e.newValue;
         }
 
         private void OnSelectedItemValueChanged(object sender, string newValue)
         {
-            var isContains = choices.Contains(newValue);
-            if (isContains == false)
-            {
-                return;
-            }
-            
             UpdateControlValue(newValue);
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual void UpdateControlValue(string newValue)
+        protected virtual void UpdateControlValue(string selectedItem)
         {
-            SetValueWithoutNotify(newValue);
+            if (choices.Any() && choices.Contains(selectedItem) == false)
+            {
+                throw new InvalidOperationException($"\"{selectedItem}\" is not presented in the collection.");
+            }
+
+            SetValueWithoutNotify(selectedItem);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AddItems(IEnumerable<string> items)
+        {
+            foreach (var item in items)
+            {
+                AddItem(item);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AddItem(string item)
+        {
+            if (string.IsNullOrWhiteSpace(item))
+            {
+                throw new NullReferenceException("Item cannot be null or empty.");
+            }
+
+            choices.Add(item);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void RemoveItem(string item)
+        {
+            choices.Remove(item);
+
+            if (value == item)
+            {
+                value = choices.Count == 0 ? default : choices[^1];
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void RemoveAllItems()
+        {
+            choices.Clear();
+            value = default;
         }
     }
 }
