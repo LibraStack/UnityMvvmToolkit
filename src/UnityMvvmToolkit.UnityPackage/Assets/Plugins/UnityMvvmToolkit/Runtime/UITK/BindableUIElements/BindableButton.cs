@@ -34,7 +34,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
-            if (_command == null)
+            if (_command is null)
             {
                 return;
             }

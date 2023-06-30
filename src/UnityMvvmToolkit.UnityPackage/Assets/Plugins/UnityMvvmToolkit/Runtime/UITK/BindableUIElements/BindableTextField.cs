@@ -29,7 +29,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
-            if (_valueProperty == null)
+            if (_valueProperty is null)
             {
                 return;
             }

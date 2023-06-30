@@ -770,6 +770,7 @@ The included UI elements are:
 - [BindableLabel](#bindablelabel)
 - [BindableTextField](#bindabletextfield)
 - [BindableButton](#bindablebutton)
+- [BindableDropdownField](#bindabledropdownfield)
 - [BindableListView](#bindablelistview)
 - [BindableScrollView](#bindablescrollview)
 - [BindingContextProvider](#bindingcontextprovider)
@@ -839,6 +840,37 @@ The `BindableButton` can be bound to the following commands:
 - [AsyncLazyCommand & AsyncLazyCommand\<T\>](#asynclazycommand--asynclazycommandt)
 
 To pass a parameter to the viewmodel, see the [ParameterValueConverter](#parametervalueconverterttargettype) section.
+
+#### BindableDropdownField
+
+The `BindableDropdownField` allows the user to pick a choice from a list of options. The `BindingSelectedItemPath` attribute is optional.
+
+```csharp
+public class DropdownFieldViewModel : IBindingContext
+{
+    public DropdownFieldViewModel()
+    {
+        var items = new ObservableCollection<string>
+        {
+            "Value 1",
+            "Value 2",
+            "Value 3"
+        };
+
+        Items = new ReadOnlyProperty<ObservableCollection<string>>(items);
+        SelectedItem = new Property<string>("Value 1");
+    }
+
+    public IReadOnlyProperty<ObservableCollection<string>> Items { get; }
+    public IProperty<string> SelectedItem { get; }
+}
+```
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableDropdownField binding-items-source-path="Items" binding-selected-item-path="SelectedItem" />
+</ui:UXML>
+```
 
 #### BindableListView
 

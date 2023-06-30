@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using UnityEngine.UIElements;
+using UnityMvvmToolkit.Common;
 using UnityMvvmToolkit.Common.Interfaces;
 using UnityMvvmToolkit.Core.Interfaces;
 
@@ -14,7 +15,7 @@ namespace UnityMvvmToolkit.UITK.Extensions
         public static VisualElement InstantiateBindableElement(this VisualTreeAsset visualTreeAsset)
         {
             var visualElement = visualTreeAsset.Instantiate();
-            visualElement.userData = visualElement.GetBindableChilds();
+            visualElement.userData = new BindableElementData(visualElement.GetBindableChilds());
 
             return visualElement;
         }
@@ -42,7 +43,7 @@ namespace UnityMvvmToolkit.UITK.Extensions
                 initializable.Initialize();
             }
 
-            var bindableElements = (List<IBindableElement>) visualElement.userData;
+            var bindableElements = ((BindableElementData) visualElement.userData).BindableElements;
 
             for (var i = 0; i < bindableElements.Count; i++)
             {
@@ -56,10 +57,20 @@ namespace UnityMvvmToolkit.UITK.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TBindingContext GetBindingContext<TBindingContext>(this VisualElement visualElement)
+            where TBindingContext : IBindingContext
+        {
+            return (TBindingContext) ((BindableElementData) visualElement.userData).BindingContext;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetChildsBindingContext(this VisualElement visualElement, IBindingContext bindingContext,
             IObjectProvider objectProvider)
         {
-            var bindableElements = (List<IBindableElement>) visualElement.userData;
+            var bindableElementData = (BindableElementData) visualElement.userData;
+            bindableElementData.BindingContext = bindingContext;
+
+            var bindableElements = bindableElementData.BindableElements;
 
             for (var i = 0; i < bindableElements.Count; i++)
             {
@@ -70,7 +81,10 @@ namespace UnityMvvmToolkit.UITK.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ResetChildsBindingContext(this VisualElement visualElement, IObjectProvider objectProvider)
         {
-            var bindableElements = (List<IBindableElement>) visualElement.userData;
+            var bindableElementData = (BindableElementData) visualElement.userData;
+            bindableElementData.BindingContext = default;
+
+            var bindableElements = bindableElementData.BindableElements;
 
             for (var i = 0; i < bindableElements.Count; i++)
             {
@@ -82,7 +96,8 @@ namespace UnityMvvmToolkit.UITK.Extensions
         public static void DisposeBindableElement(this VisualElement visualElement,
             [CanBeNull] IObjectProvider objectProvider = null)
         {
-            var bindableElements = (List<IBindableElement>) visualElement.userData;
+            var bindableElementData = (BindableElementData) visualElement.userData;
+            var bindableElements = bindableElementData.BindableElements;
 
             for (var i = 0; i < bindableElements.Count; i++)
             {
@@ -104,8 +119,8 @@ namespace UnityMvvmToolkit.UITK.Extensions
                 disposable.Dispose();
             }
 
-            bindableElements.Clear();
-            visualElement.userData = null;
+            bindableElementData.Dispose();
+            visualElement.userData = default;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

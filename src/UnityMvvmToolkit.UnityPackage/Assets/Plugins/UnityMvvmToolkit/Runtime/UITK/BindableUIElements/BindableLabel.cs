@@ -28,7 +28,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
-            if (_textProperty == null)
+            if (_textProperty is null)
             {
                 return;
             }

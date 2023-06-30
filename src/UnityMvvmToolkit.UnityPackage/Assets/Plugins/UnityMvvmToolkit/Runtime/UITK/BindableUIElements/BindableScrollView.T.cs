@@ -21,7 +21,8 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private VisualTreeAsset _itemTemplate;
 
         private PropertyBindingData _itemsSourceBindingData;
-        private IReadOnlyProperty<ObservableCollection<TItemBindingContext>> _itemsSource;
+        private ObservableCollection<TItemBindingContext> _itemsSource;
+        private IReadOnlyProperty<ObservableCollection<TItemBindingContext>> _itemsSourceProperty;
 
         private IObjectProvider _objectProvider;
 
@@ -44,7 +45,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             }
             else
             {
-                ClearItems(_itemsSource.Value);
+                ClearItems(_itemsSource);
             }
 
             _itemAssetsPool.Dispose();
@@ -52,34 +53,42 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
+            if (string.IsNullOrWhiteSpace(BindingItemsSourcePath))
+            {
+                return;
+            }
+
             _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
             _itemTemplate ??= objectProvider.GetCollectionItemTemplate<TItemBindingContext, VisualTreeAsset>();
 
             _objectProvider = objectProvider;
 
-            _itemsSource = objectProvider
+            _itemsSourceProperty = objectProvider
                 .RentReadOnlyProperty<ObservableCollection<TItemBindingContext>>(context, _itemsSourceBindingData);
-            _itemsSource.Value.CollectionChanged += OnItemsCollectionChanged;
+            _itemsSource = _itemsSourceProperty.Value;
+            _itemsSource.CollectionChanged += OnItemsCollectionChanged;
 
-            AddItems(_itemsSource.Value);
+            AddItems(_itemsSource);
         }
 
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
-            if (_itemsSource is null)
+            if (_itemsSourceProperty is null)
             {
                 return;
             }
 
-            _itemsSource.Value.CollectionChanged -= OnItemsCollectionChanged;
+            _itemsSource.CollectionChanged -= OnItemsCollectionChanged;
 
-            ClearItems(_itemsSource.Value);
+            ClearItems(_itemsSource);
 
-            objectProvider.ReturnReadOnlyProperty(_itemsSource);
+            objectProvider.ReturnReadOnlyProperty(_itemsSourceProperty);
 
-            _itemsSource = null;
             _itemTemplate = null;
             _objectProvider = null;
+
+            _itemsSource = null;
+            _itemsSourceProperty = null;
         }
 
         protected virtual VisualElement MakeItem(VisualTreeAsset itemTemplate)
@@ -101,7 +110,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             item.ResetChildsBindingContext(objectProvider);
         }
 
-        private void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        protected virtual void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -118,6 +127,18 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 foreach (var oldItem in e.OldItems)
                 {
                     RemoveItem((TItemBindingContext) oldItem);
+                }
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                if (_itemsSource.Count == 0)
+                {
+                    ClearItems();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Action not supported.");
                 }
             }
         }
@@ -166,6 +187,24 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             {
                 RemoveItem(items[i]);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ClearItems()
+        {
+            foreach (var (_, item) in _itemAssets)
+            {
+                _itemsCount--;
+
+                if (_objectProvider is not null)
+                {
+                    UnbindItem(item, _itemsCount, item.GetBindingContext<TItemBindingContext>(), _objectProvider);
+                }
+
+                _itemAssetsPool.Release(item);
+            }
+
+            _itemAssets.Clear();
         }
 
         private VisualElement OnPoolInstantiateItem()
