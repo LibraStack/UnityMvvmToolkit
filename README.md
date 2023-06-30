@@ -770,6 +770,7 @@ The included UI elements are:
 - [BindableLabel](#bindablelabel)
 - [BindableTextField](#bindabletextfield)
 - [BindableButton](#bindablebutton)
+- [BindableDropdownField](#bindabledropdownfield)
 - [BindableListView](#bindablelistview)
 - [BindableScrollView](#bindablescrollview)
 - [BindingContextProvider](#bindingcontextprovider)
@@ -842,40 +843,33 @@ To pass a parameter to the viewmodel, see the [ParameterValueConverter](#paramet
 
 #### BindableDropdownField
 
-The `BindableDropdownField` allows you to work with dropdown. To set the binding of the selected value, you need to write `binding-selected-item-path`, and to set the binding of all dropdown elements, you need to use `binding-items-source-path`.
-Moreover, you can set them independently of each other.
-
-The following example demonstrates how to bind to a collection of strings with `BindableDropdownField`.
-
-In XML, you need to write the following:
-
-```xml
-<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
-    <uitk:BindableDropdownField binding-selected-item-path="SelectedValue" binding-items-source-path="Choices" />
-</ui:UXML>
-```
-And in the C# class the following:
+The `BindableDropdownField` allows the user to pick a choice from a list of options. The `BindingSelectedItemPath` attribute is optional.
 
 ```csharp
 public class DropdownFieldViewModel : IBindingContext
 {
     public DropdownFieldViewModel()
     {
-        TextValues = new ReadOnlyProperty<ObservableCollection<string>>(new ObservableCollection<string>()
+        var items = new ObservableCollection<string>
         {
-            "Value1",
-            "Value2",
-            "Value3"
-        });
-        
-        SelectedValue = new Property<string>();
-        SelectedValue.Value = "Value1";
+            "Value 1",
+            "Value 2",
+            "Value 3"
+        };
+
+        Items = new ReadOnlyProperty<ObservableCollection<string>>(items);
+        SelectedItem = new Property<string>("Value 1");
     }
-    
-    public IProperty<string> SelectedValue { get; }
-    
-    public IReadOnlyProperty<ObservableCollection<string>> Choices { get; }
+
+    public IReadOnlyProperty<ObservableCollection<string>> Items { get; }
+    public IProperty<string> SelectedItem { get; }
 }
+```
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableDropdownField binding-items-source-path="Items" binding-selected-item-path="SelectedItem" />
+</ui:UXML>
 ```
 
 #### BindableListView
