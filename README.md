@@ -386,6 +386,38 @@ public class ItemViewModel : IBindingContext
 
 The `ItemViewModel` can be serialized and deserialized without any issues.
 
+To achieve the same result, but with minimal boilerplate code, you can automatically create an observable backing field using the `[WithObservableBackingField]` attribute from [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator).
+
+```csharp
+public partial class ItemViewModel : IBindingContext
+{
+    [WithObservableBackingField]
+    public string Name
+    {
+        get => _name.Value;
+        set => _name.Value = value;
+    }
+}
+```
+
+<details><summary><b>Generated code</b></summary>
+<br />
+
+`ItemViewModel.BackingFields.g.cs`
+
+```csharp
+partial class ItemViewModel
+{
+    [global::System.CodeDom.Compiler.GeneratedCode("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    [global::UnityMvvmToolkit.Core.Attributes.Observable(nameof(Name))]
+    private readonly global::UnityMvvmToolkit.Core.Interfaces.IProperty<string> _name = new global::UnityMvvmToolkit.Core.Property<string>();
+}
+```
+
+</details>
+
+> **Note:** The [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator) is available exclusively for my [patrons](https://patreon.com/DimaChebanov).
+
 ### Command & Command\<T\>
 
 The `Command` and `Command<T>` are `ICommand` implementations that can expose a method or delegate to the view. These types act as a way to bind commands between the viewmodel and UI elements.
@@ -1131,9 +1163,9 @@ Now we can use the `CustomViewModelProvider` as follows.
 In this example, `Label1` and `Label2` will display the text "Main Context", while `Label3` will display the text "Custom Context".
 
 ### Source code generator
-  
+
 The best way to speed up the creation of custom `VisualElement` is to use source code generators. With this powerful tool, you can achieve the same great results with minimal boilerplate code and focus on what really matters: programming!
-  
+
 Let's create the `BindableImage` control, but this time using source code generators.
 
 For a visual element without bindings, we will use a [UnityUxmlGenerator](https://github.com/LibraStack/UnityUxmlGenerator).
@@ -1148,12 +1180,12 @@ public partial class Image : VisualElement
     }
 }
 ```
-  
+
 <details><summary><b>Generated code</b></summary>
 <br />
 
 `Image.UxmlFactory.g.cs`
-  
+
 ```csharp
 partial class Image
 {
@@ -1163,9 +1195,9 @@ partial class Image
     }
 }
 ```
-  
+
 </details>
-  
+
 For a bindable visual element, we will use a [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator).
 
 ```csharp
@@ -1191,12 +1223,12 @@ public partial class BindableImage : Image
     }
 }
 ```
-  
+
 <details><summary><b>Generated code</b></summary>
 <br />
 
 `BindableImage.Bindings.g.cs`
-  
+
 ```csharp
 partial class BindableImage : global::UnityMvvmToolkit.Core.Interfaces.IBindableElement
 {
@@ -1298,7 +1330,7 @@ partial class BindableImage
     }
 }
 ```
-  
+
 </details>
 
 As you can see, using [UnityUxmlGenerator](https://github.com/LibraStack/UnityUxmlGenerator) and [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator) we can achieve the same results but with just a few lines of code.
