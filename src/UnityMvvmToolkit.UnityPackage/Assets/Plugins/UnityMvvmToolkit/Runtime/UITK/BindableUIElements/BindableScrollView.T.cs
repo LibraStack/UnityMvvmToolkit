@@ -20,14 +20,13 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         private VisualTreeAsset _itemTemplate;
 
-        private PropertyBindingData _itemsSourceBindingData;
-        private ObservableCollection<TItemBindingContext> _itemsSource;
-        private IReadOnlyProperty<ObservableCollection<TItemBindingContext>> _itemsSourceProperty;
-
         private IObjectProvider _objectProvider;
-
         private ObjectPool<VisualElement> _itemAssetsPool;
         private Dictionary<int, VisualElement> _itemAssets;
+        private ObservableCollection<TItemBindingContext> _itemsSource;
+
+        protected PropertyBindingData _itemsSourceBindingData;
+        protected IReadOnlyProperty<ObservableCollection<TItemBindingContext>> _itemsSourceProperty;
 
         public virtual void Initialize()
         {
