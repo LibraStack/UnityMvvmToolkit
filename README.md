@@ -416,6 +416,16 @@ partial class ItemViewModel
 
 </details>
 
+Waiting for the [partial properties](https://github.com/dotnet/csharplang/issues/6420) support to make it even shorter.
+
+```csharp
+public partial class ItemViewModel : IBindingContext
+{
+    [WithObservableBackingField]
+    public partial string Name { get; set; }
+}
+```
+
 > **Note:** The [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator) is available exclusively for my [patrons](https://patreon.com/DimaChebanov).
 
 ### Command & Command\<T\>
