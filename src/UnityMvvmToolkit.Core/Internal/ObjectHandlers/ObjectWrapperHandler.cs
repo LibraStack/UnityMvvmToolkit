@@ -51,9 +51,9 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         }
 
         public TProperty GetProperty<TProperty, TValueType>(IBindingContext context, BindingData bindingData,
-            MemberInfo memberInfo)
+            MemberInfo memberInfo) where TProperty : IBaseProperty
         {
-            var property = GetMemberValue(context, memberInfo, out var propertyType);
+            var property = GetMemberValue<IBaseProperty>(context, memberInfo, out var propertyType);
 
             var targetType = typeof(TValueType);
             var sourceType = propertyType.GenericTypeArguments[0];
@@ -97,22 +97,15 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         }
 
         public TCommand GetCommand<TCommand>(IBindingContext context, MemberInfo memberInfo)
+            where TCommand : IBaseCommand
         {
-            var command = GetMemberValue(context, memberInfo, out var commandType);
-
-            if (typeof(TCommand).IsAssignableFrom(commandType))
-            {
-                return (TCommand) command;
-            }
-
-            throw new InvalidCastException(
-                $"Can not cast the '{commandType}' command to the '{typeof(TCommand)}' command.");
+            return GetMemberValue<TCommand>(context, memberInfo, out _);
         }
 
         public ICommandWrapper GetCommandWrapper(IBindingContext context, CommandBindingData bindingData,
             MemberInfo memberInfo)
         {
-            var command = GetMemberValue(context, memberInfo, out var commandType);
+            var command = GetMemberValue<IBaseCommand>(context, memberInfo, out var commandType);
 
             if (commandType.IsGenericType == false ||
                 commandType.GetInterface(nameof(IBaseCommand)) == null)
@@ -312,7 +305,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static object GetMemberValue(IBindingContext context, MemberInfo memberInfo, out Type memberType)
+        private static T GetMemberValue<T>(IBindingContext context, MemberInfo memberInfo, out Type memberType)
         {
             switch (memberInfo.MemberType)
             {
@@ -321,7 +314,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                     var fieldInfo = (FieldInfo) memberInfo;
                     memberType = fieldInfo.FieldType;
 
-                    return fieldInfo.GetValue(context);
+                    return (T) fieldInfo.GetValue(context);
                 }
 
                 case MemberTypes.Property:
@@ -329,7 +322,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                     var propertyInfo = (PropertyInfo) memberInfo;
                     memberType = propertyInfo.PropertyType;
 
-                    return propertyInfo.GetValue(context);
+                    return (T) propertyInfo.GetValue(context);
                 }
 
                 default:

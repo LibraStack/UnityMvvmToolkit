@@ -1,44 +1,20 @@
-﻿using UnityEngine.UIElements;
-using UnityMvvmToolkit.UITK.Extensions;
+﻿using System.Collections.ObjectModel;
+using UnityMvvmToolkit.Common.Interfaces;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    partial class BindableListView<TItemBindingContext>
+    partial class BindableListView<TItemBindingContext> where TItemBindingContext : ICollectionItem
     {
-        public string BindingItemsSourcePath { get; private set; }
-
 #if UNITY_2023_2_OR_NEWER
         [System.Serializable]
-        public new class UxmlSerializedData : ListView.UxmlSerializedData
+        public new class UxmlSerializedData : 
+            BindableListView<TItemBindingContext, ObservableCollection<TItemBindingContext>>.UxmlSerializedData
         {
-            // ReSharper disable once InconsistentNaming
-            #pragma warning disable 649
-            [UnityEngine.SerializeField] private string BindingItemsSourcePath;
-            #pragma warning restore 649
-
-            public override void Deserialize(object visualElement)
-            {
-                base.Deserialize(visualElement);
-
-                visualElement
-                    .As<BindableListView<TItemBindingContext>>()
-                    .BindingItemsSourcePath = BindingItemsSourcePath;
-            }
         }
 #else
-        public new class UxmlTraits : ListView.UxmlTraits
+        public new class UxmlTraits : 
+            BindableListView<TItemBindingContext, ObservableCollection<TItemBindingContext>>.UxmlTraits
         {
-            private readonly UxmlStringAttributeDescription _bindingItemsSourceAttribute = new()
-                { name = "binding-items-source-path", defaultValue = "" };
-
-            public override void Init(VisualElement visualElement, IUxmlAttributes bag, CreationContext context)
-            {
-                base.Init(visualElement, bag, context);
-
-                visualElement
-                    .As<BindableListView<TItemBindingContext>>()
-                    .BindingItemsSourcePath = _bindingItemsSourceAttribute.GetValueFromBag(bag, context);
-            }
         }
 #endif
     }

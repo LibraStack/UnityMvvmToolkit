@@ -48,9 +48,9 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             return this;
         }
 
-        public IPropertyWrapper SetProperty(object property)
+        public IPropertyWrapper SetProperty(IBaseProperty property)
         {
-            if (_property != null)
+            if (_property is not null)
             {
                 throw new InvalidOperationException(
                     $"{nameof(PropertyWrapper<TValue, TSource>)} was not reset.");

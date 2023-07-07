@@ -157,6 +157,7 @@ namespace UnityMvvmToolkit.Core
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private TProperty GetProperty<TProperty, TValueType>(IBindingContext context, BindingData bindingData)
+            where TProperty : IBaseProperty
         {
             if (TryGetContextMemberInfo(context.GetType(), bindingData.PropertyName, out var memberInfo) == false)
             {
