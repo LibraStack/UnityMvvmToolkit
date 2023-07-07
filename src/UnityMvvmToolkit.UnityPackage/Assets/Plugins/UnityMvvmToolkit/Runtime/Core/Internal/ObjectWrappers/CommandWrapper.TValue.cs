@@ -43,9 +43,9 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             return this;
         }
 
-        public ICommandWrapper SetCommand(int commandId, object command)
+        public ICommandWrapper SetCommand(int commandId, IBaseCommand command)
         {
-            if (_command != null)
+            if (_command is not null)
             {
                 throw new InvalidOperationException(
                     $"{nameof(CommandWrapper<TValue>)} was not reset.");

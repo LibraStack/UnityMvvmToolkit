@@ -307,6 +307,23 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
+    public void RentProperty_ShouldThrow_WhenPropertyTypeIsWrong()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+        var bindingContext = new MyBindingContext();
+
+        var propertyBindingData = nameof(MyBindingContext.IncrementCommand).ToPropertyBindingData();
+
+        // Assert
+        objectProvider
+            .Invoking(sut => sut.RentProperty<string>(bindingContext, propertyBindingData))
+            .Should()
+            .Throw<InvalidCastException>()
+            .WithMessage($"Unable to cast object of type '{typeof(Command)}' to type '{typeof(IBaseProperty)}'.");
+    }
+
+    [Fact]
     public void RentProperty_ShouldThrow_WhenBindingDataIsNotValid()
     {
         // Arrange
@@ -402,6 +419,23 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
+    public void RentReadOnlyProperty_ShouldThrow_WhenPropertyTypeIsWrong()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+        var bindingContext = new MyBindingContext();
+
+        var propertyBindingData = nameof(MyBindingContext.FieldCommand).ToPropertyBindingData();
+
+        // Assert
+        objectProvider
+            .Invoking(sut => sut.RentReadOnlyProperty<string>(bindingContext, propertyBindingData))
+            .Should()
+            .Throw<InvalidCastException>()
+            .WithMessage($"Unable to cast object of type '{typeof(Command)}' to type '{typeof(IBaseProperty)}'.");
+    }
+
+    [Fact]
     public void RentReadOnlyProperty_ShouldThrow_WhenBindingDataIsNotValid()
     {
         // Arrange
@@ -491,7 +525,7 @@ public class BindingContextObjectProviderTests
             .Should()
             .Throw<InvalidCastException>()
             .WithMessage(
-                $"Can not cast the '{typeof(IReadOnlyProperty<string>)}' command to the '{typeof(ICommand)}' command.");
+                $"Unable to cast object of type '{typeof(ReadOnlyProperty<string>)}' to type '{typeof(ICommand)}'.");
     }
 
     [Fact]

@@ -6,7 +6,7 @@ namespace UnityMvvmToolkit.Core.Internal.Interfaces
     {
         int CommandId { get; }
 
-        ICommandWrapper SetCommand(int commandId, object command);
+        ICommandWrapper SetCommand(int commandId, IBaseCommand command);
 
         ICommandWrapper RegisterParameter(int elementId, string parameter);
         int UnregisterParameter(int elementId);

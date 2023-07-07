@@ -46,7 +46,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             return this;
         }
 
-        public IPropertyWrapper SetProperty(object readOnlyProperty)
+        public IPropertyWrapper SetProperty(IBaseProperty readOnlyProperty)
         {
             if (_isInitialized)
             {
