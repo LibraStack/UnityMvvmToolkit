@@ -997,7 +997,7 @@ public class DropdownFieldViewModel : IBindingContext
         };
 
         Items = new ReadOnlyProperty<ObservableCollection<string>>(items);
-        SelectedItem = new Property<string>("Value 1");
+        SelectedItem = new Property<string>(items[0]);
     }
 
     public IReadOnlyProperty<ObservableCollection<string>> Items { get; }
