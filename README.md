@@ -398,8 +398,6 @@ public class UserViewModel : IBindingContext
 </ui:UXML>
 ```
 
-The `ItemViewModel` can be serialized and deserialized without any issues.
-
 To achieve the same result, but with minimal boilerplate code, you can automatically create an observable backing field using the `[WithObservableBackingField]` attribute from [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator).
 
 ```csharp
@@ -461,6 +459,68 @@ public partial class UserViewModel : IBindingContext
     public partial string Name { get; set; }
 }
 ```
+
+> **Note:** The [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator) is available exclusively for my [patrons](https://patreon.com/DimaChebanov).
+
+#### Serializable ViewModel
+
+A common scenario, for instance, when working with collection items, is to create a "bindable" item that can be serialized.
+
+```csharp
+public class ItemViewModel : ICollectionItem
+{
+    [Observable(nameof(Name))]
+    private readonly IProperty<string> _name = new Property<string>();
+
+    public int Id { get; set; }
+
+    public string Name
+    {
+        get => _name.Value;
+        set => _name.Value = value;
+    }
+}
+```
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableLabel binding-text-path="Name" />
+</ui:UXML>
+```
+
+The `ItemViewModel` can be serialized and deserialized without any issues.
+
+The same result, but using the `[WithObservableBackingField]` attribute from [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator).
+
+```csharp
+public partial class ItemViewModel : ICollectionItem
+{
+    public int Id { get; set; }
+
+    [WithObservableBackingField]
+    public string Name
+    {
+        get => _name.Value;
+        set => _name.Value = value;
+    }
+}
+```
+
+<details><summary><b>Generated code</b></summary>
+<br />
+
+`ItemViewModel.BackingFields.g.cs`
+
+```csharp
+partial class ItemViewModel
+{
+    [global::System.CodeDom.Compiler.GeneratedCode("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    [global::UnityMvvmToolkit.Core.Attributes.Observable(nameof(Name))]
+    private readonly global::UnityMvvmToolkit.Core.Interfaces.IProperty<string> _name = new global::UnityMvvmToolkit.Core.Property<string>();
+}
+```
+
+</details>
 
 > **Note:** The [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator) is available exclusively for my [patrons](https://patreon.com/DimaChebanov).
 
