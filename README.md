@@ -827,6 +827,7 @@ Once the `UnityMVVMToolkit` is installed, create a class `MyFirstViewModel` that
 
 ```csharp
 using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Interfaces;
 
 public class MyFirstViewModel : IBindingContext
 {
