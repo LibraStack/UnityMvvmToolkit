@@ -380,7 +380,7 @@ public class UserViewModel : IBindingContext
 
     public string Name
     {
-        get => _name.Value;
+        get => _user.Name;
         set
         {
             if (_name.TrySetValue(value))
@@ -414,7 +414,7 @@ public partial class UserViewModel : IBindingContext
     [WithObservableBackingField]
     public string Name
     {
-        get => _name.Value;
+        get => _user.Name;
         set
         {
             if (_name.TrySetValue(value))
