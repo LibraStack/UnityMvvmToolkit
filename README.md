@@ -967,7 +967,7 @@ public class TextFieldViewModel : IBindingContext
 
 ```xml
 <ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
-    <uitk:BindableTextField binding-text-path="TextValue" />
+    <uitk:BindableTextField binding-value-path="TextValue" />
 </ui:UXML>
 ```
 
