@@ -362,13 +362,117 @@ public class MyViewModel : IBindingContext
 
 #### Wrapping a non-observable model
 
-A common scenario, for instance, when working with collection items, is to create a wrapping "bindable" item model that relays properties of the collection item model, and raises the property value changed notifications when needed.
+A common scenario, for instance, when working with database items, is to create a wrapping "bindable" model that relays properties of the database model, and raises the property changed notifications when needed.
 
 ```csharp
-public class ItemViewModel : IBindingContext
+public class UserViewModel : IBindingContext
+{
+    private readonly User _user;
+
+    [Observable(nameof(Name))]
+    private readonly IProperty<string> _name = new Property<string>();
+
+    public UserViewModel(User user)
+    {
+        _user = user;
+        _name.Value = user.Name;
+    }
+
+    public string Name
+    {
+        get => _user.Name;
+        set
+        {
+            if (_name.TrySetValue(value))
+            {
+                _user.Name = value;
+            }
+        }
+    }
+}
+```
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableLabel binding-text-path="Name" />
+</ui:UXML>
+```
+
+To achieve the same result, but with minimal boilerplate code, you can automatically create an observable backing field using the `[WithObservableBackingField]` attribute from [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator).
+
+```csharp
+public partial class UserViewModel : IBindingContext
+{
+    private readonly User _user;
+
+    public UserViewModel(User user)
+    {
+        _user = user;
+        _name.Value = user.Name;
+    }
+
+    [WithObservableBackingField]
+    public string Name
+    {
+        get => _user.Name;
+        set
+        {
+            if (_name.TrySetValue(value))
+            {
+                _user.Name = value;
+            }
+        }
+    }
+}
+```
+
+<details><summary><b>Generated code</b></summary>
+<br />
+
+`UserViewModel.BackingFields.g.cs`
+
+```csharp
+partial class UserViewModel
+{
+    [global::System.CodeDom.Compiler.GeneratedCode("UnityMvvmToolkit.Generator", "1.0.0.0")]
+    [global::UnityMvvmToolkit.Core.Attributes.Observable(nameof(Name))]
+    private readonly global::UnityMvvmToolkit.Core.Interfaces.IProperty<string> _name = new global::UnityMvvmToolkit.Core.Property<string>();
+}
+```
+
+</details>
+
+Waiting for the [partial properties](https://github.com/dotnet/csharplang/issues/6420) support to make it even shorter.
+
+```csharp
+public partial class UserViewModel : IBindingContext
+{
+    private readonly User _user;
+
+    public UserViewModel(User user)
+    {
+        _user = user;
+        _name.Value = user.Name;
+    }
+
+    [WithObservableBackingField]
+    public partial string Name { get; set; }
+}
+```
+
+> **Note:** The [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator) is available exclusively for my [patrons](https://patreon.com/DimaChebanov).
+
+#### Serializable ViewModel
+
+A common scenario, for instance, when working with collection items, is to create a "bindable" item that can be serialized.
+
+```csharp
+public class ItemViewModel : ICollectionItem
 {
     [Observable(nameof(Name))]
     private readonly IProperty<string> _name = new Property<string>();
+
+    public int Id { get; set; }
 
     public string Name
     {
@@ -386,11 +490,13 @@ public class ItemViewModel : IBindingContext
 
 The `ItemViewModel` can be serialized and deserialized without any issues.
 
-To achieve the same result, but with minimal boilerplate code, you can automatically create an observable backing field using the `[WithObservableBackingField]` attribute from [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator).
+The same result, but using the `[WithObservableBackingField]` attribute from [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator).
 
 ```csharp
-public partial class ItemViewModel : IBindingContext
+public partial class ItemViewModel : ICollectionItem
 {
+    public int Id { get; set; }
+
     [WithObservableBackingField]
     public string Name
     {
@@ -415,16 +521,6 @@ partial class ItemViewModel
 ```
 
 </details>
-
-Waiting for the [partial properties](https://github.com/dotnet/csharplang/issues/6420) support to make it even shorter.
-
-```csharp
-public partial class ItemViewModel : IBindingContext
-{
-    [WithObservableBackingField]
-    public partial string Name { get; set; }
-}
-```
 
 > **Note:** The [UnityMvvmToolkit.Generator](https://github.com/LibraStack/UnityMvvmToolkit.Generator) is available exclusively for my [patrons](https://patreon.com/DimaChebanov).
 
@@ -731,6 +827,7 @@ Once the `UnityMVVMToolkit` is installed, create a class `MyFirstViewModel` that
 
 ```csharp
 using UnityMvvmToolkit.Core;
+using UnityMvvmToolkit.Core.Interfaces;
 
 public class MyFirstViewModel : IBindingContext
 {
@@ -870,7 +967,7 @@ public class TextFieldViewModel : IBindingContext
 
 ```xml
 <ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
-    <uitk:BindableTextField binding-text-path="TextValue" />
+    <uitk:BindableTextField binding-value-path="TextValue" />
 </ui:UXML>
 ```
 
@@ -900,7 +997,7 @@ public class DropdownFieldViewModel : IBindingContext
         };
 
         Items = new ReadOnlyProperty<ObservableCollection<string>>(items);
-        SelectedItem = new Property<string>("Value 1");
+        SelectedItem = new Property<string>(items[0]);
     }
 
     public IReadOnlyProperty<ObservableCollection<string>> Items { get; }
