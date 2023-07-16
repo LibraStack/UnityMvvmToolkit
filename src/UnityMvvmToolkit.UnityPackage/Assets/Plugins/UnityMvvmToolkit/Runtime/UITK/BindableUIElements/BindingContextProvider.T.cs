@@ -49,9 +49,9 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
                 return;
             }
 
-            for (var i = 0; i < _bindableElements.Count; i++)
+            foreach (var bindableElement in _bindableElements)
             {
-                if (_bindableElements[i] is IDisposable disposable)
+                if (bindableElement is IDisposable disposable)
                 {
                     disposable.Dispose();
                 }
@@ -85,7 +85,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         protected virtual void OnSetBindingContext(IBindingContext context, IObjectProvider objectProvider,
             PropertyBindingData propertyBindingData)
         {
-            _bindingContextProperty = RentReadOnlyProperty(context, objectProvider, propertyBindingData);
+            _bindingContextProperty = RentBindingContextProperty(context, objectProvider, propertyBindingData);
             _bindingContextProperty.ValueChanged += OnBindingContextPropertyValueChanged;
 
             if (_bindingContextProperty.Value is null)
@@ -103,10 +103,11 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             objectProvider.ReturnReadOnlyProperty(_bindingContextProperty);
 
-            _bindingContextProperty = null;
-
             BindingContext = default;
             ResetChildsBindingContext(objectProvider);
+
+            _objectProvider = default;
+            _bindingContextProperty = default;
         }
 
         private void OnBindingContextPropertyValueChanged(object sender, TBindingContext bindingContext)
@@ -114,7 +115,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             SetChildsBindingContext(bindingContext, _objectProvider);
         }
 
-        protected virtual IReadOnlyProperty<TBindingContext> RentReadOnlyProperty(IBindingContext context,
+        protected virtual IReadOnlyProperty<TBindingContext> RentBindingContextProperty(IBindingContext context,
             IObjectProvider objectProvider, PropertyBindingData propertyBindingData)
         {
             return objectProvider.RentReadOnlyProperty<TBindingContext>(context, propertyBindingData);
@@ -123,18 +124,18 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetChildsBindingContext(IBindingContext bindingContext, IObjectProvider objectProvider)
         {
-            for (var i = 0; i < _bindableElements.Count; i++)
+            foreach (var bindableElement in _bindableElements)
             {
-                _bindableElements[i].SetBindingContext(bindingContext, objectProvider);
+                bindableElement.SetBindingContext(bindingContext, objectProvider);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResetChildsBindingContext(IObjectProvider objectProvider)
         {
-            for (var i = 0; i < _bindableElements.Count; i++)
+            foreach (var bindableElement in _bindableElements)
             {
-                _bindableElements[i].ResetBindingContext(objectProvider);
+                bindableElement.ResetBindingContext(objectProvider);
             }
         }
     }
