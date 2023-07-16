@@ -82,16 +82,10 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             }
         }
 
-        private void OnBindingContextPropertyValueChanged(object sender, TBindingContext bindingContext)
-        {
-            SetChildsBindingContext(bindingContext, _objectProvider);
-        }
-
         protected virtual void OnSetBindingContext(IBindingContext context, IObjectProvider objectProvider,
             PropertyBindingData propertyBindingData)
         {
-            _bindingContextProperty =
-                objectProvider.RentReadOnlyProperty<TBindingContext>(context, propertyBindingData);
+            _bindingContextProperty = RentReadOnlyProperty(context, objectProvider, propertyBindingData);
             _bindingContextProperty.ValueChanged += OnBindingContextPropertyValueChanged;
 
             if (_bindingContextProperty.Value is null)
@@ -113,6 +107,17 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             BindingContext = default;
             ResetChildsBindingContext(objectProvider);
+        }
+
+        private void OnBindingContextPropertyValueChanged(object sender, TBindingContext bindingContext)
+        {
+            SetChildsBindingContext(bindingContext, _objectProvider);
+        }
+
+        protected virtual IReadOnlyProperty<TBindingContext> RentReadOnlyProperty(IBindingContext context,
+            IObjectProvider objectProvider, PropertyBindingData propertyBindingData)
+        {
+            return objectProvider.RentReadOnlyProperty<TBindingContext>(context, propertyBindingData);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
