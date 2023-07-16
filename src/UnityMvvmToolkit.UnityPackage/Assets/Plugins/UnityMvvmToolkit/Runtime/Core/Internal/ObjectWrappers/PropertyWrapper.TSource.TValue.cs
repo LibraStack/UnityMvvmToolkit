@@ -7,7 +7,7 @@ using UnityMvvmToolkit.Core.Internal.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 {
-    internal sealed class PropertyWrapper<TSource, TValue> : IProperty<TValue>, IPropertyWrapper
+    internal class PropertyWrapper<TSource, TValue> : IProperty<TValue>, IPropertyWrapper
     {
         private readonly IPropertyValueConverter<TSource, TValue> _valueConverter;
 
@@ -53,14 +53,14 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             if (_property is not null)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(PropertyWrapper<TValue, TSource>)} was not reset.");
+                    $"{nameof(PropertyWrapper<TSource, TValue>)} was not reset.");
             }
 
             _property = (IProperty<TSource>) property;
             _property.ValueChanged += OnPropertyValueChanged;
 
             _sourceValue = _property.Value;
-            _value = _valueConverter.Convert(_sourceValue);
+            _value = Convert(_sourceValue);
 
             return this;
         }
@@ -75,7 +75,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 
             _value = value;
 
-            _sourceValue = _valueConverter.ConvertBack(value);
+            _sourceValue = ConvertBack(value);
             _property.ForceSetValue(_sourceValue);
 
             return true;
@@ -94,15 +94,24 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             if (EqualityComparer<TSource>.Default.Equals(_sourceValue, sourceValue) == false)
             {
                 _sourceValue = sourceValue;
-                _value = _valueConverter.Convert(sourceValue);
+                _value = Convert(sourceValue);
             }
 
             ValueChanged?.Invoke(this, _value);
         }
 
-        void IProperty<TValue>.ForceSetValue(TValue value)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual TValue Convert(TSource value)
         {
-            throw new NotImplementedException();
+            return _valueConverter.Convert(value);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual TSource ConvertBack(TValue value)
+        {
+            return _valueConverter.ConvertBack(value);
+        }
+
+        void IProperty<TValue>.ForceSetValue(TValue value) => throw new NotImplementedException();
     }
 }

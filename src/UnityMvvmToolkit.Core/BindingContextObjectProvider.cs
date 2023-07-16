@@ -86,6 +86,14 @@ namespace UnityMvvmToolkit.Core
             return GetProperty<IProperty<TValueType>, TValueType>(context, bindingData);
         }
 
+        public IProperty<TValueType> RentPropertyAs<TValueType>(IBindingContext context,
+            PropertyBindingData bindingData)
+        {
+            EnsureBindingDataValid(bindingData);
+
+            return GetPropertyAs<IProperty<TValueType>, TValueType>(context, bindingData);
+        }
+
         public void ReturnProperty<TValueType>(IProperty<TValueType> property)
         {
             ReturnBaseProperty(property);
@@ -97,6 +105,14 @@ namespace UnityMvvmToolkit.Core
             EnsureBindingDataValid(bindingData);
 
             return GetProperty<IReadOnlyProperty<TValueType>, TValueType>(context, bindingData);
+        }
+
+        public IReadOnlyProperty<TValueType> RentReadOnlyPropertyAs<TValueType>(IBindingContext context,
+            PropertyBindingData bindingData)
+        {
+            EnsureBindingDataValid(bindingData);
+
+            return GetPropertyAs<IReadOnlyProperty<TValueType>, TValueType>(context, bindingData);
         }
 
         public void ReturnReadOnlyProperty<TValueType>(IReadOnlyProperty<TValueType> property)
@@ -165,6 +181,18 @@ namespace UnityMvvmToolkit.Core
             }
 
             return _objectWrapperHandler.GetProperty<TProperty, TValueType>(context, bindingData, memberInfo);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private TProperty GetPropertyAs<TProperty, TValueType>(IBindingContext context, BindingData bindingData)
+            where TProperty : IBaseProperty
+        {
+            if (TryGetContextMemberInfo(context.GetType(), bindingData.PropertyName, out var memberInfo) == false)
+            {
+                throw new InvalidOperationException($"Property '{bindingData.PropertyName}' not found.");
+            }
+
+            return _objectWrapperHandler.GetPropertyAs<TProperty, TValueType>(context, memberInfo);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

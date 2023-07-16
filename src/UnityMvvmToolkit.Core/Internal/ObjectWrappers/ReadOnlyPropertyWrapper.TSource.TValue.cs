@@ -6,7 +6,7 @@ using UnityMvvmToolkit.Core.Internal.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 {
-    internal sealed class ReadOnlyPropertyWrapper<TSource, TValue> : IReadOnlyProperty<TValue>, IPropertyWrapper
+    internal class ReadOnlyPropertyWrapper<TSource, TValue> : IReadOnlyProperty<TValue>, IPropertyWrapper
     {
         private readonly IPropertyValueConverter<TSource, TValue> _valueConverter;
 
@@ -51,10 +51,10 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             if (_isInitialized)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(ReadOnlyPropertyWrapper<TValue, TSource>)} was not reset.");
+                    $"{nameof(ReadOnlyPropertyWrapper<TSource, TValue>)} was not reset.");
             }
 
-            _value = _valueConverter.Convert(((IReadOnlyProperty<TSource>) readOnlyProperty).Value);
+            _value = Convert(((IReadOnlyProperty<TSource>) readOnlyProperty).Value);
             _isInitialized = true;
 
             return this;
@@ -64,6 +64,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
         {
             _value = default;
             _isInitialized = false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual TValue Convert(TSource value)
+        {
+            return _valueConverter.Convert(value);
         }
     }
 }

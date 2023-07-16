@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
 using UnityMvvmToolkit.Core.Enums;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Extensions;
@@ -48,6 +49,54 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        public TProperty GetPropertyAs<TProperty, TValueType>(IBindingContext context, MemberInfo memberInfo)
+            where TProperty : IBaseProperty
+        {
+            var property = GetMemberValue<IBaseProperty>(context, memberInfo, out var propertyType);
+
+            var targetType = typeof(TValueType);
+            var sourceType = propertyType.GenericTypeArguments[0];
+
+            if (targetType == sourceType)
+            {
+                return (TProperty) property;
+            }
+
+            if (targetType.IsValueType || sourceType.IsValueType)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(GetPropertyAs)} is not supported for value types. Use {typeof(PropertyValueConverter<,>).Name} instead.");
+            }
+
+            if (targetType.IsAssignableFrom(sourceType) == false)
+            {
+                throw new InvalidCastException($"Can not cast the '{sourceType}' to the '{targetType}'.");
+            }
+
+            var converterId = HashCodeHelper.GetPropertyWrapperConverterId(targetType, sourceType);
+
+            if (_wrappersByConverter.TryGetValue(converterId, out var propertyWrappers))
+            {
+                if (propertyWrappers.Count > 0)
+                {
+                    return (TProperty) propertyWrappers
+                        .Dequeue()
+                        .AsPropertyWrapper()
+                        .SetProperty(property);
+                }
+            }
+            else
+            {
+                _wrappersByConverter.Add(converterId, new Queue<IObjectWrapper>());
+            }
+
+            var wrapperType = property is IProperty
+                ? typeof(PropertyCastWrapper<,>).MakeGenericType(sourceType, targetType)
+                : typeof(ReadOnlyPropertyCastWrapper<,>).MakeGenericType(sourceType, targetType);
+
+            return (TProperty) ObjectWrapperHelper.CreatePropertyWrapper(wrapperType, default, converterId, property);
         }
 
         public TProperty GetProperty<TProperty, TValueType>(IBindingContext context, BindingData bindingData,
