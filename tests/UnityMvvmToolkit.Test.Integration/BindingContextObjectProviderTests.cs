@@ -814,7 +814,7 @@ public class BindingContextObjectProviderTests
     public void Dispose_ShouldThrow_WhenReturnProperty()
     {
         // Arrange
-        var property = new PropertyWrapper<int, string>(default);
+        var property = new PropertyConvertWrapper<int, string>(default);
         var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
 
         // Act

@@ -19,7 +19,7 @@ public class PropertyWrapperTests
     public void PropertyWrapper_ShouldCreateNewPropertyWrapperInstance()
     {
         // Act
-        var propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         // Assert
         propertyWrapper.ConverterId.Should().Be(-1);
@@ -32,7 +32,7 @@ public class PropertyWrapperTests
         const int converterId = 5;
 
         var property = new Property<int>();
-        var propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         // Act
         propertyWrapper
@@ -51,7 +51,7 @@ public class PropertyWrapperTests
         // Arrange
         const int converterId = 5;
 
-        var propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         // Act
         propertyWrapper.SetConverterId(converterId);
@@ -71,7 +71,7 @@ public class PropertyWrapperTests
         const int propertyValue = 55;
 
         var property = new Property<int>(propertyValue);
-        var propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         // Act
         propertyWrapper.SetProperty(property);
@@ -89,7 +89,7 @@ public class PropertyWrapperTests
     {
         // Arrange
         var property = new Property<int>();
-        var propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         // Act
         propertyWrapper.SetProperty(property);
@@ -113,7 +113,7 @@ public class PropertyWrapperTests
         string? expectedValue = default;
 
         var property = new Property<int>(propertyValue);
-        var propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         propertyWrapper.ValueChanged += (_, newValue) =>
         {
@@ -137,7 +137,7 @@ public class PropertyWrapperTests
     public void Reset_ShouldThrow_WhenPropertyIsNull()
     {
         // Arrange
-        var propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         // Assert
         propertyWrapper
@@ -150,7 +150,7 @@ public class PropertyWrapperTests
     public void ForceSetValue_ShouldThrow()
     {
         // Arrange
-        IProperty<string> propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        IProperty<string> propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         // Assert
         propertyWrapper
@@ -169,7 +169,7 @@ public class PropertyWrapperTests
         string? expectedValue = default;
 
         var property = new Property<int>();
-        var propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         propertyWrapper.ValueChanged += (_, newValue) =>
         {
@@ -197,7 +197,7 @@ public class PropertyWrapperTests
         string? expectedValue = default;
 
         var property = new Property<int>(valueToSet);
-        var propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         propertyWrapper.ValueChanged += (_, newValue) =>
         {
@@ -225,7 +225,7 @@ public class PropertyWrapperTests
         int expectedValue = default;
 
         var property = new Property<int>();
-        var propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         property.ValueChanged += (_, newValue) =>
         {
@@ -252,7 +252,7 @@ public class PropertyWrapperTests
         int expectedValue = default;
 
         var property = new Property<int>(valueToSet);
-        var propertyWrapper = new PropertyWrapper<int, string>(_intToStrConverter);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
 
         property.ValueChanged += (_, newValue) =>
         {

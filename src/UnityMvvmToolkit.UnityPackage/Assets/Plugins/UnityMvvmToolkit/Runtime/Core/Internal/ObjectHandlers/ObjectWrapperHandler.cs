@@ -139,8 +139,8 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             var args = new object[] { valueConverter };
 
             var wrapperType = property is IProperty
-                ? typeof(PropertyWrapper<,>).MakeGenericType(sourceType, targetType)
-                : typeof(ReadOnlyPropertyWrapper<,>).MakeGenericType(sourceType, targetType);
+                ? typeof(PropertyConvertWrapper<,>).MakeGenericType(sourceType, targetType)
+                : typeof(ReadOnlyPropertyConvertWrapper<,>).MakeGenericType(sourceType, targetType);
 
             return (TProperty) ObjectWrapperHelper.CreatePropertyWrapper(wrapperType, args, converterId, property);
         }
@@ -281,7 +281,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             var itemsQueue = new Queue<IObjectWrapper>();
 
             var args = new object[] { converter };
-            var wrapperType = typeof(PropertyWrapper<,>).MakeGenericType(converter.SourceType, converter.TargetType);
+            var wrapperType = typeof(PropertyConvertWrapper<,>).MakeGenericType(converter.SourceType, converter.TargetType);
 
             for (var i = 0; i < capacity; i++)
             {

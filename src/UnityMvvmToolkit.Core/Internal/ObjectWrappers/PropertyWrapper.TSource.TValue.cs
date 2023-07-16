@@ -7,10 +7,8 @@ using UnityMvvmToolkit.Core.Internal.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 {
-    internal class PropertyWrapper<TSource, TValue> : IProperty<TValue>, IPropertyWrapper
+    internal abstract class PropertyWrapper<TSource, TValue> : IProperty<TValue>, IPropertyWrapper
     {
-        private readonly IPropertyValueConverter<TSource, TValue> _valueConverter;
-
         private int _converterId;
 
         private TValue _value;
@@ -18,10 +16,9 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
         private IProperty<TSource> _property;
 
         [Preserve]
-        public PropertyWrapper(IPropertyValueConverter<TSource, TValue> valueConverter)
+        protected PropertyWrapper()
         {
             _converterId = -1;
-            _valueConverter = valueConverter;
         }
 
         public int ConverterId => _converterId;
@@ -101,16 +98,10 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TValue Convert(TSource value)
-        {
-            return _valueConverter.Convert(value);
-        }
+        protected abstract TValue Convert(TSource value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TSource ConvertBack(TValue value)
-        {
-            return _valueConverter.ConvertBack(value);
-        }
+        protected abstract TSource ConvertBack(TValue value);
 
         void IProperty<TValue>.ForceSetValue(TValue value) => throw new NotImplementedException();
     }
