@@ -79,6 +79,31 @@ namespace UnityMvvmToolkit.Core
             return this;
         }
 
+        public bool TryRentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData,
+            out IProperty<TValueType> property)
+        {
+            EnsureBindingDataValid(bindingData);
+
+            if (TryGetContextMemberInfo(context.GetType(), bindingData.PropertyName, out var memberInfo) == false)
+            {
+                property = default;
+                return false;
+            }
+
+            var baseProperty = memberInfo.GetMemberValue<IBaseProperty>(context, out _);
+
+            if (baseProperty is IProperty<TValueType>)
+            {
+                property = _objectWrapperHandler
+                    .GetProperty<IProperty<TValueType>, TValueType>(context, bindingData, memberInfo);
+
+                return true;
+            }
+
+            property = default;
+            return false;
+        }
+
         public IProperty<TValueType> RentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData)
         {
             EnsureBindingDataValid(bindingData);

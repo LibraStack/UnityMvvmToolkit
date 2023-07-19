@@ -54,7 +54,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         public TProperty GetPropertyAs<TProperty, TValueType>(IBindingContext context, MemberInfo memberInfo)
             where TProperty : IBaseProperty
         {
-            var property = GetMemberValue<IBaseProperty>(context, memberInfo, out var propertyType);
+            var property = memberInfo.GetMemberValue<IBaseProperty>(context, out var propertyType);
 
             var targetType = typeof(TValueType);
             var sourceType = propertyType.GenericTypeArguments[0];
@@ -102,7 +102,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         public TProperty GetProperty<TProperty, TValueType>(IBindingContext context, BindingData bindingData,
             MemberInfo memberInfo) where TProperty : IBaseProperty
         {
-            var property = GetMemberValue<IBaseProperty>(context, memberInfo, out var propertyType);
+            var property = memberInfo.GetMemberValue<IBaseProperty>(context, out var propertyType);
 
             var targetType = typeof(TValueType);
             var sourceType = propertyType.GenericTypeArguments[0];
@@ -148,13 +148,13 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         public TCommand GetCommand<TCommand>(IBindingContext context, MemberInfo memberInfo)
             where TCommand : IBaseCommand
         {
-            return GetMemberValue<TCommand>(context, memberInfo, out _);
+            return memberInfo.GetMemberValue<TCommand>(context, out _);
         }
 
         public ICommandWrapper GetCommandWrapper(IBindingContext context, CommandBindingData bindingData,
             MemberInfo memberInfo)
         {
-            var command = GetMemberValue<IBaseCommand>(context, memberInfo, out var commandType);
+            var command = memberInfo.GetMemberValue<IBaseCommand>(context, out var commandType);
 
             if (commandType.IsGenericType == false ||
                 commandType.GetInterface(nameof(IBaseCommand)) == null)
@@ -351,32 +351,6 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         {
             wrapper.Reset();
             _wrappersByConverter[wrapper.ConverterId].Enqueue(wrapper);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static T GetMemberValue<T>(IBindingContext context, MemberInfo memberInfo, out Type memberType)
-        {
-            switch (memberInfo.MemberType)
-            {
-                case MemberTypes.Field:
-                {
-                    var fieldInfo = (FieldInfo) memberInfo;
-                    memberType = fieldInfo.FieldType;
-
-                    return (T) fieldInfo.GetValue(context);
-                }
-
-                case MemberTypes.Property:
-                {
-                    var propertyInfo = (PropertyInfo) memberInfo;
-                    memberType = propertyInfo.PropertyType;
-
-                    return (T) propertyInfo.GetValue(context);
-                }
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
