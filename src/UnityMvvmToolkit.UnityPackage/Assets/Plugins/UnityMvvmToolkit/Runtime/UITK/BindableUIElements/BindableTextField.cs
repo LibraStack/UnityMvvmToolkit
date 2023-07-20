@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using UnityEngine.UIElements;
 using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Extensions;
@@ -8,8 +9,10 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
     public partial class BindableTextField : TextField, IBindableElement
     {
-        private IProperty<string> _valueProperty;
         private PropertyBindingData _propertyBindingData;
+
+        private IProperty<string> _valueProperty;
+        private IReadOnlyProperty<string> _valueReadOnlyProperty;
 
         public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
@@ -20,27 +23,50 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             _propertyBindingData ??= BindingValuePath.ToPropertyBindingData();
 
-            _valueProperty = objectProvider.RentProperty<string>(context, _propertyBindingData);
-            _valueProperty.ValueChanged += OnPropertyValueChanged;
+            if (objectProvider.TryRentProperty(context, _propertyBindingData, out _valueProperty))
+            {
+                _valueReadOnlyProperty = _valueProperty;
+                this.RegisterValueChangedCallback(OnControlValueChanged);
+            }
+            else if (isReadOnly)
+            {
+                _valueReadOnlyProperty = objectProvider.RentReadOnlyProperty<string>(context, _propertyBindingData);
+            }
+            else
+            {
+                var controlName = string.IsNullOrWhiteSpace(name) ? nameof(BindableTextField) : name;
 
-            UpdateControlValue(_valueProperty.Value);
-            this.RegisterValueChangedCallback(OnControlValueChanged);
+                throw new InvalidOperationException(
+                    $"The {_propertyBindingData.PropertyName} property is read-only. Mark the {controlName} as read-only or change the property type.");
+            }
+
+            _valueReadOnlyProperty.ValueChanged += OnPropertyValueChanged;
+
+            UpdateControlValue(_valueReadOnlyProperty.Value);
         }
 
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
-            if (_valueProperty is null)
+            if (_valueReadOnlyProperty is null)
             {
                 return;
             }
 
-            _valueProperty.ValueChanged -= OnPropertyValueChanged;
+            _valueReadOnlyProperty.ValueChanged -= OnPropertyValueChanged;
 
-            objectProvider.ReturnProperty(_valueProperty);
+            if (_valueProperty is null)
+            {
+                objectProvider.ReturnReadOnlyProperty(_valueReadOnlyProperty);
+            }
+            else
+            {
+                objectProvider.ReturnProperty(_valueProperty);
+                this.UnregisterValueChangedCallback(OnControlValueChanged);
+            }
 
             _valueProperty = null;
+            _valueReadOnlyProperty = null;
 
-            this.UnregisterValueChangedCallback(OnControlValueChanged);
             UpdateControlValue(default);
         }
 

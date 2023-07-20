@@ -14,12 +14,17 @@ namespace UnityMvvmToolkit.Core.Interfaces
         IObjectProvider WarmupValueConverter<T>(int capacity, WarmupType warmupType = WarmupType.OnlyByType)
             where T : IValueConverter;
 
+        bool TryRentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData,
+            out IProperty<TValueType> property);
+
         IProperty<TValueType> RentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData);
+        IProperty<TValueType> RentPropertyAs<TValueType>(IBindingContext context, PropertyBindingData bindingData);
         void ReturnProperty<TValueType>(IProperty<TValueType> property);
 
         IReadOnlyProperty<TValueType> RentReadOnlyProperty<TValueType>(IBindingContext context,
             PropertyBindingData bindingData);
-
+        IReadOnlyProperty<TValueType> RentReadOnlyPropertyAs<TValueType>(IBindingContext context,
+            PropertyBindingData bindingData);
         void ReturnReadOnlyProperty<TValueType>(IReadOnlyProperty<TValueType> property);
 
         TCommand GetCommand<TCommand>(IBindingContext context, string propertyName) where TCommand : IBaseCommand;

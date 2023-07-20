@@ -1,9 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using UnityMvvmToolkit.Core;
-using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
 using UnityMvvmToolkit.Core.Interfaces;
-using UnityMvvmToolkit.Core.Internal.ObjectWrappers;
 
 namespace UnityMvvmToolkit.Test.Unit;
 
@@ -179,22 +177,10 @@ public class PropertyTests
     private static IEnumerable<object[]> PropertyDataSets(int defaultValue)
     {
         yield return new object[] { new Property<int>(defaultValue), defaultValue };
-
-        var converter = new IntToStrConverter();
-        var propertyWrapper = new PropertyWrapper<int, string>(converter)
-            .SetProperty(new Property<int>(defaultValue));
-
-        yield return new object[] { propertyWrapper, converter.Convert(defaultValue) };
     }
 
     private static IEnumerable<object[]> PropertyWithSetValueDataSets(int defaultValue, int valueToSet)
     {
         yield return new object[] { new Property<int>(defaultValue), defaultValue, valueToSet };
-
-        var converter = new IntToStrConverter();
-        var propertyWrapper = new PropertyWrapper<int, string>(converter)
-            .SetProperty(new Property<int>(defaultValue));
-
-        yield return new object[] { propertyWrapper, converter.Convert(defaultValue), valueToSet };
     }
 }

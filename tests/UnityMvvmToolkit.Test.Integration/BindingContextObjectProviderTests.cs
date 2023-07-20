@@ -150,6 +150,55 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
+    public void TryRentProperty_ShouldReturnProperty_WhenDataIsValid()
+    {
+        // Arrange
+        const int countValue = 69;
+
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+        var bindingContext = new MyBindingContext
+        {
+            Count = countValue,
+        };
+
+        var countPropertyBindingData = nameof(MyBindingContext.Count).ToPropertyBindingData();
+
+        // Act
+        var result =
+            objectProvider.TryRentProperty<int>(bindingContext, countPropertyBindingData, out var countProperty);
+
+        // Assert
+        countProperty
+            .Should()
+            .NotBeNull()
+            .And
+            .BeAssignableTo<IProperty<int>>()
+            .And
+            .BeAssignableTo<IReadOnlyProperty<int>>();
+
+        result.Should().BeTrue();
+        countProperty.Value.Should().Be(countValue);
+    }
+
+    [Fact]
+    public void TryRentProperty_ShouldNotReturnProperty_WhenPropertyIsReadOnly()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+        var bindingContext = new MyBindingContext();
+
+        var readOnlyPropertyBindingData = nameof(MyBindingContext.IntReadOnlyValue).ToPropertyBindingData();
+
+        // Act
+        var result =
+            objectProvider.TryRentProperty<int>(bindingContext, readOnlyPropertyBindingData, out var countProperty);
+
+        // Assert
+        result.Should().BeFalse();
+        countProperty.Should().BeNull();
+    }
+
+    [Fact]
     public void RentProperty_ShouldReturnProperty_WhenDataIsValid()
     {
         // Arrange
@@ -362,6 +411,88 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
+    public void RentPropertyAs_ShouldReturnProperty_WhenDataIsValid()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+        var bindingContext = new ParentBindingContext();
+
+        var nestedPropertyBindingData =
+            nameof(ParentBindingContext.NestedPropertyBindingContext).ToPropertyBindingData();
+
+        // Act
+        var nestedProperty =
+            objectProvider.RentPropertyAs<IBindingContext>(bindingContext, nestedPropertyBindingData);
+
+        // Assert
+        nestedProperty
+            .Should()
+            .NotBeNull()
+            .And
+            .BeAssignableTo<IProperty<IBindingContext>>()
+            .And
+            .BeAssignableTo<IReadOnlyProperty<IBindingContext>>();
+    }
+
+    [Fact]
+    public void RentPropertyAs_ShouldReturnValueTypeProperty_WhenDataIsValid()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+        var bindingContext = new ParentBindingContext();
+
+        var floatPropertyBindingData =
+            nameof(ParentBindingContext.FloatPropertyBindingContext).ToPropertyBindingData();
+
+        // Act
+        var floatProperty = objectProvider.RentPropertyAs<float>(bindingContext, floatPropertyBindingData);
+
+        // Assert
+        floatProperty
+            .Should()
+            .NotBeNull()
+            .And
+            .BeAssignableTo<IProperty<float>>()
+            .And
+            .BeAssignableTo<IReadOnlyProperty<float>>();
+    }
+
+    [Fact]
+    public void RentPropertyAs_ShouldThrow_WhenTargetTypeIsNotAssignableFromSourceType()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+        var bindingContext = new ParentBindingContext();
+
+        var nestedPropertyBindingData = nameof(ParentBindingContext.NestedProperty).ToPropertyBindingData();
+
+        // Assert
+        objectProvider
+            .Invoking(sut => sut.RentPropertyAs<IBindingContext>(bindingContext, nestedPropertyBindingData))
+            .Should()
+            .Throw<InvalidCastException>()
+            .WithMessage($"Can not cast the '{typeof(NestedClass)}' to the '{typeof(IBindingContext)}'.");
+    }
+
+    [Fact]
+    public void RentPropertyAs_ShouldThrow_WheTryingToCastValueTypes()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+        var bindingContext = new ParentBindingContext();
+
+        var floatPropertyBindingData = nameof(ParentBindingContext.FloatPropertyBindingContext).ToPropertyBindingData();
+
+        // Assert
+        objectProvider
+            .Invoking(sut => sut.RentPropertyAs<int>(bindingContext, floatPropertyBindingData))
+            .Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage(
+                $"{nameof(ObjectWrapperHandler.GetPropertyAs)} is not supported for value types. Use {typeof(PropertyValueConverter<,>).Name} instead.");
+    }
+
+    [Fact]
     public void RentReadOnlyProperty_ShouldReturnProperty_WhenDataIsValid()
     {
         // Arrange
@@ -416,6 +547,30 @@ public class BindingContextObjectProviderTests
             .BeAssignableTo<IReadOnlyProperty<bool>>();
 
         boolProperty.Value.Should().Be(resultBoolValue);
+    }
+
+    [Fact]
+    public void RentReadOnlyPropertyAs_ShouldReturnProperty_WhenDataIsValid()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+        var bindingContext = new ParentBindingContext();
+
+        var nestedReadOnlyPropertyBindingData =
+            nameof(ParentBindingContext.NestedReadOnlyPropertyBindingContext).ToPropertyBindingData();
+
+        // Act
+        var nestedReadOnlyProperty =
+            objectProvider.RentReadOnlyPropertyAs<IBindingContext>(bindingContext, nestedReadOnlyPropertyBindingData);
+
+        // Assert
+        nestedReadOnlyProperty
+            .Should()
+            .NotBeNull()
+            .And
+            .BeAssignableTo<IReadOnlyProperty<IBindingContext>>()
+            .And
+            .NotBeAssignableTo<IProperty<IBindingContext>>();
     }
 
     [Fact]
@@ -708,7 +863,7 @@ public class BindingContextObjectProviderTests
     public void Dispose_ShouldThrow_WhenReturnProperty()
     {
         // Arrange
-        var property = new PropertyWrapper<int, string>(default);
+        var property = new PropertyConvertWrapper<int, string>(default);
         var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
 
         // Act

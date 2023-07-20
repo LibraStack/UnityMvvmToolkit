@@ -6,20 +6,17 @@ using UnityMvvmToolkit.Core.Internal.Interfaces;
 
 namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
 {
-    internal sealed class ReadOnlyPropertyWrapper<TSource, TValue> : IReadOnlyProperty<TValue>, IPropertyWrapper
+    internal abstract class ReadOnlyPropertyWrapper<TSource, TValue> : IReadOnlyProperty<TValue>, IPropertyWrapper
     {
-        private readonly IPropertyValueConverter<TSource, TValue> _valueConverter;
-
         private int _converterId;
         private bool _isInitialized;
 
         private TValue _value;
 
         [Preserve]
-        public ReadOnlyPropertyWrapper(IPropertyValueConverter<TSource, TValue> valueConverter)
+        protected ReadOnlyPropertyWrapper()
         {
             _converterId = -1;
-            _valueConverter = valueConverter;
         }
 
         public int ConverterId => _converterId;
@@ -51,10 +48,10 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             if (_isInitialized)
             {
                 throw new InvalidOperationException(
-                    $"{nameof(ReadOnlyPropertyWrapper<TValue, TSource>)} was not reset.");
+                    $"{nameof(ReadOnlyPropertyWrapper<TSource, TValue>)} was not reset.");
             }
 
-            _value = _valueConverter.Convert(((IReadOnlyProperty<TSource>) readOnlyProperty).Value);
+            _value = Convert(((IReadOnlyProperty<TSource>) readOnlyProperty).Value);
             _isInitialized = true;
 
             return this;
@@ -65,5 +62,8 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectWrappers
             _value = default;
             _isInitialized = false;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected abstract TValue Convert(TSource value);
     }
 }

@@ -79,11 +79,44 @@ namespace UnityMvvmToolkit.Core
             return this;
         }
 
+        public bool TryRentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData,
+            out IProperty<TValueType> property)
+        {
+            EnsureBindingDataValid(bindingData);
+
+            if (TryGetContextMemberInfo(context.GetType(), bindingData.PropertyName, out var memberInfo) == false)
+            {
+                property = default;
+                return false;
+            }
+
+            var baseProperty = memberInfo.GetMemberValue<IBaseProperty>(context, out _);
+
+            if (baseProperty is IProperty)
+            {
+                property = _objectWrapperHandler
+                    .GetProperty<IProperty<TValueType>, TValueType>(context, bindingData, memberInfo);
+
+                return true;
+            }
+
+            property = default;
+            return false;
+        }
+
         public IProperty<TValueType> RentProperty<TValueType>(IBindingContext context, PropertyBindingData bindingData)
         {
             EnsureBindingDataValid(bindingData);
 
             return GetProperty<IProperty<TValueType>, TValueType>(context, bindingData);
+        }
+
+        public IProperty<TValueType> RentPropertyAs<TValueType>(IBindingContext context,
+            PropertyBindingData bindingData)
+        {
+            EnsureBindingDataValid(bindingData);
+
+            return GetPropertyAs<IProperty<TValueType>, TValueType>(context, bindingData);
         }
 
         public void ReturnProperty<TValueType>(IProperty<TValueType> property)
@@ -97,6 +130,14 @@ namespace UnityMvvmToolkit.Core
             EnsureBindingDataValid(bindingData);
 
             return GetProperty<IReadOnlyProperty<TValueType>, TValueType>(context, bindingData);
+        }
+
+        public IReadOnlyProperty<TValueType> RentReadOnlyPropertyAs<TValueType>(IBindingContext context,
+            PropertyBindingData bindingData)
+        {
+            EnsureBindingDataValid(bindingData);
+
+            return GetPropertyAs<IReadOnlyProperty<TValueType>, TValueType>(context, bindingData);
         }
 
         public void ReturnReadOnlyProperty<TValueType>(IReadOnlyProperty<TValueType> property)
@@ -165,6 +206,18 @@ namespace UnityMvvmToolkit.Core
             }
 
             return _objectWrapperHandler.GetProperty<TProperty, TValueType>(context, bindingData, memberInfo);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private TProperty GetPropertyAs<TProperty, TValueType>(IBindingContext context, BindingData bindingData)
+            where TProperty : IBaseProperty
+        {
+            if (TryGetContextMemberInfo(context.GetType(), bindingData.PropertyName, out var memberInfo) == false)
+            {
+                throw new InvalidOperationException($"Property '{bindingData.PropertyName}' not found.");
+            }
+
+            return _objectWrapperHandler.GetPropertyAs<TProperty, TValueType>(context, memberInfo);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

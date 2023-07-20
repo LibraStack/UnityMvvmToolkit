@@ -13,20 +13,24 @@ using UnityMvvmToolkit.UITK.Extensions;
 
 namespace UnityMvvmToolkit.UITK.BindableUIElements
 {
-    public abstract partial class BindableScrollView<TItemBindingContext> : ScrollView, IBindableCollection,
-        IInitializable, IDisposable where TItemBindingContext : ICollectionItem
+    public abstract partial class BindableScrollView<TItemBindingContext> : 
+        ScrollView, IBindableCollection, IInitializable, IDisposable 
+        where TItemBindingContext : ICollectionItem
     {
         private int _itemsCount;
 
         private VisualTreeAsset _itemTemplate;
 
         private IObjectProvider _objectProvider;
+
         private ObjectPool<VisualElement> _itemAssetsPool;
         private Dictionary<int, VisualElement> _itemAssets;
         private ObservableCollection<TItemBindingContext> _itemsSource;
 
-        protected PropertyBindingData _itemsSourceBindingData;
-        protected IReadOnlyProperty<ObservableCollection<TItemBindingContext>> _itemsSourceProperty;
+        private PropertyBindingData _itemsSourceBindingData;
+        private IReadOnlyProperty<ObservableCollection<TItemBindingContext>> _itemsSourceProperty;
+
+        protected ObservableCollection<TItemBindingContext> ItemsSource => _itemsSourceProperty?.Value;
 
         public virtual void Initialize()
         {

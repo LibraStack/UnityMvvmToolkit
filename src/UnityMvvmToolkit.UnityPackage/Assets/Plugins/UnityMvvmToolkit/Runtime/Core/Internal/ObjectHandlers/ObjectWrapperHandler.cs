@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
 using UnityMvvmToolkit.Core.Enums;
 using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Extensions;
@@ -50,10 +51,58 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             }
         }
 
+        public TProperty GetPropertyAs<TProperty, TValueType>(IBindingContext context, MemberInfo memberInfo)
+            where TProperty : IBaseProperty
+        {
+            var property = memberInfo.GetMemberValue<IBaseProperty>(context, out var propertyType);
+
+            var targetType = typeof(TValueType);
+            var sourceType = propertyType.GenericTypeArguments[0];
+
+            if (targetType == sourceType)
+            {
+                return (TProperty) property;
+            }
+
+            if (targetType.IsValueType || sourceType.IsValueType)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(GetPropertyAs)} is not supported for value types. Use {typeof(PropertyValueConverter<,>).Name} instead.");
+            }
+
+            if (targetType.IsAssignableFrom(sourceType) == false)
+            {
+                throw new InvalidCastException($"Can not cast the '{sourceType}' to the '{targetType}'.");
+            }
+
+            var converterId = HashCodeHelper.GetPropertyWrapperConverterId(targetType, sourceType);
+
+            if (_wrappersByConverter.TryGetValue(converterId, out var propertyWrappers))
+            {
+                if (propertyWrappers.Count > 0)
+                {
+                    return (TProperty) propertyWrappers
+                        .Dequeue()
+                        .AsPropertyWrapper()
+                        .SetProperty(property);
+                }
+            }
+            else
+            {
+                _wrappersByConverter.Add(converterId, new Queue<IObjectWrapper>());
+            }
+
+            var wrapperType = property is IProperty
+                ? typeof(PropertyCastWrapper<,>).MakeGenericType(sourceType, targetType)
+                : typeof(ReadOnlyPropertyCastWrapper<,>).MakeGenericType(sourceType, targetType);
+
+            return (TProperty) ObjectWrapperHelper.CreatePropertyWrapper(wrapperType, default, converterId, property);
+        }
+
         public TProperty GetProperty<TProperty, TValueType>(IBindingContext context, BindingData bindingData,
             MemberInfo memberInfo) where TProperty : IBaseProperty
         {
-            var property = GetMemberValue<IBaseProperty>(context, memberInfo, out var propertyType);
+            var property = memberInfo.GetMemberValue<IBaseProperty>(context, out var propertyType);
 
             var targetType = typeof(TValueType);
             var sourceType = propertyType.GenericTypeArguments[0];
@@ -90,8 +139,8 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             var args = new object[] { valueConverter };
 
             var wrapperType = property is IProperty
-                ? typeof(PropertyWrapper<,>).MakeGenericType(sourceType, targetType)
-                : typeof(ReadOnlyPropertyWrapper<,>).MakeGenericType(sourceType, targetType);
+                ? typeof(PropertyConvertWrapper<,>).MakeGenericType(sourceType, targetType)
+                : typeof(ReadOnlyPropertyConvertWrapper<,>).MakeGenericType(sourceType, targetType);
 
             return (TProperty) ObjectWrapperHelper.CreatePropertyWrapper(wrapperType, args, converterId, property);
         }
@@ -99,13 +148,13 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         public TCommand GetCommand<TCommand>(IBindingContext context, MemberInfo memberInfo)
             where TCommand : IBaseCommand
         {
-            return GetMemberValue<TCommand>(context, memberInfo, out _);
+            return memberInfo.GetMemberValue<TCommand>(context, out _);
         }
 
         public ICommandWrapper GetCommandWrapper(IBindingContext context, CommandBindingData bindingData,
             MemberInfo memberInfo)
         {
-            var command = GetMemberValue<IBaseCommand>(context, memberInfo, out var commandType);
+            var command = memberInfo.GetMemberValue<IBaseCommand>(context, out var commandType);
 
             if (commandType.IsGenericType == false ||
                 commandType.GetInterface(nameof(IBaseCommand)) == null)
@@ -232,7 +281,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             var itemsQueue = new Queue<IObjectWrapper>();
 
             var args = new object[] { converter };
-            var wrapperType = typeof(PropertyWrapper<,>).MakeGenericType(converter.SourceType, converter.TargetType);
+            var wrapperType = typeof(PropertyConvertWrapper<,>).MakeGenericType(converter.SourceType, converter.TargetType);
 
             for (var i = 0; i < capacity; i++)
             {
@@ -302,32 +351,6 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         {
             wrapper.Reset();
             _wrappersByConverter[wrapper.ConverterId].Enqueue(wrapper);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static T GetMemberValue<T>(IBindingContext context, MemberInfo memberInfo, out Type memberType)
-        {
-            switch (memberInfo.MemberType)
-            {
-                case MemberTypes.Field:
-                {
-                    var fieldInfo = (FieldInfo) memberInfo;
-                    memberType = fieldInfo.FieldType;
-
-                    return (T) fieldInfo.GetValue(context);
-                }
-
-                case MemberTypes.Property:
-                {
-                    var propertyInfo = (PropertyInfo) memberInfo;
-                    memberType = propertyInfo.PropertyType;
-
-                    return (T) propertyInfo.GetValue(context);
-                }
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

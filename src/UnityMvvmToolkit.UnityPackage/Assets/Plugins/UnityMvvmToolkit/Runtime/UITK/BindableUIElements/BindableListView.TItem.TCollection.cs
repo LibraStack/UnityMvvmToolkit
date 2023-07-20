@@ -19,12 +19,15 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private VisualTreeAsset _itemTemplate;
 
         private IObjectProvider _objectProvider;
+
         private List<VisualElement> _itemAssets;
         private IList<TItemBindingContext> _itemsSource;
         private Dictionary<int, TItemBindingContext> _activeItems;
 
-        protected PropertyBindingData _itemsSourceBindingData;
-        protected IReadOnlyProperty<TCollection> _itemsSourceProperty;
+        private PropertyBindingData _itemsSourceBindingData;
+        private IReadOnlyProperty<TCollection> _itemsSourceProperty;
+
+        protected TCollection ItemsSource => _itemsSourceProperty is null ? default : _itemsSourceProperty.Value;
 
         public virtual void Initialize()
         {
@@ -34,9 +37,9 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
         public virtual void Dispose()
         {
-            for (var i = 0; i < _itemAssets.Count; i++)
+            foreach (var itemAsset in _itemAssets)
             {
-                _itemAssets[i].DisposeBindableElement(_objectProvider);
+                itemAsset.DisposeBindableElement(_objectProvider);
             }
 
             _itemAssets.Clear();
