@@ -92,7 +92,7 @@ namespace UnityMvvmToolkit.Core
 
             var baseProperty = memberInfo.GetMemberValue<IBaseProperty>(context, out _);
 
-            if (baseProperty is IProperty<TValueType>)
+            if (baseProperty is IProperty)
             {
                 property = _objectWrapperHandler
                     .GetProperty<IProperty<TValueType>, TValueType>(context, bindingData, memberInfo);
