@@ -150,6 +150,55 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
+    public void TryRentProperty_ShouldReturnProperty_WhenDataIsValid()
+    {
+        // Arrange
+        const int countValue = 69;
+
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+        var bindingContext = new MyBindingContext
+        {
+            Count = countValue,
+        };
+
+        var countPropertyBindingData = nameof(MyBindingContext.Count).ToPropertyBindingData();
+
+        // Act
+        var result =
+            objectProvider.TryRentProperty<int>(bindingContext, countPropertyBindingData, out var countProperty);
+
+        // Assert
+        countProperty
+            .Should()
+            .NotBeNull()
+            .And
+            .BeAssignableTo<IProperty<int>>()
+            .And
+            .BeAssignableTo<IReadOnlyProperty<int>>();
+
+        result.Should().BeTrue();
+        countProperty.Value.Should().Be(countValue);
+    }
+
+    [Fact]
+    public void TryRentProperty_ShouldNotReturnProperty_WhenPropertyIsReadOnly()
+    {
+        // Arrange
+        var objectProvider = new BindingContextObjectProvider(Array.Empty<IValueConverter>());
+        var bindingContext = new MyBindingContext();
+
+        var readOnlyPropertyBindingData = nameof(MyBindingContext.IntReadOnlyValue).ToPropertyBindingData();
+
+        // Act
+        var result =
+            objectProvider.TryRentProperty<int>(bindingContext, readOnlyPropertyBindingData, out var countProperty);
+
+        // Assert
+        result.Should().BeFalse();
+        countProperty.Should().BeNull();
+    }
+
+    [Fact]
     public void RentProperty_ShouldReturnProperty_WhenDataIsValid()
     {
         // Arrange
