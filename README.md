@@ -1107,6 +1107,87 @@ public class UsersView : DocumentView<UsersViewModel>
 
 The `BindableScrollView` has the same binding logic as the `BindableListView`. It does not use virtualization and creates VisualElements for all items regardless of visibility.
 
+#### BindingContextProvider
+
+The `BindingContextProvider` allows you to provide a custom `IBindingContext` for all child elements.
+
+Let's say we have the following binding contexts.
+
+```csharp
+public class MainViewModel : IBindingContext
+{
+    [Observable] 
+    private readonly IReadOnlyProperty<string> _title;
+
+    [Observable]
+    private readonly IReadOnlyProperty<CustomViewModel> _customViewModel;
+
+    public MainViewModel()
+    {
+        _title = new ReadOnlyProperty<string>("Main Context");
+        _customViewModel = new ReadOnlyProperty<CustomViewModel>(new CustomViewModel());
+    }
+}
+```
+
+```csharp
+public class CustomViewModel : IBindingContext
+{
+    [Observable] 
+    private readonly IReadOnlyProperty<string> _title;
+
+    public CustomViewModel()
+    {
+        _title = new ReadOnlyProperty<string>("Custom Context");
+    }
+}
+```
+
+To provide the `CustomViewModel` as a binding context for certain elements, we have to use the `BindingContextProvider` as the parent for those elements.
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableLabel name="Label1" binding-text-path="Title" />
+<!-- Binding context not specified. Will be used MainViewModel for all childs. -->
+    <uitk:BindingContextProvider>
+        <uitk:BindableLabel name="Label2" binding-text-path="Title" />
+    </uitk:BindingContextProvider>
+<!-- Binding context is specified. Will be used CustomViewModel for all childs. -->
+    <uitk:BindingContextProvider binding-context-path="CustomViewModel">
+        <uitk:BindableLabel name="Label3" binding-text-path="Title" />
+    </uitk:BindingContextProvider>
+</ui:UXML>
+```
+
+In this example, `Label1` and `Label2` will display the text "Main Context", while `Label3` will display the text "Custom Context".
+
+We can create a `BindingContextProvider` for a specific `IBindingContext` to avoid allocating memory for a new `PropertyCastWrapper` class. Let's create a `CustomViewModelProvider` element.
+
+```csharp
+[UxmlElement]
+public partial class CustomViewModelProvider : BindingContextProvider<CustomViewModel>
+{
+}
+```
+
+> **Note:** We use a [UxmlElement](#source-code-generator) attribute to create a custom control.
+
+Now we can use the `CustomViewModelProvider` just like the default `BindingContextProvider`.
+
+```xml
+<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
+    <uitk:BindableLabel name="Label1" binding-text-path="Title" />
+<!-- Binding context not specified. Will be used MainViewModel for all childs. -->
+    <CustomViewModelProvider>
+        <uitk:BindableLabel name="Label2" binding-text-path="Title" />
+    </CustomViewModelProvider>
+<!-- Binding context is specified. Will be used CustomViewModel for all childs. -->
+    <CustomViewModelProvider binding-context-path="CustomViewModel">
+        <uitk:BindableLabel name="Label3" binding-text-path="Title" />
+    </CustomViewModelProvider>
+</ui:UXML>
+```
+
 ### Create custom control
 
 Let's create a `BindableImage` UI element.
@@ -1201,73 +1282,6 @@ public class ImageViewerViewModel : IBindingContext
     <BindableImage binding-image-path="Image" />
 </UXML>
 ```
-
-#### BindingContextProvider
-
-The `BindingContextProvider` allows you to provide a custom `IBindingContext` for all child elements.
-
-Let's say we have the following binding contexts.
-
-```csharp
-public class MainViewModel : IBindingContext
-{
-    [Observable] 
-    private readonly IReadOnlyProperty<string> _title;
-
-    [Observable]
-    private readonly IReadOnlyProperty<CustomViewModel> _customViewModel;
-
-    public MainViewModel()
-    {
-        _title = new ReadOnlyProperty<string>("Main Context");
-        _customViewModel = new ReadOnlyProperty<CustomViewModel>(new CustomViewModel());
-    }
-}
-```
-
-```csharp
-public class CustomViewModel : IBindingContext
-{
-    [Observable] 
-    private readonly IReadOnlyProperty<string> _title;
-
-    public CustomViewModel()
-    {
-        _title = new ReadOnlyProperty<string>("Custom Context");
-    }
-}
-```
-
-To provide the `CustomViewModel` as a binding context for certain elements, we have to create a `BindingContextProvider` and use it as the parent for those elements.
-
-Let's create a `CustomViewModelProvider` element.
-
-```csharp
-[UxmlElement]
-public partial class CustomViewModelProvider : BindingContextProvider<CustomViewModel>
-{
-}
-```
-
-> **Note:** We use a [UxmlElement](#source-code-generator) attribute to create a custom control.
-
-Now we can use the `CustomViewModelProvider` as follows.
-
-```xml
-<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
-    <uitk:BindableLabel name="Label1" binding-text-path="Title" />
-<!-- Binding context not specified. Will be used MainViewModel for all childs. -->
-    <CustomViewModelProvider>
-        <uitk:BindableLabel name="Label2" binding-text-path="Title" />
-    </CustomViewModelProvider>
-<!-- Binding context is specified. Will be used CustomViewModel for all childs. -->
-    <CustomViewModelProvider binding-context-path="CustomViewModel">
-        <uitk:BindableLabel name="Label3" binding-text-path="Title" />
-    </CustomViewModelProvider>
-</ui:UXML>
-```
-
-In this example, `Label1` and `Label2` will display the text "Main Context", while `Label3` will display the text "Custom Context".
 
 ### Source code generator
 
