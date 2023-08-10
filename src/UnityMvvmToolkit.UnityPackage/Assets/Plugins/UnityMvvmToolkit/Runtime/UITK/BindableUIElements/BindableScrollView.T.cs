@@ -35,7 +35,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         public virtual void Initialize()
         {
             _itemAssets = new Dictionary<int, VisualElement>();
-            _itemAssetsPool = new ObjectPool<VisualElement>(OnPoolInstantiateItem, actionOnRelease: OnPooReleaseItem,
+            _itemAssetsPool = new ObjectPool<VisualElement>(OnPoolInstantiateItem, actionOnRelease: OnPoolReleaseItem,
                 actionOnDestroy: OnPoolDestroyItem);
         }
 
@@ -215,7 +215,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             return MakeItem(_itemTemplate);
         }
 
-        private void OnPooReleaseItem(VisualElement item)
+        private void OnPoolReleaseItem(VisualElement item)
         {
             item.RemoveFromHierarchy();
         }
