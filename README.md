@@ -1017,14 +1017,6 @@ The `BindableListView` control is the most efficient way to create lists. It use
 
 The following example demonstrates how to bind to a collection of users with `BindableListView`.
 
-Create a main `UI Document` named `UsersView.uxml` with the following content.
-
-```xml
-<ui:UXML xmlns:uitk="UnityMvvmToolkit.UITK.BindableUIElements" ...>
-    <uitk:BindableListView binding-items-source-path="Users" />
-</ui:UXML>
-```
-
 Create a `UI Document` named `UserItemView.uxml` for the individual items in the list.
 
 ```xml
@@ -1056,7 +1048,7 @@ public class UserItemViewModel : ICollectionItem
 }
 ```
 
-Create a `UserListView` that inherits the `BindableListViewWrapper<TItemBindingContext>` abstract class.
+Create a `UserListView` that inherits the `BindableListView<TItemBindingContext>` abstract class.
 
 ```csharp
 public class UserListView : BindableListView<UserItemViewModel>
@@ -1086,7 +1078,7 @@ public class UsersViewModel : IBindableContext
 }
 ```
 
-Create a `UsersView` with the following content.
+Create a `UsersView` as follows.
 
 ```csharp
 public class UsersView : DocumentView<UsersViewModel>
@@ -1101,6 +1093,14 @@ public class UsersView : DocumentView<UsersViewModel>
         };
     }
 }
+```
+
+Finally, create a main `UI Document` named `UsersView.uxml` with the following content.
+
+```xml
+<ui:UXML ...>
+    <UserListView binding-items-source-path="Users" />
+</ui:UXML>
 ```
 
 #### BindableScrollView
