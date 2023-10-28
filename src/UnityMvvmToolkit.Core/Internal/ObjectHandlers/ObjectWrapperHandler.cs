@@ -79,12 +79,10 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
 
             if (_wrappersByConverter.TryGetValue(converterId, out var propertyWrappers))
             {
-                if (propertyWrappers.Count > 0)
+                var validPropertyWrapper = GetValidPropertyWrapper<TValueType>(propertyWrappers, property);
+                if (validPropertyWrapper != null)
                 {
-                    return (TProperty) propertyWrappers
-                        .Dequeue()
-                        .AsPropertyWrapper()
-                        .SetProperty(property);
+                    return (TProperty)validPropertyWrapper.SetProperty(property);
                 }
             }
             else
@@ -117,12 +115,10 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
 
             if (_wrappersByConverter.TryGetValue(converterId, out var propertyWrappers))
             {
-                if (propertyWrappers.Count > 0)
+                var validPropertyWrapper = GetValidPropertyWrapper<TValueType>(propertyWrappers, property);
+                if (validPropertyWrapper != null)
                 {
-                    return (TProperty) propertyWrappers
-                        .Dequeue()
-                        .AsPropertyWrapper()
-                        .SetProperty(property);
+                    return (TProperty)validPropertyWrapper.SetProperty(property);
                 }
             }
             else
@@ -144,6 +140,28 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
 
             return (TProperty) ObjectWrapperHelper.CreatePropertyWrapper(wrapperType, args, converterId, property);
         }
+        
+        private static IPropertyWrapper GetValidPropertyWrapper<TValueType>(Queue<IObjectWrapper> propertyWrappers, IBaseProperty property)
+        {
+            for (var i = 0; i < propertyWrappers.Count; ++i)
+            {
+                var propertyWrapper = propertyWrappers.Dequeue().AsPropertyWrapper();
+
+                if (IsValidPropertyWrapper<TValueType>(propertyWrapper, property))
+                {
+                    return propertyWrapper;
+                }
+                        
+                propertyWrappers.Enqueue(propertyWrapper);
+            }
+
+            return null;
+        }
+
+        private static bool IsValidPropertyWrapper<TValueType>(IPropertyWrapper propertyWrapper, IBaseProperty property)
+        {
+            return property is IProperty == propertyWrapper is IProperty<TValueType>; //either both implement IProperty, or both ain't
+        } 
 
         public TCommand GetCommand<TCommand>(IBindingContext context, MemberInfo memberInfo)
             where TCommand : IBaseCommand
