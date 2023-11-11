@@ -1078,7 +1078,7 @@ public class UsersViewModel : IBindableContext
 }
 ```
 
-Create a `UsersView` as follows.
+Now we need to provide an item template for the `UserItemViewModel`. Create a `UsersView` as follows.
 
 ```csharp
 public class UsersView : DocumentView<UsersViewModel>
@@ -1094,6 +1094,15 @@ public class UsersView : DocumentView<UsersViewModel>
     }
 }
 ```
+
+Starting with Unity 2023, you can select an ItemTemplate directly in the UI Builder.
+
+<details><summary>UI Builder Inspector</summary>
+<br />
+
+![collection-item-template](https://github.com/LibraStack/UnityMvvmToolkit/assets/28132516/2dba3a31-7ca9-45c3-a704-5f847262449c)
+
+</details>
 
 Finally, create a main `UI Document` named `UsersView.uxml` with the following content.
 
