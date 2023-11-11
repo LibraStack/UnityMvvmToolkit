@@ -6,23 +6,26 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
     partial class BindableListView<TItemBindingContext, TCollection>
     {
         public string BindingItemsSourcePath { get; private set; }
+        public VisualTreeAsset ItemTemplate { get; private set; }
 
 #if UNITY_2023_2_OR_NEWER
         [System.Serializable]
         public new class UxmlSerializedData : ListView.UxmlSerializedData
         {
-            // ReSharper disable once InconsistentNaming
             #pragma warning disable 649
+            // ReSharper disable once InconsistentNaming
             [UnityEngine.SerializeField] private string BindingItemsSourcePath;
+            // ReSharper disable once InconsistentNaming
+            [UnityEngine.SerializeField] private VisualTreeAsset ItemTemplate;
             #pragma warning restore 649
 
             public override void Deserialize(object visualElement)
             {
                 base.Deserialize(visualElement);
 
-                visualElement
-                    .As<BindableListView<TItemBindingContext, TCollection>>()
-                    .BindingItemsSourcePath = BindingItemsSourcePath;
+                var bindableListView = visualElement.As<BindableListView<TItemBindingContext, TCollection>>();
+                bindableListView.BindingItemsSourcePath = BindingItemsSourcePath;
+                bindableListView.ItemTemplate = ItemTemplate;
             }
         }
 #else

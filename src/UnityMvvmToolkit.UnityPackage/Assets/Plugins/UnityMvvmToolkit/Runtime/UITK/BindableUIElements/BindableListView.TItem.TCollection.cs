@@ -54,7 +54,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             }
 
             _itemsSourceBindingData ??= BindingItemsSourcePath.ToPropertyBindingData();
-            _itemTemplate ??= objectProvider.GetCollectionItemTemplate<TItemBindingContext, VisualTreeAsset>();
+            _itemTemplate ??= GetItemTemplate(objectProvider);
 
             _objectProvider = objectProvider;
 
@@ -150,6 +150,17 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             {
                 UnbindItem(item, index, itemBindingContext, _objectProvider);
             }
+        }
+
+        private VisualTreeAsset GetItemTemplate(IObjectProvider objectProvider)
+        {
+#if UNITY_2023_2_OR_NEWER
+            return ItemTemplate
+                ? ItemTemplate
+                : objectProvider.GetCollectionItemTemplate<TItemBindingContext, VisualTreeAsset>();
+#else
+            return objectProvider.GetCollectionItemTemplate<TItemBindingContext, VisualTreeAsset>();
+#endif
         }
     }
 }
