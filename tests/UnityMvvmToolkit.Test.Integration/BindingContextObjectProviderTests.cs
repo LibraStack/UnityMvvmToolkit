@@ -261,6 +261,41 @@ public class BindingContextObjectProviderTests
     }
 
     [Fact]
+    public void RentProperty_ShouldReturnValidPropertyWrapper()
+    {
+        // Arrange
+        const int countValue = 69;
+
+        var objectProvider = new BindingContextObjectProvider(new IValueConverter[]
+        {
+            new IntToStrConverter()
+        });
+
+        var bindingContext = new MyBindingContext(intValue: countValue)
+        {
+            Count = countValue
+        };
+
+        var countPropertyBindingData = nameof(MyBindingContext.Count).ToPropertyBindingData();
+        var countReadOnlyPropertyBindingData = nameof(MyBindingContext.IntReadOnlyProperty).ToPropertyBindingData();
+
+        // Act
+        var countProperty = objectProvider.RentProperty<string>(bindingContext, countPropertyBindingData);
+        var countReadOnlyProperty = objectProvider.RentReadOnlyProperty<string>(bindingContext, countReadOnlyPropertyBindingData);
+
+        objectProvider.ReturnReadOnlyProperty(countReadOnlyProperty);
+        objectProvider.ReturnProperty(countProperty);
+
+        countProperty = objectProvider.RentProperty<string>(bindingContext, countPropertyBindingData);
+        countReadOnlyProperty = objectProvider.RentReadOnlyProperty<string>(bindingContext, countReadOnlyPropertyBindingData);
+
+        // Assert
+
+        countProperty.Value.Should().Be(countValue.ToString());
+        countReadOnlyProperty.Value.Should().Be(countValue.ToString());
+    }
+
+    [Fact]
     public void RentProperty_ShouldConvertPropertyValue_WhenSourceAndTargetTypesMatch()
     {
         // Arrange
@@ -303,7 +338,7 @@ public class BindingContextObjectProviderTests
 
         var bindingContext = new MyBindingContext(intValue: intValue);
 
-        var intPropertyBindingData = nameof(MyBindingContext.IntReadOnlyProperty).ToPropertyBindingData();
+        var intPropertyBindingData = nameof(MyBindingContext.IntFakeReadOnlyProperty).ToPropertyBindingData();
 
         // Act
         IReadOnlyProperty<int> intProperty = objectProvider.RentProperty<int>(bindingContext, intPropertyBindingData);

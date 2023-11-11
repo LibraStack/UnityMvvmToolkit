@@ -32,7 +32,8 @@ public class MyBindingContext : IBindingContext
         _boolCommand = new Command<bool>(value => BoolValue = value);
 
         Title = new ReadOnlyProperty<string>(title);
-        IntReadOnlyProperty = new Property<int>(intValue);
+        IntReadOnlyProperty = new ReadOnlyProperty<int>(intValue);
+        IntFakeReadOnlyProperty = new Property<int>(intValue);
 
         FieldCommand = new Command(default);
 
@@ -56,6 +57,7 @@ public class MyBindingContext : IBindingContext
     public IReadOnlyProperty<string> Title { get; }
 
     public IReadOnlyProperty<int> IntReadOnlyProperty { get; }
+    public IReadOnlyProperty<int> IntFakeReadOnlyProperty { get; }
 
     public ICommand FieldCommand;
     public ICommand IncrementCommand { get; }
