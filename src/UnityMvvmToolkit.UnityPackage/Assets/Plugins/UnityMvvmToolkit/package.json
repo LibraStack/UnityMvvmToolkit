@@ -2,7 +2,7 @@
     "name": "com.chebanovdd.unitymvvmtoolkit",
     "displayName": "Unity MVVM Toolkit",
     "author": { "name": "ChebanovDD", "url": "https://github.com/ChebanovDD" },
-    "version": "1.1.8",
+    "version": "1.1.9",
     "unity": "2018.4",
     "description": "The Unity Mvvm Toolkit allows you to use data binding to establish a connection between the app UI and the data it displays. This is a simple and consistent way to achieve clean separation of business logic from UI.",
     "keywords": [ "mvvm", "binding", "ui", "toolkit" ],
