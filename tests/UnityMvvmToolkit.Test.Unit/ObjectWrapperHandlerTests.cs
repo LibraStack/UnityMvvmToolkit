@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using NSubstitute;
+using UnityMvvmToolkit.Core;
 using UnityMvvmToolkit.Core.Converters.ParameterValueConverters;
 using UnityMvvmToolkit.Core.Converters.PropertyValueConverters;
 using UnityMvvmToolkit.Core.Enums;
@@ -7,6 +8,7 @@ using UnityMvvmToolkit.Core.Interfaces;
 using UnityMvvmToolkit.Core.Internal.Helpers;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
 using UnityMvvmToolkit.Core.Internal.ObjectHandlers;
+using UnityMvvmToolkit.Core.Internal.ObjectWrappers;
 
 namespace UnityMvvmToolkit.Test.Unit;
 
@@ -35,8 +37,9 @@ public class ObjectWrapperHandlerTests
         // Arrange
         var converterId = HashCodeHelper.GetPropertyWrapperConverterId(_intToStrConverter);
 
-        var propertyWrapper = Substitute.For<IPropertyWrapper>();
-        propertyWrapper.ConverterId.Returns(converterId);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter)
+            .SetProperty(new Property<int>())
+            .SetConverterId(converterId);
 
         var objectWrapperHandler = new ObjectWrapperHandler(_valueConverterHandler);
 
@@ -56,8 +59,9 @@ public class ObjectWrapperHandlerTests
         // Arrange
         var converterId = HashCodeHelper.GetPropertyWrapperConverterId(_intToStrConverter, _intToStrConverter.Name);
 
-        var propertyWrapper = Substitute.For<IPropertyWrapper>();
-        propertyWrapper.ConverterId.Returns(converterId);
+        var propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter)
+            .SetProperty(new Property<int>())
+            .SetConverterId(converterId);
 
         var objectWrapperHandler = new ObjectWrapperHandler(_valueConverterHandler);
 
@@ -80,11 +84,13 @@ public class ObjectWrapperHandlerTests
         var converterIdByName =
             HashCodeHelper.GetPropertyWrapperConverterId(_intToStrConverter, _intToStrConverter.Name);
 
-        var propertyWrapperByType = Substitute.For<IPropertyWrapper>();
-        propertyWrapperByType.ConverterId.Returns(converterIdByType);
+        var propertyWrapperByType = new PropertyConvertWrapper<int, string>(_intToStrConverter)
+            .SetProperty(new Property<int>())
+            .SetConverterId(converterIdByType);
 
-        var propertyWrapperByName = Substitute.For<IPropertyWrapper>();
-        propertyWrapperByName.ConverterId.Returns(converterIdByName);
+        var propertyWrapperByName = new PropertyConvertWrapper<int, string>(_intToStrConverter)
+            .SetProperty(new Property<int>())
+            .SetConverterId(converterIdByName);
 
         var objectWrapperHandler = new ObjectWrapperHandler(_valueConverterHandler);
 
@@ -108,6 +114,7 @@ public class ObjectWrapperHandlerTests
     {
         // Arrange
         const int elementId = 55;
+
         var converterId = HashCodeHelper.GetCommandWrapperConverterId(_parameterToIntConverter);
 
         var commandWrapper = Substitute.For<ICommandWrapper>();
@@ -130,6 +137,7 @@ public class ObjectWrapperHandlerTests
     {
         // Arrange
         const int elementId = 55;
+
         var converterId =
             HashCodeHelper.GetCommandWrapperConverterId(_parameterToIntConverter, _parameterToIntConverter.Name);
 
@@ -154,6 +162,7 @@ public class ObjectWrapperHandlerTests
     {
         // Arrange
         const int elementId = 55;
+
         var converterIdByType =
             HashCodeHelper.GetCommandWrapperConverterId(_parameterToIntConverter);
         var converterIdByName =
@@ -202,8 +211,9 @@ public class ObjectWrapperHandlerTests
         // Arrange
         var converterId = HashCodeHelper.GetPropertyWrapperConverterId(_intToStrConverter);
 
-        var propertyWrapper = Substitute.For<IPropertyWrapper>();
-        propertyWrapper.ConverterId.Returns(converterId);
+        PropertyWrapper<int, string> propertyWrapper = new PropertyConvertWrapper<int, string>(_intToStrConverter);
+        propertyWrapper.SetProperty(new Property<int>(69))
+            .SetConverterId(converterId);
 
         var objectWrapperHandler = new ObjectWrapperHandler(_valueConverterHandler);
 
@@ -212,7 +222,7 @@ public class ObjectWrapperHandlerTests
         objectWrapperHandler.ReturnProperty(propertyWrapper);
 
         // Assert
-        propertyWrapper.Received(1).Reset();
+        propertyWrapper.Value.Should().Be(default);
     }
 
     [Fact]

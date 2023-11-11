@@ -14,6 +14,8 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
 {
     internal sealed class ObjectWrapperHandler : IDisposable
     {
+        private static readonly int ReadOnlyPropertyHashCode = typeof(IReadOnlyProperty<>).GetHashCode();
+
         private readonly ValueConverterHandler _valueConverterHandler;
 
         private readonly Dictionary<int, ICommandWrapper> _commandWrappers;
@@ -77,22 +79,18 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
 
             var converterId = HashCodeHelper.GetPropertyWrapperConverterId(targetType, sourceType);
 
-            if (_wrappersByConverter.TryGetValue(converterId, out var propertyWrappers))
+            var isProperty = property is IProperty;
+
+            var wrapperId = isProperty ? converterId : GetReadOnlyWrapperId(converterId);
+
+            if (TryGetObjectWrapper(wrapperId, out var objectWrapper))
             {
-                if (propertyWrappers.Count > 0)
-                {
-                    return (TProperty) propertyWrappers
-                        .Dequeue()
-                        .AsPropertyWrapper()
-                        .SetProperty(property);
-                }
-            }
-            else
-            {
-                _wrappersByConverter.Add(converterId, new Queue<IObjectWrapper>());
+                return (TProperty) objectWrapper
+                    .AsPropertyWrapper()
+                    .SetProperty(property);
             }
 
-            var wrapperType = property is IProperty
+            var wrapperType = isProperty
                 ? typeof(PropertyCastWrapper<,>).MakeGenericType(sourceType, targetType)
                 : typeof(ReadOnlyPropertyCastWrapper<,>).MakeGenericType(sourceType, targetType);
 
@@ -115,19 +113,15 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             var converterId =
                 HashCodeHelper.GetPropertyWrapperConverterId(targetType, sourceType, bindingData.ConverterName);
 
-            if (_wrappersByConverter.TryGetValue(converterId, out var propertyWrappers))
+            var isProperty = property is IProperty;
+
+            var wrapperId = isProperty ? converterId : GetReadOnlyWrapperId(converterId);
+
+            if (TryGetObjectWrapper(wrapperId, out var objectWrapper))
             {
-                if (propertyWrappers.Count > 0)
-                {
-                    return (TProperty) propertyWrappers
-                        .Dequeue()
-                        .AsPropertyWrapper()
-                        .SetProperty(property);
-                }
-            }
-            else
-            {
-                _wrappersByConverter.Add(converterId, new Queue<IObjectWrapper>());
+                return (TProperty) objectWrapper
+                    .AsPropertyWrapper()
+                    .SetProperty(property);
             }
 
             if (_valueConverterHandler.TryGetValueConverterById(converterId, out var valueConverter) == false)
@@ -138,7 +132,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
 
             var args = new object[] { valueConverter };
 
-            var wrapperType = property is IProperty
+            var wrapperType = isProperty
                 ? typeof(PropertyConvertWrapper<,>).MakeGenericType(sourceType, targetType)
                 : typeof(ReadOnlyPropertyConvertWrapper<,>).MakeGenericType(sourceType, targetType);
 
@@ -177,20 +171,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             var converterId =
                 HashCodeHelper.GetCommandWrapperConverterId(commandValueType, bindingData.ConverterName);
 
-            if (_wrappersByConverter.TryGetValue(converterId, out var commandWrappers))
+            if (TryGetObjectWrapper(converterId, out var objectWrapper))
             {
-                if (commandWrappers.Count > 0)
-                {
-                    return commandWrappers
-                        .Dequeue()
-                        .AsCommandWrapper()
-                        .SetCommand(commandId, command)
-                        .RegisterParameter(bindingData.ElementId, bindingData.ParameterValue);
-                }
-            }
-            else
-            {
-                _wrappersByConverter.Add(converterId, new Queue<IObjectWrapper>());
+                return objectWrapper
+                    .AsCommandWrapper()
+                    .SetCommand(commandId, command)
+                    .RegisterParameter(bindingData.ElementId, bindingData.ParameterValue);
             }
 
             if (_valueConverterHandler.TryGetValueConverterById(converterId, out var valueConverter) == false)
@@ -215,7 +201,7 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         {
             AssureIsNotDisposed();
 
-            ReturnWrapper(propertyWrapper);
+            ReturnObjectWrapper(propertyWrapper);
         }
 
         public void ReturnCommandWrapper(ICommandWrapper commandWrapper, int elementId)
@@ -228,7 +214,8 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             }
 
             _commandWrappers.Remove(commandWrapper.CommandId);
-            ReturnWrapper(commandWrapper);
+
+            ReturnObjectWrapper(commandWrapper);
         }
 
         public void Dispose()
@@ -347,10 +334,41 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ReturnWrapper(IObjectWrapper wrapper)
+        private bool TryGetObjectWrapper(int wrapperId, out IObjectWrapper objectWrapper)
+        {
+            if (_wrappersByConverter.TryGetValue(wrapperId, out var objectWrappers))
+            {
+                if (objectWrappers.Count > 0)
+                {
+                    objectWrapper = objectWrappers.Dequeue();
+                    return true;
+                }
+            }
+            else
+            {
+                _wrappersByConverter.Add(wrapperId, new Queue<IObjectWrapper>());
+            }
+
+            objectWrapper = default;
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ReturnObjectWrapper(IObjectWrapper wrapper)
         {
             wrapper.Reset();
-            _wrappersByConverter[wrapper.ConverterId].Enqueue(wrapper);
+
+            switch (wrapper)
+            {
+                case IProperty:
+                case ICommandWrapper:
+                    _wrappersByConverter[wrapper.ConverterId].Enqueue(wrapper);
+                    break;
+
+                default:
+                    _wrappersByConverter[GetReadOnlyWrapperId(wrapper.ConverterId)].Enqueue(wrapper);
+                    break;
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -360,6 +378,12 @@ namespace UnityMvvmToolkit.Core.Internal.ObjectHandlers
             {
                 throw new ObjectDisposedException(nameof(ObjectWrapperHandler));
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int GetReadOnlyWrapperId(int wrapperConverterId)
+        {
+            return HashCodeHelper.CombineHashCode(wrapperConverterId, ReadOnlyPropertyHashCode);
         }
     }
 }

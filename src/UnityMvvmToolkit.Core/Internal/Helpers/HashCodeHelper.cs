@@ -27,12 +27,7 @@ namespace UnityMvvmToolkit.Core.Internal.Helpers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetPropertyConverterHashCode(IPropertyValueConverter converter, string converterName = null)
         {
-            var targetTypeHash = converter.TargetType.GetHashCode();
-            var sourceTypeHash = converter.SourceType.GetHashCode();
-
-            return string.IsNullOrWhiteSpace(converterName)
-                ? CombineHashCode(targetTypeHash, sourceTypeHash)
-                : CombineHashCode(converterName.GetHashCode(), targetTypeHash, sourceTypeHash);
+            return GetPropertyWrapperConverterId(converter.TargetType, converter.SourceType, converterName);
         }
 
         /// <summary>
