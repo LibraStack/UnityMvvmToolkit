@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityMvvmToolkit.Core.Attributes;
 using UnityMvvmToolkit.Core.Interfaces;
+using UnityMvvmToolkit.Core.Internal.Extensions;
 using UnityMvvmToolkit.Core.Internal.Helpers;
 using UnityMvvmToolkit.Core.Internal.Interfaces;
 
@@ -20,7 +21,7 @@ namespace UnityMvvmToolkit.Core.Internal
             }
 
             var memberInfosSpan = bindingContextType
-                .GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .GetAllMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .AsSpan();
 
             for (var i = 0; i < memberInfosSpan.Length; i++)
