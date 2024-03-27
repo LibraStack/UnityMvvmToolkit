@@ -33,16 +33,25 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             clicked += OnButtonClicked;
             SetControlEnabled(_command.CanExecute());
 
-            _propertyBindingData ??= BindingTextPath.ToPropertyBindingData();
-
-            _textProperty = objectProvider.RentReadOnlyProperty<string>(context, _propertyBindingData);
-            _textProperty.ValueChanged += OnPropertyValueChanged;
-
-            UpdateControlText(_textProperty.Value);
+            if (!string.IsNullOrWhiteSpace(BindingTextPath))
+            {
+                _propertyBindingData ??= BindingTextPath.ToPropertyBindingData();
+                _textProperty = objectProvider.RentReadOnlyProperty<string>(context, _propertyBindingData);
+                _textProperty.ValueChanged += OnPropertyValueChanged;
+                UpdateControlText(_textProperty.Value);
+            }
         }
 
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
+            if (_textProperty != null)
+            {
+                _textProperty.ValueChanged -= OnPropertyValueChanged;
+                objectProvider.ReturnReadOnlyProperty(_textProperty);
+                _textProperty = null;
+                UpdateControlText(null);
+            }
+
             if (_command is null)
             {
                 return;
@@ -56,6 +65,7 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             clicked -= OnButtonClicked;
             SetControlEnabled(true);
+
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
