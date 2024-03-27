@@ -10,7 +10,9 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private int? _buttonId;
 
         private IBaseCommand _command;
+        private IReadOnlyProperty<string> _textProperty;
         private CommandBindingData _commandBindingData;
+        private PropertyBindingData _propertyBindingData;
 
         public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
@@ -30,10 +32,26 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             clicked += OnButtonClicked;
             SetControlEnabled(_command.CanExecute());
+
+            if (!string.IsNullOrWhiteSpace(BindingTextPath))
+            {
+                _propertyBindingData ??= BindingTextPath.ToPropertyBindingData();
+                _textProperty = objectProvider.RentReadOnlyProperty<string>(context, _propertyBindingData);
+                _textProperty.ValueChanged += OnPropertyValueChanged;
+                UpdateControlText(_textProperty.Value);
+            }
         }
 
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
         {
+            if (_textProperty != null)
+            {
+                _textProperty.ValueChanged -= OnPropertyValueChanged;
+                objectProvider.ReturnReadOnlyProperty(_textProperty);
+                _textProperty = null;
+                UpdateControlText(null);
+            }
+
             if (_command is null)
             {
                 return;
@@ -47,6 +65,13 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             clicked -= OnButtonClicked;
             SetControlEnabled(true);
+
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual void UpdateControlText(string newText)
+        {
+            text = newText;
         }
 
         private void OnButtonClicked()
@@ -63,6 +88,11 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private void SetControlEnabled(bool isEnabled)
         {
             Enabled = isEnabled;
+        }
+
+        private void OnPropertyValueChanged(object sender, string newText)
+        {
+            UpdateControlText(newText);
         }
     }
 }
