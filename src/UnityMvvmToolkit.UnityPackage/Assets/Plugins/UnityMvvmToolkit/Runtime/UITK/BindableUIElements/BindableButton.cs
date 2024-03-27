@@ -10,7 +10,9 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private int? _buttonId;
 
         private IBaseCommand _command;
+        private IReadOnlyProperty<string> _textProperty;
         private CommandBindingData _commandBindingData;
+        private PropertyBindingData _propertyBindingData;
 
         public virtual void SetBindingContext(IBindingContext context, IObjectProvider objectProvider)
         {
@@ -30,6 +32,13 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
 
             clicked += OnButtonClicked;
             SetControlEnabled(_command.CanExecute());
+
+            _propertyBindingData ??= BindingTextPath.ToPropertyBindingData();
+
+            _textProperty = objectProvider.RentReadOnlyProperty<string>(context, _propertyBindingData);
+            _textProperty.ValueChanged += OnPropertyValueChanged;
+
+            UpdateControlText(_textProperty.Value);
         }
 
         public virtual void ResetBindingContext(IObjectProvider objectProvider)
@@ -49,6 +58,12 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
             SetControlEnabled(true);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual void UpdateControlText(string newText)
+        {
+            text = newText;
+        }
+
         private void OnButtonClicked()
         {
             _command.Execute(_buttonId!.Value);
@@ -63,6 +78,11 @@ namespace UnityMvvmToolkit.UITK.BindableUIElements
         private void SetControlEnabled(bool isEnabled)
         {
             Enabled = isEnabled;
+        }
+
+        private void OnPropertyValueChanged(object sender, string newText)
+        {
+            UpdateControlText(newText);
         }
     }
 }
